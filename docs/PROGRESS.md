@@ -10,10 +10,10 @@ Implementing the "Enaf" wellness and productivity app in Jetpack Compose, based 
 - [x] Home Dashboard (UI Shell complete)
 - [x] Onboarding Screen (UI complete)
 - [x] Auth Screens (Login/Sign Up) (UI complete)
-- [ ] Screen Time Planner (In Progress)
-- [ ] Habit Insights
-- [ ] Settings Screen
-- [ ] Time's Up Overlay
+- [x] Screen Time Planner (UI complete)
+- [x] Habit Insights (UI complete)
+- [x] Settings Screen (UI complete)
+- [ ] Time's Up Overlay (In Progress)
 
 ---
 
@@ -32,8 +32,8 @@ Implementing the "Enaf" wellness and productivity app in Jetpack Compose, based 
 - [x] `AppUsageItem`: Item for habit/app usage list.
 - [x] `EnafButton`: High-fidelity primary button with glow.
 - [x] `EnafTextField`: Themed input field for auth and search.
-- [ ] `GlobalLimitCard`: Hero card with slider for planner.
-- [ ] `GlassCard`: Generic wrapper for glassmorphism effect.
+- [x] `GlobalLimitCard`: Hero card with slider for planner.
+- [ ] `TimesUpModal`: Warning overlay for app limits.
 
 ### 3. Onboarding Screen (`ui.screens.onboarding`)
 - [x] **Background**: Kinetic Light Elements (Gradients + Blurs).
@@ -52,14 +52,19 @@ Implementing the "Enaf" wellness and productivity app in Jetpack Compose, based 
 - [x] **Motivational Card**: `MotivationalCard`.
 
 ### 6. Screen Time Planner (`ui.screens.planner`)
-- [ ] **Global Limit Card**: Slider and usage indicators.
-- [ ] **Search & Filter**: Using `EnafTextField`.
-- [ ] **App Limit List**: Bento style grid for apps like TikTok, YouTube.
+- [x] **Global Limit Card**: Slider and usage indicators.
+- [x] **Search & Filter**: Using `EnafTextField`.
+- [x] **App Limit List**: Bento style grid for apps like TikTok, YouTube.
 
 ### 7. Habit Insights (`ui.screens.insights`)
-- [ ] **Monthly Streak Hero**.
-- [ ] **Average Completion Graph**.
-- [ ] **Category Distribution Donut Chart**.
+- [x] **Monthly Streak Hero**.
+- [x] **Average Completion Graph**.
+- [x] **Category Distribution Donut Chart**.
+
+### 8. Settings Screen (`ui.screens.settings`)
+- [x] **Profile Card**.
+- [x] **Anti-Procrastination Toggles**.
+- [x] **Appearance Selector**.
 
 ---
 
