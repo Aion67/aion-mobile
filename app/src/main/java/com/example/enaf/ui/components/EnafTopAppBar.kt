@@ -1,25 +1,21 @@
 package com.example.enaf.ui.components
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.enaf.R
 import com.example.enaf.ui.theme.*
 
 @Composable
@@ -32,18 +28,14 @@ fun EnafTopAppBar(
         modifier = modifier
             .fillMaxWidth()
             .height(64.dp),
-        color = EnafHeaderBg,
-        border = WindowInsets.statusBars.asPaddingValues().let {
-            // Adding a bottom border as per Figma rgba(30, 41, 59, 0.2)
-            null // Surface doesn't support partial borders easily, we'll use a Box
-        }
+        color = EnafHeaderBg
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
         ) {
             // Bottom Border
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 color = EnafHeaderBorder,
                 thickness = 1.dp
@@ -70,11 +62,11 @@ fun EnafTopAppBar(
                             .padding(1.dp)
                             .clip(CircleShape)
                     ) {
-                        // Using a placeholder image for now
+                        // Using a placeholder icon
                         Icon(
-                            imageVector = Icons.Default.Notifications, // Placeholder
+                            imageVector = Icons.Default.Person,
                             contentDescription = "Profile",
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.size(24.dp),
                             tint = Color.Gray
                         )
                     }

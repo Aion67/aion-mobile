@@ -7,11 +7,10 @@ Implementing the "Enaf" wellness and productivity app in Jetpack Compose, based 
 - [x] Initial Project Setup
 - [x] Navigation Structure (MainActivity refactor)
 - [x] Design System (Colors, Theme)
-- [ ] Components Library (In Progress)
-- [ ] Onboarding Screen
-- [ ] Auth Screens (Login/Sign Up)
-- [ ] Home Dashboard
-- [ ] Screen Time Planner
+- [x] Home Dashboard (UI Shell complete)
+- [x] Onboarding Screen (UI complete)
+- [x] Auth Screens (Login/Sign Up) (UI complete)
+- [ ] Screen Time Planner (In Progress)
 - [ ] Habit Insights
 - [ ] Settings Screen
 - [ ] Time's Up Overlay
@@ -28,21 +27,36 @@ Implementing the "Enaf" wellness and productivity app in Jetpack Compose, based 
 
 ### 2. Common Components (`ui.components`)
 - [x] `MotivationalCard`: The anti-procrastination card with fear reminder.
+- [x] `EnafTopAppBar`: Header with profile and notifications.
+- [x] `DailySummaryCard`: Hero card with circular progress.
+- [x] `AppUsageItem`: Item for habit/app usage list.
+- [x] `EnafButton`: High-fidelity primary button with glow.
+- [x] `EnafTextField`: Themed input field for auth and search.
+- [ ] `GlobalLimitCard`: Hero card with slider for planner.
 - [ ] `GlassCard`: Generic wrapper for glassmorphism effect.
-- [ ] `BentoCard`: Base for different dashboard cards.
-- [ ] `BottomNavBar`: Custom icons and active states.
-- [ ] `PulseButton`: Primary CTA button with glow.
 
-### 3. Home Dashboard (`ui.screens.home`)
-- [ ] **Hero Section**: Daily Summary Card (Bento Layout).
-- [ ] **Habits Section**: Today's Habits asymmetric list.
-- [ ] **Motivational Card**: (Implemented).
+### 3. Onboarding Screen (`ui.screens.onboarding`)
+- [x] **Background**: Kinetic Light Elements (Gradients + Blurs).
+- [x] **Carousel**: Pager implementation with custom indicators.
+- [x] **Typography**: "Heading 1" and descriptive text.
 
-### 4. Screen Time Planner (`ui.screens.planner`)
+### 4. Auth Screens (`ui.screens.auth`)
+- [x] **Sign Up Screen**: "Join the Enaf journey".
+- [x] **Login Screen**: (Similar structure).
+- [x] **Social Buttons**: Google/Apple login implementation.
+
+### 5. Home Dashboard (`ui.screens.home`)
+- [x] **Header**: `EnafTopAppBar`.
+- [x] **Hero Section**: `DailySummaryCard`.
+- [x] **Habits Section**: Today's Habits list using `AppUsageItem`.
+- [x] **Motivational Card**: `MotivationalCard`.
+
+### 6. Screen Time Planner (`ui.screens.planner`)
 - [ ] **Global Limit Card**: Slider and usage indicators.
+- [ ] **Search & Filter**: Using `EnafTextField`.
 - [ ] **App Limit List**: Bento style grid for apps like TikTok, YouTube.
 
-### 5. Habit Insights (`ui.screens.insights`)
+### 7. Habit Insights (`ui.screens.insights`)
 - [ ] **Monthly Streak Hero**.
 - [ ] **Average Completion Graph**.
 - [ ] **Category Distribution Donut Chart**.
