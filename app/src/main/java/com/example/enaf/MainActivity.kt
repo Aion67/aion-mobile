@@ -7,9 +7,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -21,8 +22,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import com.example.enaf.ui.theme.EnafTheme
 
 class MainActivity : ComponentActivity() {
@@ -37,11 +36,11 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@PreviewScreenSizes
 @Composable
 fun EnafApp() {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
 
+    // NavigationSuiteScaffold handles the transition between BottomBar and NavigationRail
     NavigationSuiteScaffold(
         navigationSuiteItems = {
             AppDestinations.entries.forEach {
@@ -60,12 +59,23 @@ fun EnafApp() {
         }
     ) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Greeting(
-                name = "Android",
-                modifier = Modifier.padding(innerPadding)
-            )
+            // Placeholder for NavHost - Logic for switching screens goes here
+            when (currentDestination) {
+                AppDestinations.HOME -> PlaceholderScreen("Home Dashboard", innerPadding)
+                AppDestinations.PLANNER -> PlaceholderScreen("Screen Time Planner", innerPadding)
+                AppDestinations.INSIGHTS -> PlaceholderScreen("Habit Insights", innerPadding)
+                AppDestinations.SETTINGS -> PlaceholderScreen("Settings", innerPadding)
+            }
         }
     }
+}
+
+@Composable
+fun PlaceholderScreen(title: String, padding: androidx.compose.foundation.layout.PaddingValues) {
+    Text(
+        text = title,
+        modifier = Modifier.padding(padding).fillMaxSize()
+    )
 }
 
 enum class AppDestinations(
@@ -73,22 +83,7 @@ enum class AppDestinations(
     val icon: ImageVector,
 ) {
     HOME("Home", Icons.Default.Home),
-    FAVORITES("Favorites", Icons.Default.Favorite),
-    PROFILE("Profile", Icons.Default.AccountBox),
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    EnafTheme {
-        Greeting("Android")
-    }
+    PLANNER("Planner", Icons.Default.DateRange),
+    INSIGHTS("Insights", Icons.Default.Info),
+    SETTINGS("Settings", Icons.Default.Settings),
 }
