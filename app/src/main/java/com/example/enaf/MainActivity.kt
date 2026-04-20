@@ -13,6 +13,8 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.runtime.Composable
@@ -48,9 +50,9 @@ fun EnafApp() {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
 
     NavigationSuiteScaffold(
-        layoutType = NavigationSuiteScaffoldDefaults.calculateLayoutType(),
+        layoutType = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(currentWindowAdaptiveInfo()),
         containerColor = EnafDarkBg,
-        navigationSuiteColors = NavigationSuiteScaffoldDefaults.colors(
+        navigationSuiteColors = NavigationSuiteDefaults.colors(
             navigationBarContainerColor = EnafHeaderBg,
             navigationBarContentColor = Color.White,
             navigationRailContainerColor = EnafHeaderBg
