@@ -11,9 +11,10 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel(
     private val localRepository: LocalRepository,
+    initialMode: AuthMode = AuthMode.SIGN_UP,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AuthUiState())
+    private val _uiState = MutableStateFlow(AuthUiState(mode = initialMode))
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
     fun onEvent(event: AuthUiEvent, onAuthSuccess: () -> Unit = {}) {
