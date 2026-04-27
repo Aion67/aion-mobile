@@ -49,6 +49,7 @@ interface LocalRepository {
     suspend fun upsertSettings(settings: SettingsEntity)
 
     fun observeAchievementCache(userId: String): Flow<List<AchievementCacheEntity>>
+    suspend fun getAchievementCache(userId: String): List<AchievementCacheEntity>
     suspend fun upsertAchievementCache(entry: AchievementCacheEntity)
     suspend fun upsertAchievementCache(entries: List<AchievementCacheEntity>)
     suspend fun clearAchievementCache(userId: String)

@@ -131,6 +131,10 @@ class RoomLocalRepository(
         return database.achievementCacheDao().observeByUser(userId)
     }
 
+    override suspend fun getAchievementCache(userId: String): List<AchievementCacheEntity> {
+        return database.achievementCacheDao().getByUser(userId)
+    }
+
     override suspend fun upsertAchievementCache(entry: AchievementCacheEntity) {
         database.achievementCacheDao().upsert(entry)
     }

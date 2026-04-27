@@ -39,6 +39,8 @@ import com.example.enaf.ui.theme.EnafTheme
 @Composable
 fun LevelsScreen(
     modifier: Modifier = Modifier,
+    uiState: LevelsUiState = levelsPreviewState(),
+    onEvent: (LevelsUiEvent) -> Unit = {},
 ) {
     Scaffold(
         topBar = { EnafTopAppBar() },
@@ -62,12 +64,20 @@ fun LevelsScreen(
             }
 
             item {
-                LevelCard(
-                    level = 12,
-                    title = "Veteran",
-                    xp = 1480,
-                    xpToNext = 2000,
-                )
+                if (uiState.isLoading) {
+                    Text(
+                        text = "Loading levels...",
+                        color = EnafTextSecondary,
+                        fontSize = 13.sp,
+                    )
+                } else {
+                    LevelCard(
+                        level = uiState.level,
+                        title = uiState.title,
+                        xp = uiState.currentXpInLevel,
+                        xpToNext = uiState.xpToNextLevel,
+                    )
+                }
             }
 
             item {
@@ -81,9 +91,9 @@ fun LevelsScreen(
 
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    UnlockRow("Level 13", "Lore Theme: Iron Discipline")
-                    UnlockRow("Level 14", "+1 Daily Streak Shield")
-                    UnlockRow("Level 15", "Elite Tier Leaderboard Badge")
+                    uiState.unlocks.forEach { unlock ->
+                        UnlockRow(unlock.levelText, unlock.rewardText)
+                    }
                 }
             }
         }

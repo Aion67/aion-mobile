@@ -38,6 +38,8 @@ import com.example.enaf.ui.theme.EnafTheme
 @Composable
 fun RoadmapScreen(
     modifier: Modifier = Modifier,
+    uiState: RoadmapUiState = roadmapPreviewState(),
+    onEvent: (RoadmapUiEvent) -> Unit = {},
 ) {
     Scaffold(
         topBar = { EnafTopAppBar() },
@@ -62,7 +64,7 @@ fun RoadmapScreen(
 
             item {
                 Text(
-                    text = "Complete milestones to level up and unlock stronger anti-distraction powers.",
+                    text = uiState.subtitle,
                     color = EnafTextMuted,
                     fontSize = 13.sp,
                     lineHeight = 18.sp
@@ -70,31 +72,23 @@ fun RoadmapScreen(
             }
 
             item {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    MilestoneCard(
-                        title = "Week 1: Recruit",
-                        detail = "Track 3 antagonist apps for 7 days",
-                        progress = "5/7 days",
-                        isCompleted = false
+                if (uiState.isLoading) {
+                    Text(
+                        text = "Loading roadmap...",
+                        color = EnafTextSecondary,
+                        fontSize = 13.sp,
                     )
-                    MilestoneCard(
-                        title = "Week 2: Sentinel",
-                        detail = "Keep daily social usage under 2h for 5 days",
-                        progress = "2/5 days",
-                        isCompleted = false
-                    )
-                    MilestoneCard(
-                        title = "Week 3: Veteran",
-                        detail = "Hit a 10-day focus streak",
-                        progress = "Completed",
-                        isCompleted = true
-                    )
-                    MilestoneCard(
-                        title = "Week 4: Vanguard",
-                        detail = "Earn 2,000 focus XP total",
-                        progress = "1,480 / 2,000 XP",
-                        isCompleted = false
-                    )
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        uiState.milestones.forEach { milestone ->
+                            MilestoneCard(
+                                title = milestone.title,
+                                detail = milestone.detail,
+                                progress = milestone.progressLabel,
+                                isCompleted = milestone.isCompleted,
+                            )
+                        }
+                    }
                 }
             }
         }

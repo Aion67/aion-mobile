@@ -40,6 +40,8 @@ import com.example.enaf.ui.theme.EnafTheme
 @Composable
 fun ShopScreen(
     modifier: Modifier = Modifier,
+    uiState: ShopUiState = shopPreviewState(),
+    onEvent: (ShopUiEvent) -> Unit = {},
 ) {
     Scaffold(
         topBar = { EnafTopAppBar() },
@@ -63,7 +65,7 @@ fun ShopScreen(
             }
 
             item {
-                WalletCard(coins = 1240, diamonds = 36)
+                WalletCard(coins = uiState.coins, diamonds = uiState.diamonds)
             }
 
             item {
@@ -76,21 +78,33 @@ fun ShopScreen(
             }
 
             item {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    ShopItemCard(
-                        title = "Mindset Scroll",
-                        description = "Unlock a daily discipline quote pack.",
-                        price = "300 coins"
+                if (uiState.isLoading) {
+                    Text(
+                        text = "Loading shop...",
+                        color = EnafTextSecondary,
+                        fontSize = 13.sp,
                     )
-                    ShopItemCard(
-                        title = "Ambush Theme: Void Grid",
-                        description = "Custom overlay visuals for distraction interrupts.",
-                        price = "12 diamonds"
-                    )
-                    ShopItemCard(
-                        title = "Streak Shield",
-                        description = "Protect your streak for one failed day.",
-                        price = "800 coins"
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        uiState.items.forEach { item ->
+                            ShopItemCard(
+                                title = item.title,
+                                description = item.description,
+                                price = "${item.price} ${item.currency.name.lowercase()}",
+                                isAffordable = item.isAffordable,
+                                onBuyClick = { onEvent(ShopUiEvent.BuyClicked(item.id)) },
+                            )
+                        }
+                    }
+                }
+            }
+
+            if (uiState.statusMessage.isNotBlank()) {
+                item {
+                    Text(
+                        text = uiState.statusMessage,
+                        color = EnafTextMuted,
+                        fontSize = 12.sp,
                     )
                 }
             }
@@ -128,6 +142,8 @@ private fun ShopItemCard(
     title: String,
     description: String,
     price: String,
+    isAffordable: Boolean,
+    onBuyClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -142,7 +158,8 @@ private fun ShopItemCard(
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(text = price, color = EnafActionBlue, fontWeight = FontWeight.Bold)
             Button(
-                onClick = { },
+                onClick = onBuyClick,
+                enabled = isAffordable,
                 colors = ButtonDefaults.buttonColors(containerColor = EnafActionBlue),
                 shape = RoundedCornerShape(10.dp)
             ) {

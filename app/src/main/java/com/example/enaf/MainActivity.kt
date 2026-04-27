@@ -33,9 +33,9 @@ import com.example.enaf.ui.screens.home.HomeScreen
 import com.example.enaf.ui.screens.planner.PlannerRoute
 import com.example.enaf.ui.screens.insights.InsightsScreen
 import com.example.enaf.ui.screens.settings.SettingsScreen
-import com.example.enaf.ui.screens.shop.ShopScreen
-import com.example.enaf.ui.screens.roadmap.RoadmapScreen
-import com.example.enaf.ui.screens.levels.LevelsScreen
+import com.example.enaf.ui.screens.shop.ShopRoute
+import com.example.enaf.ui.screens.roadmap.RoadmapRoute
+import com.example.enaf.ui.screens.levels.LevelsRoute
 import com.example.enaf.ui.screens.leaderboard.LeaderboardScreen
 import com.example.enaf.ui.screens.achievements.AchievementsScreen
 import com.example.enaf.ui.theme.EnafDarkBg
@@ -87,9 +87,9 @@ fun EnafApp() {
                 AppDestinations.HOME -> HomeScreen()
                 AppDestinations.PLANNER -> PlannerRoute()
                 AppDestinations.INSIGHTS -> InsightsScreen()
-                AppDestinations.SHOP -> ShopScreen()
-                AppDestinations.ROADMAP -> RoadmapScreen()
-                AppDestinations.LEVELS -> LevelsScreen()
+                AppDestinations.SHOP -> ShopRoute()
+                AppDestinations.ROADMAP -> RoadmapRoute()
+                AppDestinations.LEVELS -> LevelsRoute()
                 AppDestinations.LEADERBOARD -> LeaderboardScreen()
                 AppDestinations.ACHIEVEMENTS -> AchievementsScreen()
                 AppDestinations.SETTINGS -> SettingsScreen()

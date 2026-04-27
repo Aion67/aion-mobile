@@ -18,6 +18,9 @@ interface AchievementCacheDao {
     @Query("SELECT * FROM achievement_cache WHERE user_id = :userId ORDER BY unlocked_at DESC")
     fun observeByUser(userId: String): Flow<List<AchievementCacheEntity>>
 
+    @Query("SELECT * FROM achievement_cache WHERE user_id = :userId ORDER BY unlocked_at DESC")
+    suspend fun getByUser(userId: String): List<AchievementCacheEntity>
+
     @Query("DELETE FROM achievement_cache WHERE user_id = :userId")
     suspend fun deleteByUser(userId: String)
 }
