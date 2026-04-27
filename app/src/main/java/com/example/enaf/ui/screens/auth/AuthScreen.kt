@@ -24,19 +24,11 @@ import com.example.enaf.ui.components.EnafButton
 import com.example.enaf.ui.components.EnafTextField
 import com.example.enaf.ui.theme.*
 
-enum class AuthMode {
-    SIGN_UP, LOGIN
-}
-
 @Composable
 fun AuthScreen(
-    onAuthSuccess: () -> Unit = {},
-    initialMode: AuthMode = AuthMode.SIGN_UP
+    uiState: AuthUiState = authPreviewState(),
+    onEvent: (AuthUiEvent) -> Unit = {},
 ) {
-    var mode by remember { mutableStateOf(initialMode) }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -81,7 +73,7 @@ fun AuthScreen(
 
             // Heading
             Text(
-                text = if (mode == AuthMode.SIGN_UP) "Join the Enaf journey" else "Welcome back",
+                text = if (uiState.mode == AuthMode.SIGN_UP) "Join the Enaf journey" else "Welcome back",
                 color = Color.White,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
@@ -100,8 +92,8 @@ fun AuthScreen(
 
             // Form
             EnafTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = uiState.email,
+                onValueChange = { onEvent(AuthUiEvent.EmailChanged(it)) },
                 label = "Email Address",
                 placeholder = "name@example.com",
                 leadingIcon = {
@@ -112,8 +104,8 @@ fun AuthScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             EnafTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = uiState.password,
+                onValueChange = { onEvent(AuthUiEvent.PasswordChanged(it)) },
                 label = "Password",
                 placeholder = "••••••••",
                 visualTransformation = PasswordVisualTransformation(),
@@ -122,7 +114,7 @@ fun AuthScreen(
                 }
             )
 
-            if (mode == AuthMode.LOGIN) {
+            if (uiState.mode == AuthMode.LOGIN) {
                 Text(
                     text = "Forgot Password?",
                     color = EnafActionBlue,
@@ -135,9 +127,19 @@ fun AuthScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            uiState.errorMessage?.let { error ->
+                Text(
+                    text = error,
+                    color = EnafErrorRed,
+                    fontSize = 12.sp,
+                    modifier = Modifier.align(Alignment.Start),
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
             EnafButton(
-                text = if (mode == AuthMode.SIGN_UP) "Create Account" else "Sign In",
-                onClick = onAuthSuccess
+                text = if (uiState.mode == AuthMode.SIGN_UP) "Create Account" else "Sign In",
+                onClick = { onEvent(AuthUiEvent.SubmitClicked) }
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -167,14 +169,20 @@ fun AuthScreen(
             ) {
                 SocialButton(
                     text = "Google",
-                    onClick = { /* TODO */ },
+                    onClick = { onEvent(AuthUiEvent.GoogleClicked) },
                     modifier = Modifier.weight(1f)
                 )
                 SocialButton(
                     text = "Apple",
-                    onClick = { /* TODO */ },
+                    onClick = { onEvent(AuthUiEvent.AppleClicked) },
                     modifier = Modifier.weight(1f)
                 )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextButton(onClick = { onEvent(AuthUiEvent.ContinueAsGuestClicked) }) {
+                Text("Continue as Guest", color = EnafTextSecondary)
             }
 
             Spacer(modifier = Modifier.height(40.dp))
@@ -185,16 +193,16 @@ fun AuthScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = if (mode == AuthMode.SIGN_UP) "Already have an account? " else "Don't have an account? ",
+                    text = if (uiState.mode == AuthMode.SIGN_UP) "Already have an account? " else "Don't have an account? ",
                     color = EnafTextMuted,
                     fontSize = 14.sp
                 )
                 TextButton(
-                    onClick = { mode = if (mode == AuthMode.SIGN_UP) AuthMode.LOGIN else AuthMode.SIGN_UP },
+                    onClick = { onEvent(AuthUiEvent.ToggleModeClicked) },
                     contentPadding = PaddingValues(0.dp)
                 ) {
                     Text(
-                        text = if (mode == AuthMode.SIGN_UP) "Login" else "Sign Up",
+                        text = if (uiState.mode == AuthMode.SIGN_UP) "Login" else "Sign Up",
                         color = EnafActionBlue,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold

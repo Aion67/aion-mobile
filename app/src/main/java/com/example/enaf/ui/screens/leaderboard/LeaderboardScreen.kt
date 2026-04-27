@@ -33,6 +33,8 @@ import com.example.enaf.ui.theme.EnafTheme
 @Composable
 fun LeaderboardScreen(
     modifier: Modifier = Modifier,
+    uiState: LeaderboardUiState = leaderboardPreviewState(),
+    onEvent: (LeaderboardUiEvent) -> Unit = {},
 ) {
     Scaffold(
         topBar = { EnafTopAppBar() },
@@ -57,19 +59,30 @@ fun LeaderboardScreen(
 
             item {
                 Text(
-                    text = "Ranked by Digital Credit Score",
+                    text = uiState.subtitle,
                     color = EnafTextMuted,
                     fontSize = 13.sp
                 )
             }
 
-            items(8) { idx ->
-                LeaderboardRow(
-                    rank = idx + 1,
-                    name = if (idx == 0) "You" else "Warrior-${100 + idx}",
-                    tier = if (idx < 3) "Legend" else if (idx < 6) "Veteran" else "Recruit",
-                    score = 980 - (idx * 47)
-                )
+            if (uiState.isLoading) {
+                item {
+                    Text(
+                        text = "Loading leaderboard...",
+                        color = EnafTextSecondary,
+                        fontSize = 13.sp,
+                    )
+                }
+            } else {
+                items(uiState.entries.size) { idx ->
+                    val entry = uiState.entries[idx]
+                    LeaderboardRow(
+                        rank = entry.rank,
+                        name = entry.name,
+                        tier = entry.tier,
+                        score = entry.score,
+                    )
+                }
             }
         }
     }

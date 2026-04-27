@@ -21,9 +21,11 @@ import com.example.enaf.ui.theme.*
 
 @Composable
 fun OnboardingScreen(
-    onGetStartedClick: () -> Unit = {},
-    onSkipClick: () -> Unit = {}
+    uiState: OnboardingUiState = onboardingPreviewState(),
+    onEvent: (OnboardingUiEvent) -> Unit = {},
 ) {
+    val currentPage = uiState.pages[uiState.currentPageIndex]
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -61,7 +63,7 @@ fun OnboardingScreen(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(onClick = onSkipClick) {
+                TextButton(onClick = { onEvent(OnboardingUiEvent.SkipClicked) }) {
                     Text(
                         text = "Skip",
                         color = EnafTextSecondary,
@@ -103,7 +105,7 @@ fun OnboardingScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Reclaim Your Focus",
+                    text = currentPage.title,
                     color = Color.White,
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Black,
@@ -112,7 +114,7 @@ fun OnboardingScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Experience the pulse of futuristic wellness and break free from digital noise.",
+                    text = currentPage.subtitle,
                     color = EnafTextSecondary,
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center,
@@ -127,26 +129,42 @@ fun OnboardingScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(modifier = Modifier.size(width = 32.dp, height = 6.dp).background(EnafActionBlue, RoundedCornerShape(3.dp)))
-                Box(modifier = Modifier.size(8.dp).background(EnafProgressBg, CircleShape))
-                Box(modifier = Modifier.size(8.dp).background(EnafProgressBg, CircleShape))
+                uiState.pages.forEachIndexed { index, _ ->
+                    if (index == uiState.currentPageIndex) {
+                        Box(
+                            modifier = Modifier
+                                .size(width = 32.dp, height = 6.dp)
+                                .background(EnafActionBlue, RoundedCornerShape(3.dp))
+                        )
+                    } else {
+                        Box(modifier = Modifier.size(8.dp).background(EnafProgressBg, CircleShape))
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.weight(0.2f))
 
             // CTA Button
             EnafButton(
-                text = "Get Started",
-                onClick = onGetStartedClick
+                text = uiState.ctaText,
+                onClick = {
+                    if (uiState.currentPageIndex == uiState.pages.lastIndex) {
+                        onEvent(OnboardingUiEvent.GetStartedClicked)
+                    } else {
+                        onEvent(OnboardingUiEvent.NextClicked)
+                    }
+                }
             )
             
             Spacer(modifier = Modifier.height(16.dp))
             
-            Text(
-                text = "Already have an account? Log in",
-                color = EnafTextMuted,
-                fontSize = 14.sp
-            )
+            TextButton(onClick = { onEvent(OnboardingUiEvent.LoginClicked) }) {
+                Text(
+                    text = "Already have an account? Log in",
+                    color = EnafTextMuted,
+                    fontSize = 14.sp,
+                )
+            }
             
             Spacer(modifier = Modifier.height(24.dp))
         }

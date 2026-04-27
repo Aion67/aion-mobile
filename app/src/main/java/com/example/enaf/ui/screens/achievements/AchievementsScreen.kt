@@ -33,6 +33,8 @@ import com.example.enaf.ui.theme.EnafTheme
 @Composable
 fun AchievementsScreen(
     modifier: Modifier = Modifier,
+    uiState: AchievementsUiState = achievementsPreviewState(),
+    onEvent: (AchievementsUiEvent) -> Unit = {},
 ) {
     Scaffold(
         topBar = { EnafTopAppBar() },
@@ -56,20 +58,26 @@ fun AchievementsScreen(
             }
 
             item {
-                Text("6 / 20 unlocked", color = EnafTextMuted, fontSize = 13.sp)
+                Text(uiState.unlockedLabel, color = EnafTextMuted, fontSize = 13.sp)
             }
 
-            item {
-                BadgeRow(title = "3-Day Blackout", detail = "No social app limit breaks for 3 days", unlocked = true)
-            }
-            item {
-                BadgeRow(title = "Night Discipline", detail = "No scrolling after 10 PM for 5 days", unlocked = true)
-            }
-            item {
-                BadgeRow(title = "Diamond Mind", detail = "Earn 100 diamonds", unlocked = false)
-            }
-            item {
-                BadgeRow(title = "Legend Sprint", detail = "Reach top 10 in weekly leaderboard", unlocked = false)
+            if (uiState.isLoading) {
+                item {
+                    Text(
+                        text = "Loading achievements...",
+                        color = EnafTextSecondary,
+                        fontSize = 13.sp,
+                    )
+                }
+            } else {
+                items(uiState.items.size) { idx ->
+                    val item = uiState.items[idx]
+                    BadgeRow(
+                        title = item.title,
+                        detail = item.detail,
+                        unlocked = item.unlocked,
+                    )
+                }
             }
         }
     }

@@ -21,7 +21,9 @@ import com.example.enaf.ui.theme.EnafTheme
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    uiState: HomeUiState = homePreviewState(),
+    onEvent: (HomeUiEvent) -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -41,7 +43,9 @@ fun HomeScreen(
             // Daily Summary Hero
             item {
                 DailySummaryCard(
-                    modifier = Modifier.padding(24.dp)
+                    modifier = Modifier.padding(24.dp),
+                    progress = uiState.progress,
+                    hoursReclaimed = uiState.hoursReclaimed,
                 )
             }
 
@@ -60,7 +64,7 @@ fun HomeScreen(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "View All",
+                            text = if (uiState.isLoading) "Loading" else "${uiState.habits.size} Tracked",
                             color = Color(0xFF007BFF),
                             fontSize = 14.sp
                         )
@@ -75,29 +79,24 @@ fun HomeScreen(
                     modifier = Modifier.padding(horizontal = 24.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    AppUsageItem(
-                        appName = "Instagram",
-                        usedTime = "+12m used",
-                        limitTime = "Limit: 45m",
-                        remainingTime = "13m remaining",
-                        progress = 0.72f
-                    )
-                    AppUsageItem(
-                        appName = "TikTok",
-                        usedTime = "+45m used",
-                        limitTime = "Limit: 1h",
-                        remainingTime = "15m remaining",
-                        progress = 0.75f,
-                        accentColor = Color(0xFF00F2EA) // TikTok Cyan
-                    )
-                    AppUsageItem(
-                        appName = "YouTube",
-                        usedTime = "+1h 20m",
-                        limitTime = "Limit: 2h",
-                        remainingTime = "40m remaining",
-                        progress = 0.66f,
-                        accentColor = Color(0xFFFF0000) // YouTube Red
-                    )
+                    if (uiState.isLoading) {
+                        Text(
+                            text = "Loading habits...",
+                            color = Color(0xFF94A3B8),
+                            fontSize = 13.sp,
+                        )
+                    } else {
+                        uiState.habits.forEach { habit ->
+                            AppUsageItem(
+                                appName = habit.appName,
+                                usedTime = habit.usedTimeLabel,
+                                limitTime = habit.limitTimeLabel,
+                                remainingTime = habit.remainingTimeLabel,
+                                progress = habit.progress,
+                                accentColor = Color(habit.accentColor),
+                            )
+                        }
+                    }
                 }
             }
 
@@ -106,6 +105,13 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(24.dp))
                 MotivationalCard(
                     modifier = Modifier.padding(horizontal = 8.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = uiState.motivationalMessage,
+                    color = Color(0xFF94A3B8),
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(horizontal = 24.dp),
                 )
             }
         }

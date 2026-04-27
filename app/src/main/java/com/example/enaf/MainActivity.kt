@@ -29,15 +29,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.enaf.ui.screens.home.HomeScreen
+import com.example.enaf.ui.screens.home.HomeRoute
 import com.example.enaf.ui.screens.planner.PlannerRoute
-import com.example.enaf.ui.screens.insights.InsightsScreen
-import com.example.enaf.ui.screens.settings.SettingsScreen
+import com.example.enaf.ui.screens.insights.InsightsRoute
+import com.example.enaf.ui.screens.settings.SettingsRoute
 import com.example.enaf.ui.screens.shop.ShopRoute
 import com.example.enaf.ui.screens.roadmap.RoadmapRoute
 import com.example.enaf.ui.screens.levels.LevelsRoute
-import com.example.enaf.ui.screens.leaderboard.LeaderboardScreen
-import com.example.enaf.ui.screens.achievements.AchievementsScreen
+import com.example.enaf.ui.screens.leaderboard.LeaderboardRoute
+import com.example.enaf.ui.screens.achievements.AchievementsRoute
 import com.example.enaf.ui.theme.EnafDarkBg
 import com.example.enaf.ui.theme.EnafHeaderBg
 import com.example.enaf.ui.theme.EnafTheme
@@ -84,15 +84,15 @@ fun EnafApp() {
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             when (currentDestination) {
-                AppDestinations.HOME -> HomeScreen()
+                AppDestinations.HOME -> HomeRoute()
                 AppDestinations.PLANNER -> PlannerRoute()
-                AppDestinations.INSIGHTS -> InsightsScreen()
+                AppDestinations.INSIGHTS -> InsightsRoute()
                 AppDestinations.SHOP -> ShopRoute()
                 AppDestinations.ROADMAP -> RoadmapRoute()
                 AppDestinations.LEVELS -> LevelsRoute()
-                AppDestinations.LEADERBOARD -> LeaderboardScreen()
-                AppDestinations.ACHIEVEMENTS -> AchievementsScreen()
-                AppDestinations.SETTINGS -> SettingsScreen()
+                AppDestinations.LEADERBOARD -> LeaderboardRoute()
+                AppDestinations.ACHIEVEMENTS -> AchievementsRoute()
+                AppDestinations.SETTINGS -> SettingsRoute()
             }
         }
     }

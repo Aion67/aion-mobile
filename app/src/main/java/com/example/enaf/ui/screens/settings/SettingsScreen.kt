@@ -2,15 +2,41 @@ package com.example.enaf.ui.screens.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,17 +47,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.enaf.ui.components.EnafTopAppBar
-import com.example.enaf.ui.theme.*
+import com.example.enaf.ui.theme.EnafActionBlue
+import com.example.enaf.ui.theme.EnafBorder
+import com.example.enaf.ui.theme.EnafCardBg
+import com.example.enaf.ui.theme.EnafDarkBg
+import com.example.enaf.ui.theme.EnafErrorRed
+import com.example.enaf.ui.theme.EnafHeaderBg
+import com.example.enaf.ui.theme.EnafHeaderBorder
+import com.example.enaf.ui.theme.EnafProgressBg
+import com.example.enaf.ui.theme.EnafTextSecondary
+import com.example.enaf.ui.theme.EnafTheme
 
 @Composable
 fun SettingsScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    uiState: SettingsUiState = settingsPreviewState(),
+    onEvent: (SettingsUiEvent) -> Unit = {},
 ) {
     Scaffold(
-        topBar = {
-            EnafTopAppBar()
-        },
-        containerColor = EnafDarkBg
+        topBar = { EnafTopAppBar() },
+        containerColor = EnafDarkBg,
     ) { innerPadding ->
         LazyColumn(
             modifier = modifier
@@ -39,92 +74,120 @@ fun SettingsScreen(
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp),
             contentPadding = PaddingValues(top = 16.dp, bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
-            // Profile Card
-            item {
-                ProfileCard()
-            }
+            item { ProfileCard(uiState.profile) }
 
-            // Anti-Procrastination Section
             item {
                 SettingsSection(
                     title = "Anti-Procrastination",
-                    icon = Icons.Default.Warning
+                    icon = Icons.Default.Warning,
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         ToggleSettingItem(
                             title = "Regret Simulation",
                             description = "Sends reminders focused on the long-term cost of inaction.",
-                            checked = true
+                            checked = uiState.regretSimulationEnabled,
+                            onCheckedChange = { onEvent(SettingsUiEvent.RegretSimulationChanged(it)) },
                         )
                         ToggleSettingItem(
                             title = "Opportunity Leak",
                             description = "Alerts you when your inactivity window hits critical levels.",
-                            checked = false
+                            checked = uiState.opportunityLeakEnabled,
+                            onCheckedChange = { onEvent(SettingsUiEvent.OpportunityLeakChanged(it)) },
                         )
                     }
                 }
             }
 
-            // Notifications Section
             item {
                 SettingsSection(
                     title = "Notifications",
-                    icon = Icons.Default.Notifications
+                    icon = Icons.Default.Notifications,
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         Column {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
                                 Text("Quiet Mode Duration", color = Color.White, fontSize = 14.sp)
-                                Text("2 Hours", color = EnafActionBlue, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                                Text(
+                                    "${uiState.quietModeDurationHours.toInt()} Hours",
+                                    color = EnafActionBlue,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                )
                             }
                             Slider(
-                                value = 2f,
-                                onValueChange = {},
+                                value = uiState.quietModeDurationHours,
+                                onValueChange = { onEvent(SettingsUiEvent.QuietDurationChanged(it)) },
                                 valueRange = 0f..8f,
                                 colors = SliderDefaults.colors(
                                     thumbColor = Color.White,
                                     activeTrackColor = EnafActionBlue,
-                                    inactiveTrackColor = EnafProgressBg
-                                )
+                                    inactiveTrackColor = EnafProgressBg,
+                                ),
                             )
                         }
-                        
-                        ToggleSettingItem(title = "Smart Alerts", checked = true)
-                        ToggleSettingItem(title = "Pulse Notifications", checked = true)
+
+                        ToggleSettingItem(
+                            title = "Smart Alerts",
+                            checked = uiState.smartAlertsEnabled,
+                            onCheckedChange = { onEvent(SettingsUiEvent.SmartAlertsChanged(it)) },
+                        )
+                        ToggleSettingItem(
+                            title = "Pulse Notifications",
+                            checked = uiState.pulseNotificationsEnabled,
+                            onCheckedChange = { onEvent(SettingsUiEvent.PulseNotificationsChanged(it)) },
+                        )
                     }
                 }
             }
 
-            // Appearance Section
             item {
                 SettingsSection(
                     title = "Appearance",
-                    icon = Icons.Default.Settings
+                    icon = Icons.Default.Settings,
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        AppearanceModeItem("Light", Icons.Default.Star, false, Modifier.weight(1f))
-                        AppearanceModeItem("Dark", Icons.Default.Info, true, Modifier.weight(1f))
-                        AppearanceModeItem("Celestial", Icons.Default.Face, false, Modifier.weight(1f))
+                        AppearanceModeItem(
+                            label = "Light",
+                            icon = Icons.Default.Star,
+                            selected = uiState.selectedTheme == ThemeModeOption.LIGHT,
+                            onClick = { onEvent(SettingsUiEvent.ThemeSelected(ThemeModeOption.LIGHT)) },
+                            modifier = Modifier.weight(1f),
+                        )
+                        AppearanceModeItem(
+                            label = "Dark",
+                            icon = Icons.Default.Info,
+                            selected = uiState.selectedTheme == ThemeModeOption.DARK,
+                            onClick = { onEvent(SettingsUiEvent.ThemeSelected(ThemeModeOption.DARK)) },
+                            modifier = Modifier.weight(1f),
+                        )
+                        AppearanceModeItem(
+                            label = "Celestial",
+                            icon = Icons.Default.Face,
+                            selected = uiState.selectedTheme == ThemeModeOption.CELESTIAL,
+                            onClick = { onEvent(SettingsUiEvent.ThemeSelected(ThemeModeOption.CELESTIAL)) },
+                            modifier = Modifier.weight(1f),
+                        )
                     }
                 }
             }
-            
-            // Logout Button
+
             item {
                 Button(
-                    onClick = { /* TODO */ },
-                    modifier = Modifier.fillMaxWidth().height(54.dp),
+                    onClick = { onEvent(SettingsUiEvent.SignOutClicked) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(54.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = EnafHeaderBg),
                     shape = RoundedCornerShape(12.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, EnafHeaderBorder)
+                    border = androidx.compose.foundation.BorderStroke(1.dp, EnafHeaderBorder),
                 ) {
                     Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null, tint = EnafErrorRed)
                     Spacer(modifier = Modifier.width(12.dp))
@@ -136,23 +199,22 @@ fun SettingsScreen(
 }
 
 @Composable
-fun ProfileCard() {
+fun ProfileCard(profile: SettingsProfileUiModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(EnafCardBg, RoundedCornerShape(16.dp))
             .border(1.dp, EnafBorder, RoundedCornerShape(16.dp))
             .padding(25.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        // Profile Image Placeholder
         Box(
             modifier = Modifier
                 .size(80.dp)
                 .clip(CircleShape)
                 .background(EnafHeaderBg)
                 .border(2.dp, EnafActionBlue, CircleShape),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.size(40.dp), tint = Color.Gray)
         }
@@ -160,15 +222,15 @@ fun ProfileCard() {
         Spacer(modifier = Modifier.width(20.dp))
 
         Column {
-            Text(text = "Winzer Prince", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            Text(text = "aita.josh@example.com", color = EnafTextSecondary, fontSize = 14.sp)
+            Text(text = profile.displayName, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(text = profile.email, color = EnafTextSecondary, fontSize = 14.sp)
             Spacer(modifier = Modifier.height(8.dp))
             Box(
                 modifier = Modifier
                     .background(EnafActionBlue.copy(alpha = 0.1f), RoundedCornerShape(4.dp))
-                    .padding(horizontal = 8.dp, vertical = 2.dp)
+                    .padding(horizontal = 8.dp, vertical = 2.dp),
             ) {
-                Text(text = "PRO MEMBER", color = EnafActionBlue, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                Text(text = profile.tierLabel, color = EnafActionBlue, fontSize = 10.sp, fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -178,7 +240,7 @@ fun ProfileCard() {
 fun SettingsSection(
     title: String,
     icon: ImageVector,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -192,7 +254,7 @@ fun SettingsSection(
                 .fillMaxWidth()
                 .background(EnafHeaderBg.copy(alpha = 0.5f), RoundedCornerShape(16.dp))
                 .border(1.dp, EnafHeaderBorder, RoundedCornerShape(16.dp))
-                .padding(16.dp)
+                .padding(16.dp),
         ) {
             content()
         }
@@ -203,14 +265,13 @@ fun SettingsSection(
 fun ToggleSettingItem(
     title: String,
     description: String? = null,
-    checked: Boolean
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
 ) {
-    var isChecked by remember { mutableStateOf(checked) }
-    
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(text = title, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
@@ -219,12 +280,12 @@ fun ToggleSettingItem(
             }
         }
         Switch(
-            checked = isChecked,
-            onCheckedChange = { isChecked = it },
+            checked = checked,
+            onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.White,
-                checkedTrackColor = EnafActionBlue
-            )
+                checkedTrackColor = EnafActionBlue,
+            ),
         )
     }
 }
@@ -234,34 +295,37 @@ fun AppearanceModeItem(
     label: String,
     icon: ImageVector,
     selected: Boolean,
-    modifier: Modifier = Modifier
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .height(98.dp)
-            .background(
-                if (selected) EnafActionBlue.copy(alpha = 0.1f) else Color.Transparent,
-                RoundedCornerShape(12.dp)
-            )
-            .border(
-                1.dp,
-                if (selected) EnafActionBlue else EnafHeaderBorder,
-                RoundedCornerShape(12.dp)
-            )
-            .padding(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    OutlinedButton(
+        onClick = onClick,
+        modifier = modifier.height(98.dp),
+        shape = RoundedCornerShape(12.dp),
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            if (selected) EnafActionBlue else EnafHeaderBorder,
+        ),
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = if (selected) EnafActionBlue.copy(alpha = 0.1f) else Color.Transparent,
+        ),
+        contentPadding = PaddingValues(8.dp),
     ) {
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .background(if (selected) EnafActionBlue else EnafCardBg, RoundedCornerShape(8.dp)),
-            contentAlignment = Alignment.Center
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
         ) {
-            Icon(icon, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .background(if (selected) EnafActionBlue else EnafCardBg, RoundedCornerShape(8.dp)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(icon, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = label, color = Color.White, fontSize = 12.sp)
         }
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = label, color = Color.White, fontSize = 12.sp)
     }
 }
 

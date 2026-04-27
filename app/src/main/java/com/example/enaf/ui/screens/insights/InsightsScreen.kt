@@ -2,6 +2,7 @@ package com.example.enaf.ui.screens.insights
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -9,12 +10,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,10 +25,10 @@ import com.example.enaf.ui.theme.*
 
 @Composable
 fun InsightsScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    uiState: InsightsUiState = insightsPreviewState(),
+    onEvent: (InsightsUiEvent) -> Unit = {},
 ) {
-    var selectedTab by remember { mutableIntStateOf(2) } // Monthly by default
-
     Scaffold(
         topBar = {
             EnafTopAppBar()
@@ -65,20 +65,31 @@ fun InsightsScreen(
                     ) {
                         val tabs = listOf("Weekly", "Monthly", "Yearly")
                         tabs.forEachIndexed { index, title ->
+                            val range = when (index) {
+                                0 -> InsightsRange.WEEKLY
+                                1 -> InsightsRange.MONTHLY
+                                else -> InsightsRange.YEARLY
+                            }
+                            val selected = uiState.selectedRange == range
                             Box(
                                 modifier = Modifier
                                     .weight(1f)
                                     .fillMaxHeight()
                                     .clip(RoundedCornerShape(20.dp))
-                                    .background(if (selectedTab == index) EnafActionBlue else Color.Transparent)
-                                    .let { if (selectedTab == index) it.padding(horizontal = 12.dp) else it },
+                                    .background(if (selected) EnafActionBlue else Color.Transparent)
+                                    .let { if (selected) it.padding(horizontal = 12.dp) else it }
+                                    .clickable { onEvent(InsightsUiEvent.RangeSelected(range)) },
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
                                     text = title,
-                                    color = if (selectedTab == index) Color.White else EnafTextSecondary,
+                                    color = if (selected) Color.White else EnafTextSecondary,
                                     fontSize = 14.sp,
-                                    fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal
+                                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(20.dp))
+                                        .background(Color.Transparent)
+                                        .padding(horizontal = 2.dp),
                                 )
                             }
                         }
@@ -88,24 +99,35 @@ fun InsightsScreen(
 
             // Monthly Streak Hero
             item {
-                MonthlyStreakCard()
+                if (uiState.isLoading) {
+                    Text(
+                        text = "Loading insights...",
+                        color = EnafTextSecondary,
+                        fontSize = 13.sp,
+                    )
+                } else {
+                    MonthlyStreakCard(
+                        streakDays = uiState.streakDays,
+                        totalDaysLabel = uiState.totalDaysLabel,
+                    )
+                }
             }
 
             // Category Distribution
             item {
-                CategoryDistributionCard()
+                CategoryDistributionCard(uiState.categories)
             }
 
             // Pattern Observations
             item {
-                PatternObservationsList()
+                PatternObservationsList(uiState.observations)
             }
         }
     }
 }
 
 @Composable
-fun MonthlyStreakCard() {
+fun MonthlyStreakCard(streakDays: Int, totalDaysLabel: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -147,14 +169,14 @@ fun MonthlyStreakCard() {
 
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(
-                    text = "24",
+                    text = streakDays.toString(),
                     color = Color.White,
                     fontSize = 48.sp,
                     fontWeight = FontWeight.Black
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Days Total",
+                    text = totalDaysLabel,
                     color = EnafTextSecondary,
                     fontSize = 18.sp,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -183,7 +205,7 @@ fun MonthlyStreakCard() {
 }
 
 @Composable
-fun CategoryDistributionCard() {
+fun CategoryDistributionCard(categories: List<InsightsCategoryUiModel>) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -222,10 +244,9 @@ fun CategoryDistributionCard() {
             
             // Legend
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                LegendItem("Focus", EnafActionBlue, "42%")
-                LegendItem("Wellness", EnafPink, "28%")
-                LegendItem("Productivity", Color(0xFF00F2EA), "18%")
-                LegendItem("Social", Color(0xFFF97316), "12%")
+                categories.forEach { category ->
+                    LegendItem(category.label, Color(category.accentColor), category.percentageLabel)
+                }
             }
         }
     }
@@ -244,7 +265,7 @@ fun LegendItem(label: String, color: Color, percentage: String) {
 }
 
 @Composable
-fun PatternObservationsList() {
+fun PatternObservationsList(observations: List<InsightsObservationUiModel>) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Text(
             text = "Pattern Observations",
@@ -254,16 +275,13 @@ fun PatternObservationsList() {
             modifier = Modifier.padding(start = 8.dp)
         )
         
-        ObservationItem(
-            title = "Morning Peak",
-            description = "Your productivity is 40% higher between 8 AM and 11 AM. Schedule deep work then.",
-            iconColor = EnafActionBlue
-        )
-        ObservationItem(
-            title = "Weekend Drift",
-            description = "Social media usage spikes on Saturdays. Consider a digital detox period.",
-            iconColor = EnafPink
-        )
+        observations.forEach { observation ->
+            ObservationItem(
+                title = observation.title,
+                description = observation.description,
+                iconColor = Color(observation.accentColor),
+            )
+        }
     }
 }
 
