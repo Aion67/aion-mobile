@@ -8,9 +8,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Leaderboard
+import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -29,6 +33,11 @@ import com.example.enaf.ui.screens.home.HomeScreen
 import com.example.enaf.ui.screens.planner.PlannerScreen
 import com.example.enaf.ui.screens.insights.InsightsScreen
 import com.example.enaf.ui.screens.settings.SettingsScreen
+import com.example.enaf.ui.screens.shop.ShopScreen
+import com.example.enaf.ui.screens.roadmap.RoadmapScreen
+import com.example.enaf.ui.screens.levels.LevelsScreen
+import com.example.enaf.ui.screens.leaderboard.LeaderboardScreen
+import com.example.enaf.ui.screens.achievements.AchievementsScreen
 import com.example.enaf.ui.theme.EnafDarkBg
 import com.example.enaf.ui.theme.EnafHeaderBg
 import com.example.enaf.ui.theme.EnafTheme
@@ -78,6 +87,11 @@ fun EnafApp() {
                 AppDestinations.HOME -> HomeScreen()
                 AppDestinations.PLANNER -> PlannerScreen()
                 AppDestinations.INSIGHTS -> InsightsScreen()
+                AppDestinations.SHOP -> ShopScreen()
+                AppDestinations.ROADMAP -> RoadmapScreen()
+                AppDestinations.LEVELS -> LevelsScreen()
+                AppDestinations.LEADERBOARD -> LeaderboardScreen()
+                AppDestinations.ACHIEVEMENTS -> AchievementsScreen()
                 AppDestinations.SETTINGS -> SettingsScreen()
             }
         }
@@ -91,5 +105,10 @@ enum class AppDestinations(
     HOME("Home", Icons.Default.Home),
     PLANNER("Planner", Icons.Default.DateRange),
     INSIGHTS("Insights", Icons.Default.Info),
+    SHOP("Shop", Icons.Default.Storefront),
+    ROADMAP("Roadmap", Icons.Default.Flag),
+    LEVELS("Levels", Icons.Default.MilitaryTech),
+    LEADERBOARD("Leaders", Icons.Default.Leaderboard),
+    ACHIEVEMENTS("Badges", Icons.Default.MilitaryTech),
     SETTINGS("Settings", Icons.Default.Settings),
 }

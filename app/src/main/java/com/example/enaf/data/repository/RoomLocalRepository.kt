@@ -55,6 +55,10 @@ class RoomLocalRepository(
         return database.appLimitDao().observeByTrackedApp(trackedAppId)
     }
 
+    override suspend fun getAppLimits(trackedAppId: String): List<AppLimitEntity> {
+        return database.appLimitDao().getByTrackedApp(trackedAppId)
+    }
+
     override suspend fun upsertAppLimit(limit: AppLimitEntity) {
         database.appLimitDao().upsert(limit)
     }

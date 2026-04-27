@@ -23,6 +23,7 @@ interface LocalRepository {
     suspend fun deleteTrackedApp(id: String)
 
     fun observeAppLimits(trackedAppId: String): Flow<List<AppLimitEntity>>
+    suspend fun getAppLimits(trackedAppId: String): List<AppLimitEntity>
     suspend fun upsertAppLimit(limit: AppLimitEntity)
     suspend fun upsertAppLimits(limits: List<AppLimitEntity>)
     suspend fun deleteAppLimits(trackedAppId: String)

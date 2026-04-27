@@ -18,6 +18,9 @@ interface AppLimitDao {
     @Query("SELECT * FROM app_limit WHERE tracked_app_id = :trackedAppId ORDER BY updated_at DESC")
     fun observeByTrackedApp(trackedAppId: String): Flow<List<AppLimitEntity>>
 
+    @Query("SELECT * FROM app_limit WHERE tracked_app_id = :trackedAppId ORDER BY updated_at DESC")
+    suspend fun getByTrackedApp(trackedAppId: String): List<AppLimitEntity>
+
     @Query("DELETE FROM app_limit WHERE tracked_app_id = :trackedAppId")
     suspend fun deleteByTrackedApp(trackedAppId: String)
 }
