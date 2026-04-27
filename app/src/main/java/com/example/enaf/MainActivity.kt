@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.enaf.ui.screens.home.HomeScreen
-import com.example.enaf.ui.screens.planner.PlannerScreen
+import com.example.enaf.ui.screens.planner.PlannerRoute
 import com.example.enaf.ui.screens.insights.InsightsScreen
 import com.example.enaf.ui.screens.settings.SettingsScreen
 import com.example.enaf.ui.screens.shop.ShopScreen
@@ -85,7 +85,7 @@ fun EnafApp() {
         Box(modifier = Modifier.fillMaxSize()) {
             when (currentDestination) {
                 AppDestinations.HOME -> HomeScreen()
-                AppDestinations.PLANNER -> PlannerScreen()
+                AppDestinations.PLANNER -> PlannerRoute()
                 AppDestinations.INSIGHTS -> InsightsScreen()
                 AppDestinations.SHOP -> ShopScreen()
                 AppDestinations.ROADMAP -> RoadmapScreen()

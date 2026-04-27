@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.enaf.data.local.entity.AppLimitEntity
 import com.example.enaf.data.local.entity.TrackedAppEntity
-import com.example.enaf.data.local.entity.UsageSessionEntity
 import com.example.enaf.data.repository.LocalRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -60,7 +59,13 @@ class PlannerViewModel(
 
     private suspend fun loadPlannerState(userId: String) {
         val trackedApps = localRepository.getTrackedApps(userId)
-        val appItems = trackedApps.mapNotNull { app -> buildPlannerItem(app) }
+        val appItems = mutableListOf<PlannerAppItemUiModel>()
+        trackedApps.forEach { app ->
+            val item = buildPlannerItem(app)
+            if (item != null) {
+                appItems.add(item)
+            }
+        }
         val visibleItems = filterItems(appItems, _uiState.value.searchQuery)
 
         _uiState.value = PlannerUiState(
