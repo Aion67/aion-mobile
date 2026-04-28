@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 class HomeViewModel(
     private val localRepository: LocalRepository,
@@ -85,7 +86,7 @@ class HomeViewModel(
 
     private suspend fun buildHabitItem(app: TrackedAppEntity): HomeHabitUiModel? {
         val limit = latestLimitFor(app.id) ?: return null
-        val usedMinutes = usageMinutesFor(app.id)
+        val usedMinutes = usageMinutesForToday(app.id)
         val limitMinutes = limit.dailyLimitMinutes.coerceAtLeast(1)
         val remainingMinutes = (limitMinutes - usedMinutes).coerceAtLeast(0)
         val progress = (usedMinutes.toFloat() / limitMinutes.toFloat()).coerceIn(0f, 1f)
@@ -105,11 +106,20 @@ class HomeViewModel(
         return localRepository.getAppLimits(trackedAppId).firstOrNull()
     }
 
-    private suspend fun usageMinutesFor(trackedAppId: String): Int {
+    private suspend fun usageMinutesForToday(trackedAppId: String): Int {
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val startOfDay = calendar.timeInMillis
+        val endOfDay = startOfDay + 86_400_000L
+
         return localRepository.getUsageSessionsInRange(
             trackedAppId = trackedAppId,
-            start = 0L,
-            end = Long.MAX_VALUE,
+            start = startOfDay,
+            end = endOfDay,
         ).sumOf { it.durationMinutes }
     }
 

@@ -132,7 +132,7 @@ fun AuthScreen(
 
             uiState.error?.let { error ->
                 Text(
-                    text = error.message,
+                    text = error.userMessage,
                     color = EnafErrorRed,
                     fontSize = 12.sp,
                     modifier = Modifier.align(Alignment.Start),

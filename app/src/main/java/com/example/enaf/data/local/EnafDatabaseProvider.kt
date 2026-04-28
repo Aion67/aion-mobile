@@ -21,7 +21,7 @@ object EnafDatabaseProvider {
                 context.applicationContext,
                 EnafDatabase::class.java,
                 EnafDatabase.DB_NAME,
-            ).addMigrations(MIGRATION_1_2).fallbackToDestructiveMigration(false).build().also { db ->
+            ).addMigrations(MIGRATION_1_2).fallbackToDestructiveMigration().build().also { db ->
                 instance = db
             }
         }
