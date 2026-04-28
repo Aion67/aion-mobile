@@ -1,5 +1,6 @@
 package com.example.enaf.ui.screens.home
 
+import com.example.enaf.ui.components.UiError
 import kotlin.collections.emptyList
 import kotlin.collections.listOf
 
@@ -19,6 +20,7 @@ data class HomeUiState(
     val habits: List<HomeHabitUiModel> = emptyList(),
     val motivationalMessage: String = "",
     val isLoading: Boolean = true,
+    val error: UiError? = null,
 )
 
 sealed interface HomeUiEvent {

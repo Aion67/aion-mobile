@@ -30,3 +30,21 @@ val EnafHeaderBorder = Color(0x331E293B) // rgba(30, 41, 59, 0.2)
 val EnafProfileBorder = Color(0x4D007BFF) // rgba(0, 123, 255, 0.3)
 val EnafOverlay = Color(0x800B121A) // rgba(11, 18, 26, 0.5)
 val EnafRedSoft = Color(0x1AEF4444) // rgba(239, 68, 68, 0.1)
+
+// Semantic Status Colors
+val EnafSuccess = Color(0xFF10B981) // Green - for achievements, streaks
+val EnafSuccessSoft = Color(0x1A10B981) // Green with low opacity for backgrounds
+val EnafWarning = Color(0xFFF59E0B) // Amber - for approaching limits, caution
+val EnafWarningSoft = Color(0x1AF59E0B) // Amber with low opacity
+val EnafInfo = Color(0xFF3B82F6) // Blue - for informational messages
+val EnafInfoSoft = Color(0x1A3B82F6) // Blue with low opacity
+
+// Additional semantic colors for states
+val EnafSurface = Color(0xFF1E293B) // For elevated surfaces, cards
+val EnafSurfaceVariant = Color(0xFF334155) // For secondary surfaces
+val EnafOnSurface = Color(0xFFFFFFFF) // Text on surface
+val EnafOutline = Color(0xFF64748B) // Borders, dividers
+
+// Shimmer/Skeleton loading colors
+val EnafShimmerLight = Color(0xFF334155)
+val EnafShimmerDark = Color(0xFF0F172A)

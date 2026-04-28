@@ -1,5 +1,6 @@
 package com.example.enaf.ui.screens.levels
 
+import com.example.enaf.ui.components.UiError
 import kotlin.collections.emptyList
 import kotlin.collections.listOf
 
@@ -15,6 +16,7 @@ data class LevelsUiState(
     val xpToNextLevel: Int = 250,
     val unlocks: List<LevelUnlockUiModel> = emptyList(),
     val isLoading: Boolean = true,
+    val error: UiError? = null,
 )
 
 sealed interface LevelsUiEvent {

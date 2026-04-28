@@ -1,5 +1,6 @@
 package com.example.enaf.ui.screens.roadmap
 
+import com.example.enaf.ui.components.UiError
 import kotlin.collections.emptyList
 import kotlin.collections.listOf
 
@@ -15,6 +16,7 @@ data class RoadmapUiState(
     val subtitle: String = "",
     val milestones: List<RoadmapMilestoneUiModel> = emptyList(),
     val isLoading: Boolean = true,
+    val error: UiError? = null,
 )
 
 sealed interface RoadmapUiEvent {

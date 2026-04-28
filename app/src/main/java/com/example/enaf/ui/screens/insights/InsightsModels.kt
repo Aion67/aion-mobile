@@ -1,5 +1,6 @@
 package com.example.enaf.ui.screens.insights
 
+import com.example.enaf.ui.components.UiError
 import kotlin.collections.emptyList
 import kotlin.collections.listOf
 
@@ -28,6 +29,7 @@ data class InsightsUiState(
     val categories: List<InsightsCategoryUiModel> = emptyList(),
     val observations: List<InsightsObservationUiModel> = emptyList(),
     val isLoading: Boolean = true,
+    val error: UiError? = null,
 )
 
 sealed interface InsightsUiEvent {

@@ -76,7 +76,7 @@ fun EnafTopAppBar(
                     // "Enaf" Logo Text
                     Text(
                         text = "Enaf",
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Black,
                         letterSpacing = (-1).sp
@@ -89,7 +89,7 @@ fun EnafTopAppBar(
                         imageVector = Icons.Default.Notifications,
                         contentDescription = "Notifications",
                         modifier = Modifier.size(20.dp),
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }

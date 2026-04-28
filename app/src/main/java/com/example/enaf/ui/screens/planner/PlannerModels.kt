@@ -1,5 +1,6 @@
 package com.example.enaf.ui.screens.planner
 
+import com.example.enaf.ui.components.UiError
 import kotlin.collections.emptyList
 import kotlin.collections.listOf
 
@@ -11,6 +12,7 @@ data class PlannerUiState(
     val allAppItems: List<PlannerAppItemUiModel> = emptyList(),
     val appItems: List<PlannerAppItemUiModel> = emptyList(),
     val isLoading: Boolean = true,
+    val error: UiError? = null,
 )
 
 data class PlannerAppItemUiModel(

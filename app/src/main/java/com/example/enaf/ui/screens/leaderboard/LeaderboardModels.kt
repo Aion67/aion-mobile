@@ -1,5 +1,6 @@
 package com.example.enaf.ui.screens.leaderboard
 
+import com.example.enaf.ui.components.UiError
 import kotlin.collections.emptyList
 import kotlin.collections.listOf
 
@@ -14,6 +15,7 @@ data class LeaderboardUiState(
     val subtitle: String = "",
     val entries: List<LeaderboardEntryUiModel> = emptyList(),
     val isLoading: Boolean = true,
+    val error: UiError? = null,
 )
 
 sealed interface LeaderboardUiEvent {

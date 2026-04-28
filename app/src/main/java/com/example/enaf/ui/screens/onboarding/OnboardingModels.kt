@@ -1,5 +1,6 @@
 package com.example.enaf.ui.screens.onboarding
 
+import com.example.enaf.ui.components.UiError
 import kotlin.collections.listOf
 
 data class OnboardingPageUiModel(
@@ -11,6 +12,7 @@ data class OnboardingUiState(
     val currentPageIndex: Int = 0,
     val pages: List<OnboardingPageUiModel> = defaultOnboardingPages(),
     val ctaText: String = "Get Started",
+    val error: UiError? = null,
 )
 
 sealed interface OnboardingUiEvent {

@@ -22,7 +22,7 @@ fun EnafButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     containerColor: Color = EnafActionBlue,
-    contentColor: Color = Color.White
+    contentColor: Color = MaterialTheme.colorScheme.onPrimary
 ) {
     Box(
         modifier = modifier

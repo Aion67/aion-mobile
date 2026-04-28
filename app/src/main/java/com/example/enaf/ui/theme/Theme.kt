@@ -9,24 +9,36 @@ import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
     primary = EnafActionBlue,
-    secondary = EnafCardBg,
+    secondary = EnafPink,
+    tertiary = EnafSuccess,
     background = EnafDarkBg,
     surface = EnafCardBg,
-    onPrimary = Color.White,
+    onPrimary = EnafTextPrimary,
+    onSecondary = EnafTextPrimary,
+    onTertiary = EnafTextPrimary,
     onBackground = EnafTextPrimary,
     onSurface = EnafTextPrimary,
-    error = EnafErrorRed
+    error = EnafErrorRed,
+    onError = EnafTextPrimary,
+    outline = EnafOutline,
+    outlineVariant = EnafBorder
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = EnafActionBlue,
-    secondary = Color.White,
-    background = Color.White,
-    surface = Color.White,
+    secondary = EnafPink,
+    tertiary = EnafSuccess,
+    background = Color(0xFFF8FAFC), // Very light blue-grey
+    surface = Color(0xFFFFFFFF), // White
     onPrimary = Color.White,
-    onBackground = Color.Black,
-    onSurface = Color.Black,
-    error = EnafErrorRed
+    onSecondary = Color.White,
+    onTertiary = Color.White,
+    onBackground = Color(0xFF0F172A), // Dark slate for contrast
+    onSurface = Color(0xFF0F172A),
+    error = EnafErrorRed,
+    onError = Color.White,
+    outline = Color(0xFFCBD5E1),
+    outlineVariant = Color(0xFFE2E8F0)
 )
 
 @Composable

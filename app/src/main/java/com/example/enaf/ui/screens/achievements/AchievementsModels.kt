@@ -1,5 +1,6 @@
 package com.example.enaf.ui.screens.achievements
 
+import com.example.enaf.ui.components.UiError
 import kotlin.collections.emptyList
 import kotlin.collections.listOf
 
@@ -14,6 +15,7 @@ data class AchievementsUiState(
     val unlockedLabel: String = "0 / 0 unlocked",
     val items: List<AchievementItemUiModel> = emptyList(),
     val isLoading: Boolean = true,
+    val error: UiError? = null,
 )
 
 sealed interface AchievementsUiEvent {

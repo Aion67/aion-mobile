@@ -1,5 +1,6 @@
 package com.example.enaf.ui.screens.shop
 
+import com.example.enaf.ui.components.UiError
 import kotlin.collections.emptyList
 import kotlin.collections.listOf
 
@@ -23,6 +24,7 @@ data class ShopUiState(
     val items: List<ShopItemUiModel> = emptyList(),
     val statusMessage: String = "",
     val isLoading: Boolean = true,
+    val error: UiError? = null,
 )
 
 sealed interface ShopUiEvent {

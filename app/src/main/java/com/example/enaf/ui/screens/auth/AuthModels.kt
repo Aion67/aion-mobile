@@ -1,5 +1,7 @@
 package com.example.enaf.ui.screens.auth
 
+import com.example.enaf.ui.components.UiError
+
 enum class AuthMode {
     SIGN_UP,
     LOGIN,
@@ -10,7 +12,7 @@ data class AuthUiState(
     val email: String = "",
     val password: String = "",
     val isLoading: Boolean = false,
-    val errorMessage: String? = null,
+    val error: UiError? = null,
 )
 
 sealed interface AuthUiEvent {

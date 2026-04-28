@@ -1,5 +1,6 @@
 package com.example.enaf.ui.screens.settings
 
+import com.example.enaf.ui.components.UiError
 import kotlin.collections.listOf
 
 enum class ThemeModeOption {
@@ -23,6 +24,7 @@ data class SettingsUiState(
     val quietModeDurationHours: Float = 2f,
     val selectedTheme: ThemeModeOption = ThemeModeOption.DARK,
     val isLoading: Boolean = true,
+    val error: UiError? = null,
 )
 
 sealed interface SettingsUiEvent {
