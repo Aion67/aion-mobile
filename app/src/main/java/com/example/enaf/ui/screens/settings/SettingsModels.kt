@@ -17,6 +17,7 @@ data class SettingsProfileUiModel(
 
 data class SettingsUiState(
     val profile: SettingsProfileUiModel = SettingsProfileUiModel("", "", ""),
+    val globalLimitMinutes: Int = 240,
     val regretSimulationEnabled: Boolean = true,
     val opportunityLeakEnabled: Boolean = false,
     val smartAlertsEnabled: Boolean = true,
@@ -45,6 +46,7 @@ fun settingsPreviewState(): SettingsUiState {
             email = "aita.josh@example.com",
             tierLabel = "PRO MEMBER",
         ),
+        globalLimitMinutes = 240,
         regretSimulationEnabled = true,
         opportunityLeakEnabled = false,
         smartAlertsEnabled = true,

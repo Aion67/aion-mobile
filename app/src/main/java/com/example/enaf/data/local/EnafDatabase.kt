@@ -30,7 +30,7 @@ import com.example.enaf.data.local.entity.WalletLedgerEntity
         AchievementCacheEntity::class,
         WalletLedgerEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = true,
 )
 abstract class EnafDatabase : RoomDatabase() {

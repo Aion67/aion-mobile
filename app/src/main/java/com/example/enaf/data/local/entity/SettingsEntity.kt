@@ -24,6 +24,8 @@ data class SettingsEntity(
     val id: String,
     @ColumnInfo(name = "user_id")
     val userId: String,
+    @ColumnInfo(name = "global_limit_minutes")
+    val globalLimitMinutes: Int,
     @ColumnInfo(name = "allow_notifications")
     val allowNotifications: Boolean,
     @ColumnInfo(name = "allow_display_over_other_apps")

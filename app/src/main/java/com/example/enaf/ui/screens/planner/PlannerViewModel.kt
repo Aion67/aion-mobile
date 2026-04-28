@@ -18,6 +18,8 @@ class PlannerViewModel(
     private val _uiState = MutableStateFlow(PlannerUiState())
     val uiState: StateFlow<PlannerUiState> = _uiState.asStateFlow()
 
+    private var currentUserId: String? = null
+
     init {
         observeActiveSession()
     }
@@ -30,7 +32,7 @@ class PlannerViewModel(
             }
             is PlannerUiEvent.GlobalLimitChanged -> {
                 _uiState.value = _uiState.value.copy(globalLimitMinutes = event.limitMinutes)
-                // TODO: Persist this setting to database
+                persistGlobalLimit(event.limitMinutes)
             }
             PlannerUiEvent.Refresh -> refreshVisibleItems()
         }
@@ -48,6 +50,7 @@ class PlannerViewModel(
                     return@collect
                 }
 
+                currentUserId = userId
                 loadPlannerState(userId)
             }
         }
@@ -65,6 +68,7 @@ class PlannerViewModel(
     private suspend fun loadPlannerState(userId: String) {
         try {
             val trackedApps = localRepository.getTrackedApps(userId)
+            val settings = localRepository.getSettings(userId)
             val appItems = mutableListOf<PlannerAppItemUiModel>()
             trackedApps.forEach { app ->
                 val item = buildPlannerItem(app)
@@ -76,7 +80,7 @@ class PlannerViewModel(
 
             _uiState.value = PlannerUiState(
                 searchQuery = _uiState.value.searchQuery,
-                globalLimitMinutes = appItems.sumOf { it.limitMinutes },
+                globalLimitMinutes = settings?.globalLimitMinutes ?: appItems.sumOf { it.limitMinutes },
                 totalUsedMinutes = appItems.sumOf { it.usedMinutes },
                 usageInsightMessage = buildInsightMessage(appItems),
                 allAppItems = appItems,
@@ -88,6 +92,28 @@ class PlannerViewModel(
             _uiState.value = _uiState.value.copy(
                 isLoading = false,
                 error = e.toUiError(),
+            )
+        }
+    }
+
+    private fun persistGlobalLimit(limitMinutes: Int) {
+        val userId = currentUserId ?: return
+        viewModelScope.launch {
+            val existing = localRepository.getSettings(userId)
+            localRepository.upsertSettings(
+                com.example.enaf.data.local.entity.SettingsEntity(
+                    id = existing?.id ?: "settings-$userId",
+                    userId = userId,
+                    globalLimitMinutes = limitMinutes,
+                    allowNotifications = existing?.allowNotifications ?: true,
+                    allowDisplayOverOtherApps = existing?.allowDisplayOverOtherApps ?: true,
+                    themeMode = existing?.themeMode ?: "dark",
+                    preferredTheme = existing?.preferredTheme ?: "dark",
+                    biometricLockEnabled = existing?.biometricLockEnabled ?: false,
+                    overlayEnabled = existing?.overlayEnabled ?: true,
+                    quietHoursStart = existing?.quietHoursStart ?: "22:00",
+                    quietHoursEnd = existing?.quietHoursEnd ?: "00:00",
+                )
             )
         }
     }

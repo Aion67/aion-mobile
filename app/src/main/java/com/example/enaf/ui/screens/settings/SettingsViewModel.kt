@@ -95,6 +95,7 @@ class SettingsViewModel(
                     email = "$userId@enaf.local",
                     tierLabel = inferTier(userId),
                 ),
+                globalLimitMinutes = settings?.globalLimitMinutes ?: 240,
                 regretSimulationEnabled = settings?.overlayEnabled ?: true,
                 opportunityLeakEnabled = settings?.biometricLockEnabled ?: false,
                 smartAlertsEnabled = settings?.allowNotifications ?: true,
@@ -120,6 +121,7 @@ class SettingsViewModel(
             val entity = SettingsEntity(
                 id = settingsId ?: "settings-$userId",
                 userId = userId,
+                globalLimitMinutes = state.globalLimitMinutes,
                 allowNotifications = state.smartAlertsEnabled,
                 allowDisplayOverOtherApps = state.pulseNotificationsEnabled,
                 themeMode = when (state.selectedTheme) {
