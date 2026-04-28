@@ -67,8 +67,7 @@ fun LeaderboardScreen(
                     EmptyStateCard("No leaderboard data yet. Play through a few days to enter the rankings.")
                 }
             } else {
-                items(uiState.entries.size) { idx ->
-                    val entry = uiState.entries[idx]
+                items(uiState.entries, key = { it.rank }) { entry ->
                     LeaderboardRow(
                         rank = entry.rank,
                         name = entry.name,

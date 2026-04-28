@@ -67,8 +67,7 @@ fun AchievementsScreen(
                     EmptyStateCard("No achievements yet. Unlock the first badges by keeping your limits intact.")
                 }
             } else {
-                items(uiState.items.size) { idx ->
-                    val item = uiState.items[idx]
+                items(uiState.items, key = { it.id }) { item ->
                     BadgeRow(
                         title = item.title,
                         detail = item.detail,
