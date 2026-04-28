@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.enaf.ui.components.EnafButton
 import com.example.enaf.ui.components.EnafTextField
+import com.example.enaf.ui.components.SocialButton
 import com.example.enaf.ui.theme.*
 
 @Composable
@@ -212,26 +213,6 @@ fun AuthScreen(
             
             Spacer(modifier = Modifier.height(24.dp))
         }
-    }
-}
-
-@Composable
-fun SocialButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    OutlinedButton(
-        onClick = onClick,
-        modifier = modifier.height(56.dp),
-        shape = RoundedCornerShape(12.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, EnafHeaderBorder),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
-    ) {
-        // Placeholder for Icon
-        Box(modifier = Modifier.size(20.dp).background(Color.Gray.copy(alpha = 0.3f), RoundedCornerShape(4.dp)))
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(text = text, fontSize = 14.sp, fontWeight = FontWeight.Medium)
     }
 }
 
