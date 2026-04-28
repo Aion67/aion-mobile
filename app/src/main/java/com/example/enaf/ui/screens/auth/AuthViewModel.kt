@@ -20,8 +20,8 @@ class AuthViewModel(
 
     fun onEvent(event: AuthUiEvent, onAuthSuccess: () -> Unit = {}) {
         when (event) {
-            is AuthUiEvent.EmailChanged -> _uiState.value = _uiState.value.copy(email = event.value, errorMessage = null)
-            is AuthUiEvent.PasswordChanged -> _uiState.value = _uiState.value.copy(password = event.value, errorMessage = null)
+            is AuthUiEvent.EmailChanged -> _uiState.value = _uiState.value.copy(email = event.value, emailError = null, error = null)
+            is AuthUiEvent.PasswordChanged -> _uiState.value = _uiState.value.copy(password = event.value, passwordError = null, error = null)
             AuthUiEvent.ToggleModeClicked -> toggleMode()
             AuthUiEvent.SubmitClicked -> submitCredentials(onAuthSuccess)
             AuthUiEvent.GoogleClicked -> signInWithProvider("google", onAuthSuccess)
@@ -32,19 +32,26 @@ class AuthViewModel(
 
     private fun toggleMode() {
         val next = if (_uiState.value.mode == AuthMode.SIGN_UP) AuthMode.LOGIN else AuthMode.SIGN_UP
-        _uiState.value = _uiState.value.copy(mode = next, errorMessage = null)
+        _uiState.value = _uiState.value.copy(mode = next, emailError = null, passwordError = null, error = null)
     }
 
     private fun submitCredentials(onAuthSuccess: () -> Unit) {
         val state = _uiState.value
-        if (state.email.isBlank() || state.password.length < 6) {
-            _uiState.value = state.copy(error = UiError.ValidationError("Enter a valid email and password (min 6 chars)."))
+        val emailError = validateEmail(state.email)
+        val passwordError = validatePassword(state.password)
+
+        if (emailError != null || passwordError != null) {
+            _uiState.value = state.copy(
+                emailError = emailError,
+                passwordError = passwordError,
+                error = UiError.ValidationError("Fix the highlighted fields and try again."),
+            )
             return
         }
 
         viewModelScope.launch {
             try {
-                _uiState.value = state.copy(isLoading = true, error = null)
+                _uiState.value = state.copy(isLoading = true, emailError = null, passwordError = null, error = null)
                 val userId = state.email.trim().lowercase()
                 localRepository.upsertSession(
                     UserSessionEntity(
@@ -69,7 +76,7 @@ class AuthViewModel(
     private fun signInWithProvider(provider: String, onAuthSuccess: () -> Unit) {
         viewModelScope.launch {
             try {
-                _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+                _uiState.value = _uiState.value.copy(isLoading = true, emailError = null, passwordError = null, error = null)
                 val userId = "$provider-user"
                 localRepository.upsertSession(
                     UserSessionEntity(
@@ -94,7 +101,7 @@ class AuthViewModel(
     private fun continueAsGuest(onAuthSuccess: () -> Unit) {
         viewModelScope.launch {
             try {
-                _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+                _uiState.value = _uiState.value.copy(isLoading = true, emailError = null, passwordError = null, error = null)
                 localRepository.upsertSession(
                     UserSessionEntity(
                         id = "session-guest",
@@ -113,5 +120,17 @@ class AuthViewModel(
                 )
             }
         }
+    }
+
+    private fun validateEmail(email: String): String? {
+        if (email.isBlank()) return "Email is required."
+        if (!email.contains("@") || !email.contains(".")) return "Enter a valid email address."
+        return null
+    }
+
+    private fun validatePassword(password: String): String? {
+        if (password.isBlank()) return "Password is required."
+        if (password.length < 6) return "Password must be at least 6 characters."
+        return null
     }
 }

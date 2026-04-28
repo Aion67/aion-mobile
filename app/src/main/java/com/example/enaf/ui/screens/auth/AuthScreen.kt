@@ -101,6 +101,16 @@ fun AuthScreen(
                     Icon(Icons.Default.Email, contentDescription = null, tint = EnafTextMuted, modifier = Modifier.size(20.dp))
                 }
             )
+            uiState.emailError?.let { error ->
+                Text(
+                    text = error,
+                    color = EnafErrorRed,
+                    fontSize = 12.sp,
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(top = 6.dp),
+                )
+            }
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -114,6 +124,16 @@ fun AuthScreen(
                     Icon(Icons.Default.Lock, contentDescription = null, tint = EnafTextMuted, modifier = Modifier.size(20.dp))
                 }
             )
+            uiState.passwordError?.let { error ->
+                Text(
+                    text = error,
+                    color = EnafErrorRed,
+                    fontSize = 12.sp,
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(top = 6.dp),
+                )
+            }
 
             if (uiState.mode == AuthMode.LOGIN) {
                 Text(
@@ -128,9 +148,9 @@ fun AuthScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            uiState.errorMessage?.let { error ->
+            uiState.error?.let { error ->
                 Text(
-                    text = error,
+                    text = error.message,
                     color = EnafErrorRed,
                     fontSize = 12.sp,
                     modifier = Modifier.align(Alignment.Start),
