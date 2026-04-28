@@ -30,6 +30,7 @@ data class PlannerAppItemUiModel(
 
 sealed interface PlannerUiEvent {
     data class SearchQueryChanged(val value: String) : PlannerUiEvent
+    data class GlobalLimitChanged(val limitMinutes: Int) : PlannerUiEvent
     data object Refresh : PlannerUiEvent
 }
 

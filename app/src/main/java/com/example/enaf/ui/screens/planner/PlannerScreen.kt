@@ -76,7 +76,10 @@ fun PlannerScreen(
             }
 
             item {
-                GlobalLimitCard()
+                GlobalLimitCard(
+                    limitMinutes = uiState.globalLimitMinutes,
+                    onLimitChange = { minutes -> onEvent(PlannerUiEvent.GlobalLimitChanged(minutes)) }
+                )
             }
 
             item {

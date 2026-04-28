@@ -28,6 +28,10 @@ class PlannerViewModel(
                 _uiState.value = _uiState.value.copy(searchQuery = event.value)
                 refreshVisibleItems()
             }
+            is PlannerUiEvent.GlobalLimitChanged -> {
+                _uiState.value = _uiState.value.copy(globalLimitMinutes = event.limitMinutes)
+                // TODO: Persist this setting to database
+            }
             PlannerUiEvent.Refresh -> refreshVisibleItems()
         }
     }

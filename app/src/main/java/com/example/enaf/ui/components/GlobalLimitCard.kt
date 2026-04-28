@@ -22,9 +22,10 @@ import com.example.enaf.ui.theme.*
 @Composable
 fun GlobalLimitCard(
     modifier: Modifier = Modifier,
-    initialLimitHours: Float = 2f
+    limitMinutes: Int = 120,
+    onLimitChange: (Int) -> Unit = {}
 ) {
-    var limit by remember { mutableFloatStateOf(initialLimitHours) }
+    var limit by remember(limitMinutes) { mutableFloatStateOf(limitMinutes / 60f) }
 
     Box(
         modifier = modifier
@@ -93,7 +94,10 @@ fun GlobalLimitCard(
             Column {
                 Slider(
                     value = limit,
-                    onValueChange = { limit = it },
+                    onValueChange = { newLimit ->
+                        limit = newLimit
+                        onLimitChange((newLimit * 60).toInt())
+                    },
                     valueRange = 0f..6f,
                     colors = SliderDefaults.colors(
                         thumbColor = Color.White,
