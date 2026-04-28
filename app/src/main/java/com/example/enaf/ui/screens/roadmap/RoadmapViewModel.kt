@@ -3,6 +3,7 @@ package com.example.enaf.ui.screens.roadmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.enaf.data.repository.LocalRepository
+import com.example.enaf.ui.components.toUiError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -53,24 +54,32 @@ class RoadmapViewModel(
     }
 
     private suspend fun loadRoadmapState(userId: String) {
-        val summaries = localRepository.getDailySummaries(userId).sortedBy { it.summaryDate }
-        val achievements = localRepository.getAchievementCache(userId)
+        try {
+            val summaries = localRepository.getDailySummaries(userId).sortedBy { it.summaryDate }
+            val achievements = localRepository.getAchievementCache(userId)
 
-        val streak = summaries.maxOfOrNull { it.streakDay } ?: 0
-        val focusXp = summaries.sumOf { it.focusMinutes }
-        val lowScrollDays = summaries.count { it.scrollMinutes <= 120 }
-        val averageCredit = summaries.map { it.creditScore }.average().toInt()
+            val streak = summaries.maxOfOrNull { it.streakDay } ?: 0
+            val focusXp = summaries.sumOf { it.focusMinutes }
+            val lowScrollDays = summaries.count { it.scrollMinutes <= 120 }
+            val averageCredit = summaries.map { it.creditScore }.average().toInt()
 
-        _uiState.value = RoadmapUiState(
-            subtitle = buildSubtitle(achievements.size, averageCredit),
-            milestones = buildMilestones(
-                streak = streak,
-                lowScrollDays = lowScrollDays,
-                focusXp = focusXp,
-                totalDays = summaries.size,
-            ),
-            isLoading = false,
-        )
+            _uiState.value = RoadmapUiState(
+                subtitle = buildSubtitle(achievements.size, averageCredit),
+                milestones = buildMilestones(
+                    streak = streak,
+                    lowScrollDays = lowScrollDays,
+                    focusXp = focusXp,
+                    totalDays = summaries.size,
+                ),
+                isLoading = false,
+                error = null,
+            )
+        } catch (e: Exception) {
+            _uiState.value = _uiState.value.copy(
+                isLoading = false,
+                error = e.toUiError(),
+            )
+        }
     }
 
     private fun buildSubtitle(achievementCount: Int, averageCredit: Int): String {

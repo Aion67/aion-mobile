@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.enaf.data.local.entity.SettingsEntity
 import com.example.enaf.data.repository.LocalRepository
+import com.example.enaf.ui.components.toUiError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -84,23 +85,31 @@ class SettingsViewModel(
     }
 
     private suspend fun loadSettingsState(userId: String) {
-        val settings = localRepository.getSettings(userId)
-        settingsId = settings?.id ?: "settings-$userId"
+        try {
+            val settings = localRepository.getSettings(userId)
+            settingsId = settings?.id ?: "settings-$userId"
 
-        _uiState.value = SettingsUiState(
-            profile = SettingsProfileUiModel(
-                displayName = "Warrior ${userId.takeLast(4)}",
-                email = "$userId@enaf.local",
-                tierLabel = inferTier(userId),
-            ),
-            regretSimulationEnabled = settings?.overlayEnabled ?: true,
-            opportunityLeakEnabled = settings?.biometricLockEnabled ?: false,
-            smartAlertsEnabled = settings?.allowNotifications ?: true,
-            pulseNotificationsEnabled = settings?.allowDisplayOverOtherApps ?: true,
-            quietModeDurationHours = parseDurationHours(settings?.quietHoursStart, settings?.quietHoursEnd),
-            selectedTheme = parseThemeMode(settings?.themeMode),
-            isLoading = false,
-        )
+            _uiState.value = SettingsUiState(
+                profile = SettingsProfileUiModel(
+                    displayName = "Warrior ${userId.takeLast(4)}",
+                    email = "$userId@enaf.local",
+                    tierLabel = inferTier(userId),
+                ),
+                regretSimulationEnabled = settings?.overlayEnabled ?: true,
+                opportunityLeakEnabled = settings?.biometricLockEnabled ?: false,
+                smartAlertsEnabled = settings?.allowNotifications ?: true,
+                pulseNotificationsEnabled = settings?.allowDisplayOverOtherApps ?: true,
+                quietModeDurationHours = parseDurationHours(settings?.quietHoursStart, settings?.quietHoursEnd),
+                selectedTheme = parseThemeMode(settings?.themeMode),
+                isLoading = false,
+                error = null,
+            )
+        } catch (e: Exception) {
+            _uiState.value = _uiState.value.copy(
+                isLoading = false,
+                error = e.toUiError(),
+            )
+        }
     }
 
     private fun persistSettings() {

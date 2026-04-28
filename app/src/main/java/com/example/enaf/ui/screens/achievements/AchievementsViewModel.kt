@@ -3,6 +3,7 @@ package com.example.enaf.ui.screens.achievements
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.enaf.data.repository.LocalRepository
+import com.example.enaf.ui.components.toUiError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -53,17 +54,25 @@ class AchievementsViewModel(
     }
 
     private suspend fun loadAchievements(userId: String) {
-        val unlockedIds = localRepository.getAchievementCache(userId).map { it.achievementId }.toSet()
-        val items = achievementCatalog().map { base ->
-            base.copy(unlocked = unlockedIds.contains(base.id))
-        }
-        val unlockedCount = items.count { it.unlocked }
+        try {
+            val unlockedIds = localRepository.getAchievementCache(userId).map { it.achievementId }.toSet()
+            val items = achievementCatalog().map { base ->
+                base.copy(unlocked = unlockedIds.contains(base.id))
+            }
+            val unlockedCount = items.count { it.unlocked }
 
-        _uiState.value = AchievementsUiState(
-            unlockedLabel = "$unlockedCount / ${items.size} unlocked",
-            items = items,
-            isLoading = false,
-        )
+            _uiState.value = AchievementsUiState(
+                unlockedLabel = "$unlockedCount / ${items.size} unlocked",
+                items = items,
+                isLoading = false,
+                error = null,
+            )
+        } catch (e: Exception) {
+            _uiState.value = _uiState.value.copy(
+                isLoading = false,
+                error = e.toUiError(),
+            )
+        }
     }
 
     private fun achievementCatalog(): List<AchievementItemUiModel> {

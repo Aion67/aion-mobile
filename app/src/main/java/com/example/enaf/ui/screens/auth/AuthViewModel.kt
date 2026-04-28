@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.enaf.data.local.entity.UserSessionEntity
 import com.example.enaf.data.repository.LocalRepository
+import com.example.enaf.ui.components.toUiError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,59 +38,80 @@ class AuthViewModel(
     private fun submitCredentials(onAuthSuccess: () -> Unit) {
         val state = _uiState.value
         if (state.email.isBlank() || state.password.length < 6) {
-            _uiState.value = state.copy(errorMessage = "Enter a valid email and password (min 6 chars).")
+            _uiState.value = state.copy(error = UiError.ValidationError("Enter a valid email and password (min 6 chars)."))
             return
         }
 
         viewModelScope.launch {
-            _uiState.value = state.copy(isLoading = true, errorMessage = null)
-            val userId = state.email.trim().lowercase()
-            localRepository.upsertSession(
-                UserSessionEntity(
-                    id = "session-$userId",
-                    userId = userId,
-                    authToken = "local-token-$userId",
-                    onboardingSeen = true,
-                    createdAtEpochMillis = System.currentTimeMillis(),
+            try {
+                _uiState.value = state.copy(isLoading = true, error = null)
+                val userId = state.email.trim().lowercase()
+                localRepository.upsertSession(
+                    UserSessionEntity(
+                        id = "session-$userId",
+                        userId = userId,
+                        authToken = "local-token-$userId",
+                        onboardingSeen = true,
+                        createdAtEpochMillis = System.currentTimeMillis(),
+                    )
                 )
-            )
-            _uiState.value = _uiState.value.copy(isLoading = false)
-            onAuthSuccess()
+                _uiState.value = _uiState.value.copy(isLoading = false, error = null)
+                onAuthSuccess()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = e.toUiError(),
+                )
+            }
         }
     }
 
     private fun signInWithProvider(provider: String, onAuthSuccess: () -> Unit) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
-            val userId = "$provider-user"
-            localRepository.upsertSession(
-                UserSessionEntity(
-                    id = "session-$userId",
-                    userId = userId,
-                    authToken = "$provider-token",
-                    onboardingSeen = true,
-                    createdAtEpochMillis = System.currentTimeMillis(),
+            try {
+                _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+                val userId = "$provider-user"
+                localRepository.upsertSession(
+                    UserSessionEntity(
+                        id = "session-$userId",
+                        userId = userId,
+                        authToken = "$provider-token",
+                        onboardingSeen = true,
+                        createdAtEpochMillis = System.currentTimeMillis(),
+                    )
                 )
-            )
-            _uiState.value = _uiState.value.copy(isLoading = false)
-            onAuthSuccess()
+                _uiState.value = _uiState.value.copy(isLoading = false, error = null)
+                onAuthSuccess()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = e.toUiError(),
+                )
+            }
         }
     }
 
     private fun continueAsGuest(onAuthSuccess: () -> Unit) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
-            localRepository.upsertSession(
-                UserSessionEntity(
-                    id = "session-guest",
-                    userId = "guest-local-user",
-                    authToken = null,
-                    onboardingSeen = true,
-                    createdAtEpochMillis = System.currentTimeMillis(),
+            try {
+                _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+                localRepository.upsertSession(
+                    UserSessionEntity(
+                        id = "session-guest",
+                        userId = "guest-local-user",
+                        authToken = null,
+                        onboardingSeen = true,
+                        createdAtEpochMillis = System.currentTimeMillis(),
+                    )
                 )
-            )
-            _uiState.value = _uiState.value.copy(isLoading = false)
-            onAuthSuccess()
+                _uiState.value = _uiState.value.copy(isLoading = false, error = null)
+                onAuthSuccess()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = e.toUiError(),
+                )
+            }
         }
     }
 }

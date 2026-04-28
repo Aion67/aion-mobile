@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.enaf.data.local.entity.AppLimitEntity
 import com.example.enaf.data.local.entity.TrackedAppEntity
 import com.example.enaf.data.repository.LocalRepository
+import com.example.enaf.ui.components.toUiError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -58,25 +59,33 @@ class PlannerViewModel(
     }
 
     private suspend fun loadPlannerState(userId: String) {
-        val trackedApps = localRepository.getTrackedApps(userId)
-        val appItems = mutableListOf<PlannerAppItemUiModel>()
-        trackedApps.forEach { app ->
-            val item = buildPlannerItem(app)
-            if (item != null) {
-                appItems.add(item)
+        try {
+            val trackedApps = localRepository.getTrackedApps(userId)
+            val appItems = mutableListOf<PlannerAppItemUiModel>()
+            trackedApps.forEach { app ->
+                val item = buildPlannerItem(app)
+                if (item != null) {
+                    appItems.add(item)
+                }
             }
-        }
-        val visibleItems = filterItems(appItems, _uiState.value.searchQuery)
+            val visibleItems = filterItems(appItems, _uiState.value.searchQuery)
 
-        _uiState.value = PlannerUiState(
-            searchQuery = _uiState.value.searchQuery,
-            globalLimitMinutes = appItems.sumOf { it.limitMinutes },
-            totalUsedMinutes = appItems.sumOf { it.usedMinutes },
-            usageInsightMessage = buildInsightMessage(appItems),
-            allAppItems = appItems,
-            appItems = visibleItems,
-            isLoading = false,
-        )
+            _uiState.value = PlannerUiState(
+                searchQuery = _uiState.value.searchQuery,
+                globalLimitMinutes = appItems.sumOf { it.limitMinutes },
+                totalUsedMinutes = appItems.sumOf { it.usedMinutes },
+                usageInsightMessage = buildInsightMessage(appItems),
+                allAppItems = appItems,
+                appItems = visibleItems,
+                isLoading = false,
+                error = null,
+            )
+        } catch (e: Exception) {
+            _uiState.value = _uiState.value.copy(
+                isLoading = false,
+                error = e.toUiError(),
+            )
+        }
     }
 
     private suspend fun buildPlannerItem(app: TrackedAppEntity): PlannerAppItemUiModel? {

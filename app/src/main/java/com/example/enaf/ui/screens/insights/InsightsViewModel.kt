@@ -3,6 +3,7 @@ package com.example.enaf.ui.screens.insights
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.enaf.data.repository.LocalRepository
+import com.example.enaf.ui.components.toUiError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -63,31 +64,39 @@ class InsightsViewModel(
     }
 
     private suspend fun loadInsightsState(userId: String) {
-        val summaries = localRepository.getDailySummaries(userId)
-        val scoped = scopedSummaries(summaries)
-        val streak = scoped.maxOfOrNull { it.streakDay } ?: 0
+        try {
+            val summaries = localRepository.getDailySummaries(userId)
+            val scoped = scopedSummaries(summaries)
+            val streak = scoped.maxOfOrNull { it.streakDay } ?: 0
 
-        val totalFocus = scoped.sumOf { it.focusMinutes }.coerceAtLeast(1)
-        val totalScroll = scoped.sumOf { it.scrollMinutes }
-        val totalSaved = scoped.sumOf { it.timeSavedMinutes }
-        val recovery = (totalSaved / 2).coerceAtLeast(0)
-        val bucketTotal = (totalFocus + totalScroll + totalSaved + recovery).coerceAtLeast(1)
+            val totalFocus = scoped.sumOf { it.focusMinutes }.coerceAtLeast(1)
+            val totalScroll = scoped.sumOf { it.scrollMinutes }
+            val totalSaved = scoped.sumOf { it.timeSavedMinutes }
+            val recovery = (totalSaved / 2).coerceAtLeast(0)
+            val bucketTotal = (totalFocus + totalScroll + totalSaved + recovery).coerceAtLeast(1)
 
-        val categories = listOf(
-            InsightsCategoryUiModel("Focus", percentLabel(totalFocus, bucketTotal), 0xFF007BFF),
-            InsightsCategoryUiModel("Wellness", percentLabel(totalSaved, bucketTotal), 0xFFD946EF),
-            InsightsCategoryUiModel("Productivity", percentLabel(recovery, bucketTotal), 0xFF00F2EA),
-            InsightsCategoryUiModel("Social", percentLabel(totalScroll, bucketTotal), 0xFFF97316),
-        )
+            val categories = listOf(
+                InsightsCategoryUiModel("Focus", percentLabel(totalFocus, bucketTotal), 0xFF007BFF),
+                InsightsCategoryUiModel("Wellness", percentLabel(totalSaved, bucketTotal), 0xFFD946EF),
+                InsightsCategoryUiModel("Productivity", percentLabel(recovery, bucketTotal), 0xFF00F2EA),
+                InsightsCategoryUiModel("Social", percentLabel(totalScroll, bucketTotal), 0xFFF97316),
+            )
 
-        _uiState.value = InsightsUiState(
-            selectedRange = _uiState.value.selectedRange,
-            streakDays = streak,
-            totalDaysLabel = "$streak Days Total",
-            categories = categories,
-            observations = buildObservations(scoped),
-            isLoading = false,
-        )
+            _uiState.value = InsightsUiState(
+                selectedRange = _uiState.value.selectedRange,
+                streakDays = streak,
+                totalDaysLabel = "$streak Days Total",
+                categories = categories,
+                observations = buildObservations(scoped),
+                isLoading = false,
+                error = null,
+            )
+        } catch (e: Exception) {
+            _uiState.value = _uiState.value.copy(
+                isLoading = false,
+                error = e.toUiError(),
+            )
+        }
     }
 
     private fun scopedSummaries(summaries: List<com.example.enaf.data.local.entity.DailySummaryEntity>): List<com.example.enaf.data.local.entity.DailySummaryEntity> {

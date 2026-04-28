@@ -3,6 +3,7 @@ package com.example.enaf.ui.screens.levels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.enaf.data.repository.LocalRepository
+import com.example.enaf.ui.components.toUiError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -50,19 +51,27 @@ class LevelsViewModel(
     }
 
     private suspend fun loadLevelsState(userId: String) {
-        val summaries = localRepository.getDailySummaries(userId)
-        val totalXp = summaries.sumOf { it.focusMinutes + (it.timeSavedMinutes * 2) }
-        val level = (totalXp / XP_PER_LEVEL).coerceAtLeast(0) + 1
-        val currentXpInLevel = totalXp % XP_PER_LEVEL
+        try {
+            val summaries = localRepository.getDailySummaries(userId)
+            val totalXp = summaries.sumOf { it.focusMinutes + (it.timeSavedMinutes * 2) }
+            val level = (totalXp / XP_PER_LEVEL).coerceAtLeast(0) + 1
+            val currentXpInLevel = totalXp % XP_PER_LEVEL
 
-        _uiState.value = LevelsUiState(
-            level = level,
-            title = levelTitle(level),
-            currentXpInLevel = currentXpInLevel,
-            xpToNextLevel = XP_PER_LEVEL,
-            unlocks = nextUnlocks(level),
-            isLoading = false,
-        )
+            _uiState.value = LevelsUiState(
+                level = level,
+                title = levelTitle(level),
+                currentXpInLevel = currentXpInLevel,
+                xpToNextLevel = XP_PER_LEVEL,
+                unlocks = nextUnlocks(level),
+                isLoading = false,
+                error = null,
+            )
+        } catch (e: Exception) {
+            _uiState.value = _uiState.value.copy(
+                isLoading = false,
+                error = e.toUiError(),
+            )
+        }
     }
 
     private fun levelTitle(level: Int): String {

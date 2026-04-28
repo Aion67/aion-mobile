@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.enaf.data.local.entity.AppLimitEntity
 import com.example.enaf.data.local.entity.TrackedAppEntity
 import com.example.enaf.data.repository.LocalRepository
+import com.example.enaf.ui.components.toUiError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -55,23 +56,31 @@ class HomeViewModel(
     }
 
     private suspend fun loadHomeState(userId: String) {
-        val trackedApps = localRepository.getTrackedApps(userId)
-        val habits = trackedApps.mapNotNull { app -> buildHabitItem(app) }
-        val summaries = localRepository.getDailySummaries(userId)
-        val latestSummary = summaries.firstOrNull()
+        try {
+            val trackedApps = localRepository.getTrackedApps(userId)
+            val habits = trackedApps.mapNotNull { app -> buildHabitItem(app) }
+            val summaries = localRepository.getDailySummaries(userId)
+            val latestSummary = summaries.firstOrNull()
 
-        val totalLimitMinutes = habits.sumOf { parseMinutesFromLimitLabel(it.limitTimeLabel) }.coerceAtLeast(1)
-        val totalUsedMinutes = habits.sumOf { parseMinutesFromUsedLabel(it.usedTimeLabel) }
-        val progress = (totalUsedMinutes.toFloat() / totalLimitMinutes.toFloat()).coerceIn(0f, 1f)
-        val hoursReclaimed = ((latestSummary?.timeSavedMinutes ?: 0) / 60.0)
+            val totalLimitMinutes = habits.sumOf { parseMinutesFromLimitLabel(it.limitTimeLabel) }.coerceAtLeast(1)
+            val totalUsedMinutes = habits.sumOf { parseMinutesFromUsedLabel(it.usedTimeLabel) }
+            val progress = (totalUsedMinutes.toFloat() / totalLimitMinutes.toFloat()).coerceIn(0f, 1f)
+            val hoursReclaimed = ((latestSummary?.timeSavedMinutes ?: 0) / 60.0)
 
-        _uiState.value = HomeUiState(
-            progress = progress,
-            hoursReclaimed = hoursReclaimed,
-            habits = habits,
-            motivationalMessage = buildMotivation(progress, latestSummary?.streakDay ?: 0),
-            isLoading = false,
-        )
+            _uiState.value = HomeUiState(
+                progress = progress,
+                hoursReclaimed = hoursReclaimed,
+                habits = habits,
+                motivationalMessage = buildMotivation(progress, latestSummary?.streakDay ?: 0),
+                isLoading = false,
+                error = null,
+            )
+        } catch (e: Exception) {
+            _uiState.value = _uiState.value.copy(
+                isLoading = false,
+                error = e.toUiError(),
+            )
+        }
     }
 
     private suspend fun buildHabitItem(app: TrackedAppEntity): HomeHabitUiModel? {

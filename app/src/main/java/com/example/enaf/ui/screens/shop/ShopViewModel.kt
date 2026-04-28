@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.enaf.data.local.entity.WalletLedgerEntity
 import com.example.enaf.data.repository.LocalRepository
+import com.example.enaf.ui.components.toUiError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -104,18 +105,26 @@ class ShopViewModel(
     }
 
     private suspend fun loadShopState(userId: String) {
-        val wallet = localRepository.getWalletLedger(userId)
-        val coins = wallet?.coinsBalanceCache ?: 0
-        val diamonds = wallet?.diamondsBalanceCache ?: 0
-        walletLedgerId = wallet?.id ?: "wallet-$userId"
+        try {
+            val wallet = localRepository.getWalletLedger(userId)
+            val coins = wallet?.coinsBalanceCache ?: 0
+            val diamonds = wallet?.diamondsBalanceCache ?: 0
+            walletLedgerId = wallet?.id ?: "wallet-$userId"
 
-        _uiState.value = ShopUiState(
-            coins = coins,
-            diamonds = diamonds,
-            items = buildShopCatalog(coins, diamonds),
-            statusMessage = "Spend smart. Boosters are permanent once unlocked.",
-            isLoading = false,
-        )
+            _uiState.value = ShopUiState(
+                coins = coins,
+                diamonds = diamonds,
+                items = buildShopCatalog(coins, diamonds),
+                statusMessage = "",
+                isLoading = false,
+                error = null,
+            )
+        } catch (e: Exception) {
+            _uiState.value = _uiState.value.copy(
+                isLoading = false,
+                error = e.toUiError(),
+            )
+        }
     }
 
     private fun buildShopCatalog(coins: Int, diamonds: Int): List<ShopItemUiModel> {
