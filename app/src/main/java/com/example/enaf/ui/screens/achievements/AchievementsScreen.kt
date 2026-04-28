@@ -22,6 +22,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.enaf.ui.components.EnafTopAppBar
+import com.example.enaf.ui.components.EmptyStateCard
+import com.example.enaf.ui.components.LoadingStateText
+import com.example.enaf.ui.components.ScreenTitleBlock
 import com.example.enaf.ui.theme.EnafActionBlue
 import com.example.enaf.ui.theme.EnafCardBg
 import com.example.enaf.ui.theme.EnafDarkBg
@@ -49,25 +52,19 @@ fun AchievementsScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {
-                Text(
-                    text = "Achievements",
-                    color = Color.White,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
+                ScreenTitleBlock(
+                    title = "Achievements",
+                    subtitle = uiState.unlockedLabel,
                 )
-            }
-
-            item {
-                Text(uiState.unlockedLabel, color = EnafTextMuted, fontSize = 13.sp)
             }
 
             if (uiState.isLoading) {
                 item {
-                    Text(
-                        text = "Loading achievements...",
-                        color = EnafTextSecondary,
-                        fontSize = 13.sp,
-                    )
+                    LoadingStateText("Loading achievements...")
+                }
+            } else if (uiState.items.isEmpty()) {
+                item {
+                    EmptyStateCard("No achievements yet. Unlock the first badges by keeping your limits intact.")
                 }
             } else {
                 items(uiState.items.size) { idx ->

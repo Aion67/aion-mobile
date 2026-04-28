@@ -27,6 +27,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.enaf.ui.components.EnafTopAppBar
+import com.example.enaf.ui.components.EmptyStateCard
+import com.example.enaf.ui.components.LoadingStateText
+import com.example.enaf.ui.components.ScreenTitleBlock
 import com.example.enaf.ui.theme.EnafActionBlue
 import com.example.enaf.ui.theme.EnafCardBg
 import com.example.enaf.ui.theme.EnafDarkBg
@@ -54,30 +57,17 @@ fun RoadmapScreen(
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             item {
-                Text(
-                    text = "Warrior Roadmap",
-                    color = Color.White,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            item {
-                Text(
-                    text = uiState.subtitle,
-                    color = EnafTextMuted,
-                    fontSize = 13.sp,
-                    lineHeight = 18.sp
+                ScreenTitleBlock(
+                    title = "Warrior Roadmap",
+                    subtitle = uiState.subtitle,
                 )
             }
 
             item {
                 if (uiState.isLoading) {
-                    Text(
-                        text = "Loading roadmap...",
-                        color = EnafTextSecondary,
-                        fontSize = 13.sp,
-                    )
+                    LoadingStateText("Loading roadmap...")
+                } else if (uiState.milestones.isEmpty()) {
+                    EmptyStateCard("No roadmap milestones yet. Keep tracking focus and the path will populate here.")
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         uiState.milestones.forEach { milestone ->

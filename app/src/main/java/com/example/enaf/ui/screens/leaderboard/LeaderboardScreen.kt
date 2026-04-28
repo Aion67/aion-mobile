@@ -22,6 +22,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.enaf.ui.components.EnafTopAppBar
+import com.example.enaf.ui.components.EmptyStateCard
+import com.example.enaf.ui.components.LoadingStateText
+import com.example.enaf.ui.components.ScreenTitleBlock
 import com.example.enaf.ui.theme.EnafActionBlue
 import com.example.enaf.ui.theme.EnafCardBg
 import com.example.enaf.ui.theme.EnafDarkBg
@@ -49,29 +52,19 @@ fun LeaderboardScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {
-                Text(
-                    text = "Global Leaderboard",
-                    color = Color.White,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            item {
-                Text(
-                    text = uiState.subtitle,
-                    color = EnafTextMuted,
-                    fontSize = 13.sp
+                ScreenTitleBlock(
+                    title = "Global Leaderboard",
+                    subtitle = uiState.subtitle,
                 )
             }
 
             if (uiState.isLoading) {
                 item {
-                    Text(
-                        text = "Loading leaderboard...",
-                        color = EnafTextSecondary,
-                        fontSize = 13.sp,
-                    )
+                    LoadingStateText("Loading leaderboard...")
+                }
+            } else if (uiState.entries.isEmpty()) {
+                item {
+                    EmptyStateCard("No leaderboard data yet. Play through a few days to enter the rankings.")
                 }
             } else {
                 items(uiState.entries.size) { idx ->

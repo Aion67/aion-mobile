@@ -30,9 +30,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.enaf.ui.components.AppUsageItem
+import com.example.enaf.ui.components.EmptyStateCard
 import com.example.enaf.ui.components.EnafTextField
 import com.example.enaf.ui.components.EnafTopAppBar
 import com.example.enaf.ui.components.GlobalLimitCard
+import com.example.enaf.ui.components.LoadingStateText
+import com.example.enaf.ui.components.ScreenTitleBlock
+import com.example.enaf.ui.components.SectionHeaderRow
 import com.example.enaf.ui.theme.EnafActionBlue
 import com.example.enaf.ui.theme.EnafDarkBg
 import com.example.enaf.ui.theme.EnafTextMuted
@@ -64,16 +68,9 @@ fun PlannerScreen(
         ) {
             item {
                 Column {
-                    Text(
-                        text = "Screen Time Planner",
-                        color = Color.White,
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "Optimize your focus and digital wellbeing.",
-                        color = EnafTextMuted,
-                        fontSize = 14.sp
+                    ScreenTitleBlock(
+                        title = "Screen Time Planner",
+                        subtitle = "Optimize your focus and digital wellbeing.",
                     )
                 }
             }
@@ -94,49 +91,19 @@ fun PlannerScreen(
             }
 
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Individual App Limits",
-                        color = Color.White,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "${uiState.appItems.size} Tracked",
-                        color = EnafActionBlue,
-                        fontSize = 12.sp
-                    )
-                }
+                SectionHeaderRow(
+                    title = "Individual App Limits",
+                    trailingText = "${uiState.appItems.size} Tracked",
+                )
             }
 
             if (uiState.isLoading) {
                 item {
-                    Text(
-                        text = "Loading planner data...",
-                        color = EnafTextSecondary,
-                        fontSize = 14.sp
-                    )
+                    LoadingStateText("Loading planner data...")
                 }
             } else if (uiState.appItems.isEmpty()) {
                 item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(EnafActionBlue.copy(alpha = 0.08f), RoundedCornerShape(12.dp))
-                            .border(1.dp, EnafActionBlue.copy(alpha = 0.16f), RoundedCornerShape(12.dp))
-                            .padding(20.dp)
-                    ) {
-                        Text(
-                            text = "No tracked apps yet. Add your first antagonist app to start the war for your focus.",
-                            color = EnafTextSecondary,
-                            fontSize = 13.sp,
-                            lineHeight = 18.sp
-                        )
-                    }
+                    EmptyStateCard("No tracked apps yet. Add your first antagonist app to start the war for your focus.")
                 }
             } else {
                 item {

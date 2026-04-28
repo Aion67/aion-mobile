@@ -27,6 +27,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.enaf.ui.components.EnafTopAppBar
+import com.example.enaf.ui.components.EmptyStateCard
+import com.example.enaf.ui.components.LoadingStateText
+import com.example.enaf.ui.components.ScreenTitleBlock
 import com.example.enaf.ui.theme.EnafActionBlue
 import com.example.enaf.ui.theme.EnafCardBg
 import com.example.enaf.ui.theme.EnafDarkBg
@@ -55,21 +58,15 @@ fun LevelsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                Text(
-                    text = "Levels & XP",
-                    color = Color.White,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
+                ScreenTitleBlock(
+                    title = "Levels & XP",
+                    subtitle = "Your focus work fuels levels, perks, and stronger unlocks.",
                 )
             }
 
             item {
                 if (uiState.isLoading) {
-                    Text(
-                        text = "Loading levels...",
-                        color = EnafTextSecondary,
-                        fontSize = 13.sp,
-                    )
+                    LoadingStateText("Loading levels...")
                 } else {
                     LevelCard(
                         level = uiState.level,
@@ -90,9 +87,13 @@ fun LevelsScreen(
             }
 
             item {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    uiState.unlocks.forEach { unlock ->
-                        UnlockRow(unlock.levelText, unlock.rewardText)
+                if (uiState.unlocks.isEmpty()) {
+                    EmptyStateCard("Level rewards will appear once progress data is available.")
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        uiState.unlocks.forEach { unlock ->
+                            UnlockRow(unlock.levelText, unlock.rewardText)
+                        }
                     }
                 }
             }

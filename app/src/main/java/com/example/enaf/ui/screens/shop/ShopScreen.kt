@@ -29,6 +29,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.enaf.ui.components.EnafTopAppBar
+import com.example.enaf.ui.components.LoadingStateText
+import com.example.enaf.ui.components.ScreenTitleBlock
 import com.example.enaf.ui.theme.EnafActionBlue
 import com.example.enaf.ui.theme.EnafCardBg
 import com.example.enaf.ui.theme.EnafDarkBg
@@ -56,11 +58,9 @@ fun ShopScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                Text(
-                    text = "Warrior Shop",
-                    color = Color.White,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
+                ScreenTitleBlock(
+                    title = "Warrior Shop",
+                    subtitle = "Spend rewards on focus boosters that reinforce the grind.",
                 )
             }
 
@@ -79,11 +79,7 @@ fun ShopScreen(
 
             item {
                 if (uiState.isLoading) {
-                    Text(
-                        text = "Loading shop...",
-                        color = EnafTextSecondary,
-                        fontSize = 13.sp,
-                    )
+                    LoadingStateText("Loading shop...")
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         uiState.items.forEach { item ->
