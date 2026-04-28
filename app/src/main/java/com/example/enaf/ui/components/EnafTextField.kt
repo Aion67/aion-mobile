@@ -26,6 +26,7 @@ fun EnafTextField(
     label: String? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
+    errorText: String? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default
 ) {
@@ -45,7 +46,6 @@ fun EnafTextField(
             onValueChange = onValueChange,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
                 .background(EnafHeaderBg.copy(alpha = 0.5f), RoundedCornerShape(12.dp)),
             placeholder = {
                 Text(
@@ -59,11 +59,12 @@ fun EnafTextField(
             visualTransformation = visualTransformation,
             keyboardOptions = keyboardOptions,
             singleLine = true,
+            isError = errorText != null,
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = EnafActionBlue,
-                unfocusedBorderColor = EnafHeaderBorder,
-                cursorColor = EnafActionBlue,
+                focusedBorderColor = if (errorText != null) EnafErrorRed else EnafActionBlue,
+                unfocusedBorderColor = if (errorText != null) EnafErrorRed else EnafHeaderBorder,
+                cursorColor = if (errorText != null) EnafErrorRed else EnafActionBlue,
                 focusedTextColor = Color.White,
                 unfocusedTextColor = Color.White,
                 focusedContainerColor = Color.Transparent,
@@ -71,6 +72,15 @@ fun EnafTextField(
             ),
             textStyle = TextStyle(fontSize = 14.sp)
         )
+
+        if (errorText != null) {
+            Text(
+                text = errorText,
+                color = EnafErrorRed,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(start = 4.dp, top = 6.dp)
+            )
+        }
     }
 }
 
@@ -83,7 +93,8 @@ fun EnafTextFieldPreview() {
                 value = "",
                 onValueChange = {},
                 label = "Email Address",
-                placeholder = "name@example.com"
+                placeholder = "name@example.com",
+                errorText = "Enter a valid email address."
             )
         }
     }

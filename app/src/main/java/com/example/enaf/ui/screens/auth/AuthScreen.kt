@@ -97,20 +97,11 @@ fun AuthScreen(
                 onValueChange = { onEvent(AuthUiEvent.EmailChanged(it)) },
                 label = "Email Address",
                 placeholder = "name@example.com",
+                errorText = uiState.emailError,
                 leadingIcon = {
                     Icon(Icons.Default.Email, contentDescription = null, tint = EnafTextMuted, modifier = Modifier.size(20.dp))
                 }
             )
-            uiState.emailError?.let { error ->
-                Text(
-                    text = error,
-                    color = EnafErrorRed,
-                    fontSize = 12.sp,
-                    modifier = Modifier
-                        .align(Alignment.Start)
-                        .padding(top = 6.dp),
-                )
-            }
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -119,21 +110,12 @@ fun AuthScreen(
                 onValueChange = { onEvent(AuthUiEvent.PasswordChanged(it)) },
                 label = "Password",
                 placeholder = "••••••••",
+                errorText = uiState.passwordError,
                 visualTransformation = PasswordVisualTransformation(),
                 leadingIcon = {
                     Icon(Icons.Default.Lock, contentDescription = null, tint = EnafTextMuted, modifier = Modifier.size(20.dp))
                 }
             )
-            uiState.passwordError?.let { error ->
-                Text(
-                    text = error,
-                    color = EnafErrorRed,
-                    fontSize = 12.sp,
-                    modifier = Modifier
-                        .align(Alignment.Start)
-                        .padding(top = 6.dp),
-                )
-            }
 
             if (uiState.mode == AuthMode.LOGIN) {
                 Text(
