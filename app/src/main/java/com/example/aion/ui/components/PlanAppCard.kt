@@ -2,6 +2,7 @@ package com.example.aion.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,7 @@ fun PlanAppCard(
     usedTime: String = "12h 35m",
     remainingTime: String = "12h 35m",
     progress: Float = 0.8f,
+    onClick: (() -> Unit)? = null,
 ) {
     val labelStyle = androidx.compose.ui.text.TextStyle(
         fontSize = Variables.StaticLabelLargeSize,
@@ -49,7 +51,14 @@ fun PlanAppCard(
         modifier = modifier
             .fillMaxWidth()
             .height(103.dp)
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .let { rowModifier ->
+                if (onClick != null) {
+                    rowModifier.clickable(onClick = onClick)
+                } else {
+                    rowModifier
+                }
+            },
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
         verticalAlignment = Alignment.Top,
     ) {

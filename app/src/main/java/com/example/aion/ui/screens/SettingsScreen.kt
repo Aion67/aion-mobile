@@ -9,9 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,19 +42,21 @@ import com.example.aion.ui.components.AionSettingsSection
 import com.example.aion.ui.components.AionThemeOption
 import com.example.aion.ui.components.AionTopAppBar
 import com.example.aion.ui.theme.Variables
-import androidx.compose.runtime.saveable.rememberSaveable
+
 @Composable
 fun SettingsScreen(
     onThemeClick: () -> Unit,
     onAccentClick: () -> Unit,
+    onFaqClick: () -> Unit,
+    onFeedbackClick: () -> Unit,
+    onPrivacyClick: () -> Unit,
+    onVersionClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            AionTopAppBar(
-                title = "Settings"
-            )
+            AionTopAppBar(title = "Settings")
         },
         containerColor = Variables.SchemesSurface
     ) { innerPadding ->
@@ -63,12 +66,10 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .background(Variables.SchemesSurface),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 8.dp)
+            contentPadding = PaddingValues(vertical = 8.dp)
         ) {
             item {
-                AionSettingsSection(
-                    title = "General"
-                ) {
+                AionSettingsSection(title = "General") {
                     AionSettingsRow(
                         title = "Notifications",
                         subtitle = "Turn on notifications",
@@ -87,9 +88,7 @@ fun SettingsScreen(
             }
 
             item {
-                AionSettingsSection(
-                    title = "Custom"
-                ) {
+                AionSettingsSection(title = "Custom") {
                     AionSettingsRow(
                         title = "Theme",
                         subtitle = "Choose light or dark mode",
@@ -106,28 +105,27 @@ fun SettingsScreen(
             }
 
             item {
-                AionSettingsSection(
-                    title = "About"
-                ) {
+                AionSettingsSection(title = "About") {
                     AionSettingsRow(
                         title = "FAQ",
                         leadingIcon = Icons.Filled.HelpOutline,
-                        onClick = { }
+                        onClick = onFaqClick
                     )
                     AionSettingsRow(
                         title = "Feedback",
                         leadingIcon = Icons.Filled.Feedback,
-                        onClick = { }
+                        onClick = onFeedbackClick
                     )
                     AionSettingsRow(
                         title = "Privacy Policy",
                         leadingIcon = Icons.Filled.PrivacyTip,
-                        onClick = { }
+                        onClick = onPrivacyClick
                     )
                     AionSettingsRow(
                         title = "Version",
                         subtitle = "1.0.0",
-                        leadingIcon = Icons.Filled.Info
+                        leadingIcon = Icons.Filled.Info,
+                        onClick = onVersionClick
                     )
                 }
             }
@@ -163,7 +161,7 @@ fun ThemeSettingsScreen(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Text(
-                text = "This is a them selection view",
+                text = "This is a theme selection view",
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = Variables.StaticBodyLargeSize,
                     lineHeight = Variables.StaticBodyLargeLineHeight,
@@ -281,7 +279,11 @@ private data class AccentOption(
 private fun SettingsScreenPreview() {
     SettingsScreen(
         onThemeClick = {},
-        onAccentClick = {}
+        onAccentClick = {},
+        onFaqClick = {},
+        onFeedbackClick = {},
+        onPrivacyClick = {},
+        onVersionClick = {}
     )
 }
 

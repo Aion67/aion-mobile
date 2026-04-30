@@ -22,7 +22,7 @@ import com.example.aion.ui.theme.Variables
 
 @Composable
 fun AppDetailsScreen(
-    appName: String,
+    app: AppDetailSpec,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -38,7 +38,7 @@ fun AppDetailsScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             AionTopAppBar(
-                title = appName,
+                title = app.appName,
                 leadingIcon = Icons.AutoMirrored.Filled.ArrowBack,
                 onLeadingClick = onBack
             )
@@ -52,7 +52,7 @@ fun AppDetailsScreen(
         ) {
             // Persistent Header
             AppDetailsHeader(
-                iconRes = R.drawable.tiktok,
+                iconRes = app.iconRes,
                 lastOpened = "13:08",
                 dataUsage = "34 MB",
                 notoriety = "HARD",
@@ -213,5 +213,15 @@ private data class HistoryData(
 @Preview(showBackground = true)
 @Composable
 fun AppDetailsScreenPreview() {
-    AppDetailsScreen(appName = "TikTok", onBack = {})
+    AppDetailsScreen(
+        app = AppDetailSpec(
+            appName = "TikTok",
+            iconRes = R.drawable.tiktok,
+            creditScore = "76.23",
+            usedTime = "12h 35m",
+            remainingTime = "1h 35m",
+            progress = 0.8f
+        ),
+        onBack = {}
+    )
 }

@@ -2,30 +2,35 @@ package com.example.aion.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.aion.ui.components.AionHomeHeader
-import com.example.aion.ui.components.AionStatCard
-import com.example.aion.ui.theme.Variables
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import com.example.aion.ui.components.AionHomeHeader
 import com.example.aion.ui.components.AionProgressGauge
+import com.example.aion.ui.components.AionStatCard
 import com.example.aion.ui.components.PlanAppCard
 import com.example.aion.ui.components.AionTopAppBar
+import com.example.aion.ui.theme.Variables
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    onAppClick: (AppDetailSpec) -> Unit = {},
 ) {
+    val homeApps = listOf(
+        AppDetailSpec("Instagram", com.example.aion.R.drawable.tiktok, "76.23", "12h 35m", "1h 35m", 0.8f),
+        AppDetailSpec("TikTok", com.example.aion.R.drawable.tiktok, "76.23", "12h 35m", "1h 35m", 0.5f),
+        AppDetailSpec("YouTube", com.example.aion.R.drawable.tiktok, "76.23", "12h 35m", "1h 35m", 0.2f)
+    )
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -72,14 +77,15 @@ fun HomeScreen(
             }
 
             // App cards list (sample)
-            items(listOf(
-                Pair("Instagram", 0.8f),
-                Pair("TikTok", 0.5f),
-                Pair("YouTube", 0.2f)
-            )) { item ->
+            items(homeApps) { app ->
                 PlanAppCard(
-                    appName = item.first,
-                    progress = item.second
+                    appName = app.appName,
+                    iconRes = app.iconRes,
+                    creditScore = app.creditScore,
+                    usedTime = app.usedTime,
+                    remainingTime = app.remainingTime,
+                    progress = app.progress,
+                    onClick = { onAppClick(app) }
                 )
             }
         }

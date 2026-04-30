@@ -42,7 +42,8 @@ val sampleAppPlans = listOf(
 fun PlanScreen(
     modifier: Modifier = Modifier,
     onNavigateToAddApps: () -> Unit = {},
-    onNavigateBack: () -> Unit = {}
+    onNavigateBack: () -> Unit = {},
+    onAppClick: (AppDetailSpec) -> Unit = {}
 ) {
     var showMenu by remember { mutableStateOf(false) }
 
@@ -109,13 +110,22 @@ fun PlanScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(sampleAppPlans) { app ->
+                    val appDetail = AppDetailSpec(
+                        appName = app.name,
+                        iconRes = app.iconRes,
+                        creditScore = app.creditScore,
+                        usedTime = app.usedTime,
+                        remainingTime = app.remainingTime,
+                        progress = app.progress,
+                    )
                     PlanAppCard(
                         appName = app.name,
                         iconRes = app.iconRes,
                         creditScore = app.creditScore,
                         usedTime = app.usedTime,
                         remainingTime = app.remainingTime,
-                        progress = app.progress
+                        progress = app.progress,
+                        onClick = { onAppClick(appDetail) }
                     )
                 }
             }
