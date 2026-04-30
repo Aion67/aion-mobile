@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.LinearProgressIndicator
 import com.example.aion.R
@@ -46,8 +47,9 @@ fun PlanAppCard(
 
     Row(
         modifier = modifier
-            .width(380.dp)
-            .height(103.dp),
+            .fillMaxWidth()
+            .height(103.dp)
+            .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
         verticalAlignment = Alignment.Top,
     ) {

@@ -4,14 +4,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
@@ -23,6 +24,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import com.example.aion.ui.screens.AccentSettingsScreen
+import com.example.aion.ui.screens.PlanScreen
+import com.example.aion.ui.screens.AddAppsScreen
+import com.example.aion.ui.screens.SettingsScreen
+import com.example.aion.ui.screens.ThemeSettingsScreen
+import com.example.aion.ui.screens.HomeScreen
 import com.example.aion.ui.theme.AionTheme
 
 class MainActivity : ComponentActivity() {
@@ -41,31 +48,64 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AionApp() {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
+    var settingsDestination by rememberSaveable { mutableStateOf(SettingsDestinations.LIST) }
+    var showAddApps by rememberSaveable { mutableStateOf(false) }
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
-            AppDestinations.entries.forEach {
+            for (destination in AppDestinations.values()) {
                 item(
                     icon = {
                         Icon(
-                            it.icon,
-                            contentDescription = it.label
+                            destination.icon,
+                            contentDescription = destination.label
                         )
                     },
-                    label = { Text(it.label) },
-                    selected = it == currentDestination,
-                    onClick = { currentDestination = it }
+                    label = { Text(destination.label) },
+                    selected = destination == currentDestination,
+                    onClick = {
+                        settingsDestination = SettingsDestinations.LIST
+                        currentDestination = destination
+                        showAddApps = false // Reset sub-navigation when switching main tabs
+                    }
                 )
             }
         }
     ) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Greeting(
-                name = "Android",
-                modifier = Modifier.padding(innerPadding)
-            )
+        Box(modifier = Modifier.fillMaxSize()) {
+            when (currentDestination) {
+                AppDestinations.HOME -> HomeScreen()
+                AppDestinations.PLAN -> {
+                    if (showAddApps) {
+                        AddAppsScreen(onNavigateBack = { showAddApps = false })
+                    } else {
+                        PlanScreen(onNavigateToAddApps = { showAddApps = true })
+                    }
+                }
+                AppDestinations.NOTIFICATIONS -> Greeting("Notifications Screen")
+                AppDestinations.SETTINGS -> {
+                    when (settingsDestination) {
+                        SettingsDestinations.LIST -> SettingsScreen(
+                            onThemeClick = { settingsDestination = SettingsDestinations.THEME },
+                            onAccentClick = { settingsDestination = SettingsDestinations.ACCENT }
+                        )
+                        SettingsDestinations.THEME -> ThemeSettingsScreen(
+                            onBack = { settingsDestination = SettingsDestinations.LIST }
+                        )
+                        SettingsDestinations.ACCENT -> AccentSettingsScreen(
+                            onBack = { settingsDestination = SettingsDestinations.LIST }
+                        )
+                    }
+                }
+            }
         }
     }
+}
+
+private enum class SettingsDestinations {
+    LIST,
+    THEME,
+    ACCENT,
 }
 
 enum class AppDestinations(
@@ -73,8 +113,9 @@ enum class AppDestinations(
     val icon: ImageVector,
 ) {
     HOME("Home", Icons.Default.Home),
-    FAVORITES("Favorites", Icons.Default.Favorite),
-    PROFILE("Profile", Icons.Default.AccountBox),
+    PLAN("Plan", Icons.AutoMirrored.Filled.List),
+    NOTIFICATIONS("Notifications", Icons.Default.Notifications),
+    SETTINGS("Settings", Icons.Default.Settings),
 }
 
 @Composable
