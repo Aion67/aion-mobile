@@ -8,6 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+// use Icons.AutoMirrored.Filled.ArrowBack via Icons import
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.aion.R
 import com.example.aion.ui.components.*
 import com.example.aion.ui.theme.Variables
 
@@ -50,12 +50,11 @@ fun AppDetailsScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            // Persistent Header
             AppDetailsHeader(
                 iconRes = app.iconRes,
-                lastOpened = "13:08",
-                dataUsage = "34 MB",
-                notoriety = "HARD",
+                lastOpened = app.lastOpened,
+                dataUsage = app.dataUsage,
+                notoriety = app.notoriety,
                 modifier = Modifier.padding(vertical = 16.dp)
             )
 
@@ -68,7 +67,7 @@ fun AppDetailsScreen(
             // Tab Content
             Box(modifier = Modifier.weight(1f)) {
                 when (selectedTabIndex) {
-                    0 -> OverviewTabContent()
+                    0 -> OverviewTabContent(app = app)
                     1 -> SettingsTabContent(
                         h = limitHours,
                         m = limitMinutes,
@@ -89,7 +88,7 @@ fun AppDetailsScreen(
 }
 
 @Composable
-private fun OverviewTabContent() {
+private fun OverviewTabContent(app: AppDetailSpec) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -103,14 +102,14 @@ private fun OverviewTabContent() {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             AionProgressGauge(
-                progress = 0.7623f,
-                valueText = "76.23",
+                progress = app.progress,
+                valueText = app.creditScore,
                 metricText = "Score"
             )
             AionProgressGauge(
-                progress = 0.45f,
-                valueText = "4h 23m",
-                metricText = "Used",
+                progress = 1f - app.progress,
+                valueText = app.remainingTime,
+                metricText = "Remaining",
                 progressColor = Variables.PrimaryBrand
             )
         }
@@ -214,14 +213,7 @@ private data class HistoryData(
 @Composable
 fun AppDetailsScreenPreview() {
     AppDetailsScreen(
-        app = AppDetailSpec(
-            appName = "TikTok",
-            iconRes = R.drawable.tiktok,
-            creditScore = "76.23",
-            usedTime = "12h 35m",
-            remainingTime = "1h 35m",
-            progress = 0.8f
-        ),
+        app = sampleAppDetails.first(),
         onBack = {}
     )
 }

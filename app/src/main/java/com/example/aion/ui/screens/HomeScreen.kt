@@ -13,28 +13,36 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import com.example.aion.ui.components.AionHomeHeader
-import com.example.aion.ui.components.AionProgressGauge
-import com.example.aion.ui.components.AionStatCard
-import com.example.aion.ui.components.PlanAppCard
-import com.example.aion.ui.components.AionTopAppBar
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.aion.ui.viewmodels.HomeViewModel
+import com.example.aion.util.TimeUtils
+import com.example.aion.ui.components.*
 import com.example.aion.ui.theme.Variables
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    onAppClick: (AppDetailSpec) -> Unit = {},
+    viewModel: HomeViewModel = hiltViewModel(),
+    onAppClick: (String) -> Unit = {},
+    onProfileClick: () -> Unit = {},
 ) {
-    val homeApps = listOf(
-        AppDetailSpec("Instagram", com.example.aion.R.drawable.tiktok, "76.23", "12h 35m", "1h 35m", 0.8f),
-        AppDetailSpec("TikTok", com.example.aion.R.drawable.tiktok, "76.23", "12h 35m", "1h 35m", 0.5f),
-        AppDetailSpec("YouTube", com.example.aion.R.drawable.tiktok, "76.23", "12h 35m", "1h 35m", 0.2f)
-    )
+    val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            AionTopAppBar(title = "", avatarRes = com.example.aion.R.drawable.tiktok)
+            AionTopAppBar(
+                title = "",
+                avatarRes = com.example.aion.R.drawable.tiktok,
+                actions = {
+                    AionProfileActionButton(
+                        avatarRes = com.example.aion.R.drawable.tiktok,
+                        onClick = onProfileClick
+                    )
+                }
+            )
         },
         containerColor = Variables.SchemesSurface
     ) { inner ->
@@ -51,17 +59,21 @@ fun HomeScreen(
             }
 
             item {
+                val totalUsage = uiState.trackedApps.sumOf { it.usageMs }
+                val totalLimit = uiState.trackedApps.sumOf { it.limitMs }
+                val usagePercentage = if (totalLimit > 0) totalUsage.toFloat() / totalLimit else 0f
+
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     AionProgressGauge(
-                        progress = 0.7623f,
+                        progress = 0.7623f, // Score logic still static for now
                         valueText = "76.23",
                         metricText = "Score",
                         modifier = Modifier.weight(1f)
                     )
 
                     AionProgressGauge(
-                        progress = 0.45f,
-                        valueText = "45%",
+                        progress = usagePercentage,
+                        valueText = "${(usagePercentage * 100).toInt()}%",
                         metricText = "Today",
                         modifier = Modifier.weight(1f)
                     )
@@ -76,16 +88,18 @@ fun HomeScreen(
                 AionStatCard(percentage = -10, label = "Improvement from last week")
             }
 
-            // App cards list (sample)
-            items(homeApps) { app ->
+            items(uiState.trackedApps) { trackedAppUsage ->
+                val remainingMs = (trackedAppUsage.limitMs - trackedAppUsage.usageMs).coerceAtLeast(0)
+                val progress = if (trackedAppUsage.limitMs > 0) trackedAppUsage.usageMs.toFloat() / trackedAppUsage.limitMs else 0f
+
                 PlanAppCard(
-                    appName = app.appName,
-                    iconRes = app.iconRes,
-                    creditScore = app.creditScore,
-                    usedTime = app.usedTime,
-                    remainingTime = app.remainingTime,
-                    progress = app.progress,
-                    onClick = { onAppClick(app) }
+                    appName = trackedAppUsage.app.appName,
+                    icon = trackedAppUsage.icon,
+                    creditScore = "76.23", // Static for now
+                    usedTime = TimeUtils.formatDuration(trackedAppUsage.usageMs),
+                    remainingTime = TimeUtils.formatDuration(remainingMs),
+                    progress = progress,
+                    onClick = { onAppClick(trackedAppUsage.app.packageName) }
                 )
             }
         }

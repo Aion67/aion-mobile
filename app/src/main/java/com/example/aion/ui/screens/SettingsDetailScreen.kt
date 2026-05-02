@@ -16,6 +16,9 @@ import androidx.compose.ui.unit.dp
 import com.example.aion.ui.components.AionTopAppBar
 import com.example.aion.ui.theme.Variables
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+
 @Composable
 fun SettingsDetailScreen(
     title: String,
@@ -26,7 +29,7 @@ fun SettingsDetailScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            AionTopAppBar(title = title, leadingIcon = androidx.compose.material.icons.automirrored.filled.ArrowBack, onLeadingClick = onBack)
+            AionTopAppBar(title = title, leadingIcon = Icons.AutoMirrored.Filled.ArrowBack, onLeadingClick = onBack)
         },
         containerColor = Variables.SchemesSurface
     ) { innerPadding ->

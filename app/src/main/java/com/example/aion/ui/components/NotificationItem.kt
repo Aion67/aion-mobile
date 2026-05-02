@@ -86,6 +86,7 @@ fun NotificationItem(
                         fontSize = Variables.StaticBodySmallSize,
                         lineHeight = Variables.StaticBodySmallLineHeight,
                         color = Variables.SchemesOnSurfaceVariant,
+                        letterSpacing = Variables.StaticBodySmallTracking,
                         fontWeight = FontWeight.Medium
                     )
                 )

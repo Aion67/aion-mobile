@@ -6,8 +6,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+// use Icons.AutoMirrored.Filled.ArrowBack via Icons import
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
+import androidx.compose.runtime.collectAsState
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.aion.ui.viewmodels.AddAppsViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,39 +23,13 @@ import com.example.aion.ui.components.AionTopAppBar
 import com.example.aion.ui.components.SortHeader
 import com.example.aion.ui.theme.Variables
 
-data class AppItem(
-    val name: String,
-    val iconRes: Int,
-    val progress: Float? = null,
-    val usedTime: String? = null
-)
-
-val mockApps = listOf(
-    AppItem("Instagram", R.drawable.tiktok, progress = 0.8f),
-    AppItem("TikTok", R.drawable.tiktok, usedTime = "12h 35m"),
-    AppItem("Reddit", R.drawable.tiktok, usedTime = "12h 35m"),
-    AppItem("Snapchat", R.drawable.tiktok, progress = 0.9f),
-    AppItem("Facebook", R.drawable.tiktok, usedTime = "12h 35m"),
-    AppItem("YouTube", R.drawable.tiktok, usedTime = "12h 35m"),
-    AppItem("X", R.drawable.tiktok, usedTime = "12h 35m"),
-    AppItem("Pinterest", R.drawable.tiktok),
-    AppItem("LinkedIn", R.drawable.tiktok)
-)
-
 @Composable
 fun AddAppsScreen(
     modifier: Modifier = Modifier,
+    viewModel: AddAppsViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit = {}
 ) {
-    var searchQuery by remember { mutableStateOf("") }
-    
-    val filteredApps = remember(searchQuery) {
-        if (searchQuery.isEmpty()) {
-            mockApps
-        } else {
-            mockApps.filter { it.name.contains(searchQuery, ignoreCase = true) }
-        }
-    }
+    val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -63,10 +41,10 @@ fun AddAppsScreen(
                     onLeadingClick = onNavigateBack
                 )
                 AionSearchBar(
-                    query = searchQuery,
-                    onQueryChange = { searchQuery = it },
+                    query = uiState.searchQuery,
+                    onQueryChange = { viewModel.onSearchQueryChange(it) },
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    onClear = { searchQuery = "" }
+                    onClear = { viewModel.onSearchQueryChange("") }
                 )
             }
         },
@@ -83,18 +61,22 @@ fun AddAppsScreen(
                 onSortClick = { /* Handle sort */ }
             )
             
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(filteredApps) { app ->
-                    AddAppCard(
-                        appName = app.name,
-                        iconRes = app.iconRes,
-                        progress = app.progress,
-                        usedTime = app.usedTime
-                    )
+            if (uiState.isLoading) {
+                // Show loading indicator
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(uiState.apps) { app ->
+                        AddAppCard(
+                            appName = app.name,
+                            icon = app.icon,
+                            isTracked = app.isTracked,
+                            onToggleTracking = { viewModel.toggleTracking(app) }
+                        )
+                    }
                 }
             }
         }

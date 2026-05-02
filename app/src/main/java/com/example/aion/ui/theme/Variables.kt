@@ -30,6 +30,7 @@ object Variables {
     val SchemesTertiaryContainer = Color(0xFFFFD8E4)
     val SchemesOnTertiaryContainer = Color(0xFF633B48)
     val SchemesSurface = Color(0xFFFEF7FF)
+    val SchemesSurfaceVariant = Color(0xFFE7E0EB)
     val SchemesOnSurface = Color(0xFF1D1B20)
 
     // Typography Sizes

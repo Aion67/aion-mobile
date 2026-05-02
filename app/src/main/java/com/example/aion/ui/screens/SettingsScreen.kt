@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.PrivacyTip
@@ -39,24 +40,41 @@ import androidx.compose.ui.unit.dp
 import com.example.aion.ui.components.AionAccentColorOption
 import com.example.aion.ui.components.AionSettingsRow
 import com.example.aion.ui.components.AionSettingsSection
+import com.example.aion.ui.components.AionProfileActionButton
 import com.example.aion.ui.components.AionThemeOption
 import com.example.aion.ui.components.AionTopAppBar
 import com.example.aion.ui.theme.Variables
+
+import androidx.compose.runtime.collectAsState
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.aion.ui.viewmodels.SettingsViewModel
 
 @Composable
 fun SettingsScreen(
     onThemeClick: () -> Unit,
     onAccentClick: () -> Unit,
+    onProfileClick: () -> Unit,
     onFaqClick: () -> Unit,
     onFeedbackClick: () -> Unit,
     onPrivacyClick: () -> Unit,
     onVersionClick: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: SettingsViewModel = hiltViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            AionTopAppBar(title = "Settings")
+            AionTopAppBar(
+                title = "Settings",
+                actions = {
+                    AionProfileActionButton(
+                        avatarRes = com.example.aion.R.drawable.tiktok,
+                        onClick = onProfileClick
+                    )
+                }
+            )
         },
         containerColor = Variables.SchemesSurface
     ) { innerPadding ->
@@ -69,13 +87,24 @@ fun SettingsScreen(
             contentPadding = PaddingValues(vertical = 8.dp)
         ) {
             item {
+                AionSettingsSection(title = "Account") {
+                    AionSettingsRow(
+                        title = "Profile",
+                        subtitle = "Update username and profile picture",
+                        leadingIcon = Icons.Filled.Person,
+                        onClick = onProfileClick
+                    )
+                }
+            }
+
+            item {
                 AionSettingsSection(title = "General") {
                     AionSettingsRow(
                         title = "Notifications",
                         subtitle = "Turn on notifications",
                         leadingIcon = Icons.Filled.Notifications,
-                        checked = true,
-                        onCheckedChange = { }
+                        checked = uiState.notificationsEnabled,
+                        onCheckedChange = { viewModel.toggleNotifications(it) }
                     )
                     AionSettingsRow(
                         title = "Display over other Apps",
@@ -91,13 +120,13 @@ fun SettingsScreen(
                 AionSettingsSection(title = "Custom") {
                     AionSettingsRow(
                         title = "Theme",
-                        subtitle = "Choose light or dark mode",
+                        subtitle = uiState.theme,
                         leadingIcon = Icons.Filled.Palette,
                         onClick = onThemeClick
                     )
                     AionSettingsRow(
                         title = "Accent color",
-                        subtitle = "Pick the highlight color used across the app",
+                        subtitle = uiState.accentColor,
                         leadingIcon = Icons.Filled.Palette,
                         onClick = onAccentClick
                     )
@@ -137,8 +166,9 @@ fun SettingsScreen(
 fun ThemeSettingsScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: SettingsViewModel = hiltViewModel(),
 ) {
-    var selectedThemeIndex by rememberSaveable { mutableIntStateOf(0) }
+    val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -161,7 +191,7 @@ fun ThemeSettingsScreen(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Text(
-                text = "This is a theme selection view",
+                text = "Choose light or dark mode for the app.",
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = Variables.StaticBodyLargeSize,
                     lineHeight = Variables.StaticBodyLargeLineHeight,
@@ -175,21 +205,29 @@ fun ThemeSettingsScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 AionThemeOption(
-                    label = "Light mode",
+                    label = "Light",
                     previewColor = Color(0xFFECE6F0),
-                    isSelected = selectedThemeIndex == 0,
-                    onClick = { selectedThemeIndex = 0 },
+                    isSelected = uiState.theme == "Light",
+                    onClick = { viewModel.updateTheme("Light") },
                     modifier = Modifier.weight(1f)
                 )
 
                 AionThemeOption(
-                    label = "Dark mode",
+                    label = "Dark",
                     previewColor = Color(0xFF1D1B20),
-                    isSelected = selectedThemeIndex == 1,
-                    onClick = { selectedThemeIndex = 1 },
+                    isSelected = uiState.theme == "Dark",
+                    onClick = { viewModel.updateTheme("Dark") },
                     modifier = Modifier.weight(1f)
                 )
             }
+
+            AionThemeOption(
+                label = "System",
+                previewColor = Color.Gray,
+                isSelected = uiState.theme == "System",
+                onClick = { viewModel.updateTheme("System") },
+                modifier = Modifier.fillMaxWidth()
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
         }
@@ -200,9 +238,10 @@ fun ThemeSettingsScreen(
 fun AccentSettingsScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: SettingsViewModel = hiltViewModel(),
 ) {
-    var selectedAccentIndex by rememberSaveable { mutableIntStateOf(0) }
-
+    val uiState by viewModel.uiState.collectAsState()
+    
     val accentOptions = remember {
         listOf(
             AccentOption("Purple", Variables.PrimaryBrand),
@@ -252,12 +291,11 @@ fun AccentSettingsScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     rowOptions.forEachIndexed { columnIndex, option ->
-                        val optionIndex = rowIndex * 4 + columnIndex
                         AionAccentColorOption(
                             color = option.color,
                             label = option.label,
-                            isSelected = selectedAccentIndex == optionIndex,
-                            onClick = { selectedAccentIndex = optionIndex },
+                            isSelected = uiState.accentColor == option.label,
+                            onClick = { viewModel.updateAccentColor(option.label) },
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -280,6 +318,7 @@ private fun SettingsScreenPreview() {
     SettingsScreen(
         onThemeClick = {},
         onAccentClick = {},
+        onProfileClick = {},
         onFaqClick = {},
         onFeedbackClick = {},
         onPrivacyClick = {},

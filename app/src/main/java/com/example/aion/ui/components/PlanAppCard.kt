@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.LinearProgressIndicator
 import com.example.aion.R
@@ -28,16 +29,27 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.aion.ui.theme.Variables
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+
+import android.graphics.drawable.Drawable
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.core.graphics.drawable.toBitmap
+
 @Composable
 fun PlanAppCard(
     modifier: Modifier = Modifier,
     appName: String = "TikTok",
+    icon: Drawable? = null,
     iconRes: Int = R.drawable.tiktok,
     creditScore: String = "76.23",
     usedTime: String = "12h 35m",
     remainingTime: String = "12h 35m",
     progress: Float = 0.8f,
     onClick: (() -> Unit)? = null,
+    onDeleteClick: (() -> Unit)? = null,
 ) {
     val labelStyle = androidx.compose.ui.text.TextStyle(
         fontSize = Variables.StaticLabelLargeSize,
@@ -70,14 +82,25 @@ fun PlanAppCard(
             verticalArrangement = Arrangement.spacedBy(7.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Image(
-                painter = painterResource(id = iconRes),
-                contentDescription = appName,
-                modifier = Modifier
-                    .width(76.dp)
-                    .height(76.dp),
-                contentScale = ContentScale.FillBounds
-            )
+            if (icon != null) {
+                Image(
+                    bitmap = icon.toBitmap().asImageBitmap(),
+                    contentDescription = appName,
+                    modifier = Modifier
+                        .width(76.dp)
+                        .height(76.dp),
+                    contentScale = ContentScale.FillBounds
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = iconRes),
+                    contentDescription = appName,
+                    modifier = Modifier
+                        .width(76.dp)
+                        .height(76.dp),
+                    contentScale = ContentScale.FillBounds
+                )
+            }
             Text(
                 text = creditScore,
                 style = labelStyle.copy(
@@ -96,17 +119,33 @@ fun PlanAppCard(
             verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
             horizontalAlignment = Alignment.Start,
         ) {
-            Text(
-                text = appName,
-                style = androidx.compose.ui.text.TextStyle(
-                    fontSize = Variables.StaticTitleLargeSize,
-                    lineHeight = Variables.StaticTitleLargeLineHeight,
-                    fontFamily = Variables.TitleFontFamily,
-                    fontWeight = FontWeight.Normal,
-                    color = Variables.SchemesOnSurface,
-                ),
-                modifier = Modifier.fillMaxWidth().height(28.dp)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = appName,
+                    style = androidx.compose.ui.text.TextStyle(
+                        fontSize = Variables.StaticTitleLargeSize,
+                        lineHeight = Variables.StaticTitleLargeLineHeight,
+                        fontFamily = Variables.TitleFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        color = Variables.SchemesOnSurface,
+                    ),
+                    modifier = Modifier.weight(1f).height(28.dp)
+                )
+
+                if (onDeleteClick != null) {
+                    IconButton(onClick = onDeleteClick, modifier = Modifier.size(28.dp)) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Remove App",
+                            tint = Variables.WarningRed
+                        )
+                    }
+                }
+            }
 
             LinearProgressIndicator(
                 progress = { progress },

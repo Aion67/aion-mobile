@@ -25,22 +25,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
-import com.example.aion.ui.screens.AccentSettingsScreen
-import com.example.aion.ui.screens.AppDetailSpec
-import com.example.aion.ui.screens.AppDetailsScreen
-import com.example.aion.ui.screens.NotificationsScreen
-import com.example.aion.ui.screens.PlanScreen
-import com.example.aion.ui.screens.AddAppsScreen
-import com.example.aion.ui.screens.SettingsScreen
-import com.example.aion.ui.screens.SettingsDetailScreen
-import com.example.aion.ui.screens.ThemeSettingsScreen
-import com.example.aion.ui.screens.HomeScreen
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.example.aion.ui.navigation.Screen
+import com.example.aion.ui.screens.*
 import com.example.aion.ui.theme.AionTheme
+import com.example.aion.data.manager.WorkScheduler
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var workScheduler: WorkScheduler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        workScheduler.scheduleUsageSync()
+
         setContent {
             AionTheme {
                 AionApp()
@@ -49,13 +57,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@PreviewScreenSizes
 @Composable
 fun AionApp() {
+    val navController = rememberNavController()
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
-    var settingsDestination by rememberSaveable { mutableStateOf(SettingsDestinations.LIST) }
-    var showAddApps by rememberSaveable { mutableStateOf(false) }
-    var selectedAppDetail by remember { mutableStateOf<AppDetailSpec?>(null) }
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
@@ -70,89 +75,90 @@ fun AionApp() {
                     label = { Text(destination.label) },
                     selected = destination == currentDestination,
                     onClick = {
-                        settingsDestination = SettingsDestinations.LIST
-                        selectedAppDetail = null
                         currentDestination = destination
-                        showAddApps = false // Reset sub-navigation when switching main tabs
+                        when (destination) {
+                            AppDestinations.HOME -> navController.navigate(Screen.Home.route) {
+                                popUpTo(Screen.Home.route) { inclusive = true }
+                            }
+                            AppDestinations.PLAN -> navController.navigate(Screen.Plan.route)
+                            AppDestinations.NOTIFICATIONS -> navController.navigate(Screen.Notifications.route)
+                            AppDestinations.SETTINGS -> navController.navigate(Screen.Settings.route)
+                        }
                     }
                 )
             }
         }
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            when {
-                selectedAppDetail != null -> {
-                    AppDetailsScreen(
-                        app = selectedAppDetail!!,
-                        onBack = { selectedAppDetail = null }
-                    )
-                }
-
-                else -> {
-                    when (currentDestination) {
-                        AppDestinations.HOME -> HomeScreen(
-                            onAppClick = { selectedAppDetail = it }
-                        )
-
-                        AppDestinations.PLAN -> {
-                            if (showAddApps) {
-                                AddAppsScreen(onNavigateBack = { showAddApps = false })
-                            } else {
-                                PlanScreen(
-                                    onNavigateToAddApps = { showAddApps = true },
-                                    onAppClick = { selectedAppDetail = it }
-                                )
-                            }
-                        }
-
-                        AppDestinations.NOTIFICATIONS -> NotificationsScreen()
-
-                        AppDestinations.SETTINGS -> {
-                            when (settingsDestination) {
-                                SettingsDestinations.LIST -> SettingsScreen(
-                                    onThemeClick = { settingsDestination = SettingsDestinations.THEME },
-                                    onAccentClick = { settingsDestination = SettingsDestinations.ACCENT },
-                                    onFaqClick = { settingsDestination = SettingsDestinations.FAQ },
-                                    onFeedbackClick = { settingsDestination = SettingsDestinations.FEEDBACK },
-                                    onPrivacyClick = { settingsDestination = SettingsDestinations.PRIVACY },
-                                    onVersionClick = { settingsDestination = SettingsDestinations.VERSION }
-                                )
-
-                                SettingsDestinations.THEME -> ThemeSettingsScreen(
-                                    onBack = { settingsDestination = SettingsDestinations.LIST }
-                                )
-
-                                SettingsDestinations.ACCENT -> AccentSettingsScreen(
-                                    onBack = { settingsDestination = SettingsDestinations.LIST }
-                                )
-
-                                SettingsDestinations.FAQ -> SettingsDetailScreen(
-                                    title = "FAQ",
-                                    body = "Frequently asked questions will be listed here.",
-                                    onBack = { settingsDestination = SettingsDestinations.LIST }
-                                )
-
-                                SettingsDestinations.FEEDBACK -> SettingsDetailScreen(
-                                    title = "Feedback",
-                                    body = "Share your feedback and suggestions here.",
-                                    onBack = { settingsDestination = SettingsDestinations.LIST }
-                                )
-
-                                SettingsDestinations.PRIVACY -> SettingsDetailScreen(
-                                    title = "Privacy Policy",
-                                    body = "Privacy policy details will be shown here.",
-                                    onBack = { settingsDestination = SettingsDestinations.LIST }
-                                )
-
-                                SettingsDestinations.VERSION -> SettingsDetailScreen(
-                                    title = "Version",
-                                    body = "Aion version 1.0.0",
-                                    onBack = { settingsDestination = SettingsDestinations.LIST }
-                                )
-                            }
-                        }
+        NavHost(navController = navController, startDestination = Screen.Home.route) {
+            composable(Screen.Home.route) {
+                HomeScreen(
+                    onAppClick = { packageName ->
+                        navController.navigate(Screen.AppDetails.createRoute(packageName))
+                    },
+                    onProfileClick = {
+                        navController.navigate(Screen.Profile.route)
                     }
-                }
+                )
+            }
+            composable(Screen.Plan.route) {
+                PlanScreen(
+                    onNavigateToAddApps = { navController.navigate(Screen.AddApps.route) },
+                    onAppClick = { packageName ->
+                        navController.navigate(Screen.AppDetails.createRoute(packageName))
+                    }
+                )
+            }
+            composable(Screen.AddApps.route) {
+                AddAppsScreen(onNavigateBack = { navController.popBackStack() })
+            }
+            composable(Screen.Notifications.route) {
+                NotificationsScreen(
+                    onNotificationClick = { notification ->
+                        navController.navigate(Screen.NotificationDetails.createRoute(notification.id))
+                    }
+                )
+            }
+            composable(Screen.Settings.route) {
+                SettingsScreen(
+                    onThemeClick = { navController.navigate("settings_theme") },
+                    onAccentClick = { navController.navigate("settings_accent") },
+                    onProfileClick = { navController.navigate(Screen.Profile.route) },
+                    onFaqClick = { /* TODO */ },
+                    onFeedbackClick = { /* TODO */ },
+                    onPrivacyClick = { /* TODO */ },
+                    onVersionClick = { /* TODO */ }
+                )
+            }
+            composable("settings_theme") {
+                ThemeSettingsScreen(onBack = { navController.popBackStack() })
+            }
+            composable("settings_accent") {
+                AccentSettingsScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Screen.Profile.route) {
+                ProfileScreen(
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable(
+                route = Screen.AppDetails.route,
+                arguments = listOf(navArgument("packageName") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val packageName = backStackEntry.arguments?.getString("packageName")
+                AppDetailsScreen(
+                    app = sampleAppDetails.first { it.appName == "TikTok" }, // Placeholder
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable(
+                route = Screen.NotificationDetails.route,
+                arguments = listOf(navArgument("id") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val id = backStackEntry.arguments?.getLong("id")
+                NotificationDetailScreen(
+                    notification = sampleNotifications.first(), // Placeholder
+                    onBack = { navController.popBackStack() }
+                )
             }
         }
     }
