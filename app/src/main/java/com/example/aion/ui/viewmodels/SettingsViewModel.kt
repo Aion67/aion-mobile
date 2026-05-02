@@ -13,6 +13,8 @@ data class SettingsUiState(
     val theme: String = "System",
     val accentColor: String = "Purple",
     val notificationsEnabled: Boolean = true,
+    val hasUsageAccess: Boolean = false,
+    val hasOverlayPermission: Boolean = false,
     val isLoading: Boolean = false
 )
 
@@ -21,20 +23,29 @@ class SettingsViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<SettingsUiState> = userRepository.getAllPreferences()
-        .map { prefs ->
-            val prefMap = prefs.associate { it.key to it.value }
-            SettingsUiState(
-                theme = prefMap["theme_mode"] ?: "System",
-                accentColor = prefMap["accent_color"] ?: "Purple",
-                notificationsEnabled = prefMap["notifications_enabled"]?.toBoolean() ?: true
-            )
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = SettingsUiState(isLoading = true)
+    private val _permissionState = MutableStateFlow(Pair(false, false))
+
+    val uiState: StateFlow<SettingsUiState> = combine(
+        userRepository.getAllPreferences(),
+        _permissionState
+    ) { prefs, permissions ->
+        val prefMap = prefs.associate { it.key to it.value }
+        SettingsUiState(
+            theme = prefMap["theme_mode"] ?: "System",
+            accentColor = prefMap["accent_color"] ?: "Purple",
+            notificationsEnabled = prefMap["notifications_enabled"]?.toBoolean() ?: true,
+            hasUsageAccess = permissions.first,
+            hasOverlayPermission = permissions.second
         )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = SettingsUiState(isLoading = true)
+    )
+
+    fun updatePermissionStatus(usage: Boolean, overlay: Boolean) {
+        _permissionState.value = Pair(usage, overlay)
+    }
 
     fun updateTheme(theme: String) {
         viewModelScope.launch {

@@ -36,7 +36,7 @@ fun ProfileHeaderCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Variables.SchemesSurface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         shape = RoundedCornerShape(24.dp),
     ) {
         Row(
@@ -62,7 +62,7 @@ fun ProfileHeaderCard(
                         fontSize = Variables.StaticTitleLargeSize,
                         lineHeight = Variables.StaticTitleLargeLineHeight,
                         fontWeight = FontWeight.Medium,
-                        color = Variables.SchemesOnSurface,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 )
                 Text(
@@ -70,7 +70,7 @@ fun ProfileHeaderCard(
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontSize = Variables.StaticBodyMediumSize,
                         lineHeight = Variables.StaticBodyMediumLineHeight,
-                        color = Variables.SchemesOnSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 )
                 Text(
@@ -78,7 +78,7 @@ fun ProfileHeaderCard(
                     style = MaterialTheme.typography.bodySmall.copy(
                         fontSize = Variables.StaticBodySmallSize,
                         lineHeight = Variables.StaticBodySmallLineHeight,
-                        color = Variables.SchemesOnSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 )
             }
@@ -94,7 +94,7 @@ fun ProfilePictureCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Variables.SchemesSurface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         shape = RoundedCornerShape(24.dp),
     ) {
         Column(
@@ -110,7 +110,7 @@ fun ProfilePictureCard(
                 modifier = Modifier
                     .size(112.dp)
                     .clip(CircleShape)
-                    .background(Variables.SchemesSurfaceContainerHigh),
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentScale = ContentScale.Crop,
             )
 
@@ -130,7 +130,7 @@ fun ProfileUsernameCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Variables.SchemesSurface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         shape = RoundedCornerShape(24.dp),
     ) {
         Column(
@@ -140,12 +140,12 @@ fun ProfileUsernameCard(
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Text(
-                text = "Username",
+                text = "Display Name",
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = Variables.StaticTitleMediumSize,
                     lineHeight = Variables.StaticTitleMediumLineHeight,
                     fontWeight = FontWeight.Medium,
-                    color = Variables.SchemesOnSurface,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             )
 
@@ -154,11 +154,11 @@ fun ProfileUsernameCard(
                 onValueChange = onUsernameChange,
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                label = { Text("Enter username") },
+                label = { Text("Enter display name") },
             )
 
             Button(onClick = onSaveUsername) {
-                Text(text = "Save username")
+                Text(text = "Save display name")
             }
         }
     }

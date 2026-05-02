@@ -22,7 +22,8 @@ object DatabaseModule {
             context,
             AionDatabase::class.java,
             "aion_database"
-        ).build()
+        ).fallbackToDestructiveMigration(dropAllTables = true)
+            .build()
     }
 
     @Provides

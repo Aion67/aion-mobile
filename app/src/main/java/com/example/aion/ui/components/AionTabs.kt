@@ -37,13 +37,13 @@ fun AionTabs(
     TabRow(
         selectedTabIndex = selectedTabIndex,
         modifier = modifier.height(64.dp),
-        containerColor = Variables.SchemesSurface,
-        contentColor = Variables.PrimaryBrand,
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.primary,
         divider = {
             HorizontalDivider(
                 modifier = Modifier.fillMaxWidth(),
                 thickness = 1.dp,
-                color = Variables.NeutralGray.copy(alpha = 0.2f)
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)
             )
         },
         indicator = { tabPositions ->
@@ -51,7 +51,7 @@ fun AionTabs(
                 TabRowDefaults.SecondaryIndicator(
                     Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
                     height = 3.dp,
-                    color = Variables.PrimaryBrand
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -78,8 +78,8 @@ fun AionTabs(
                         modifier = Modifier.size(24.dp)
                     )
                 },
-                selectedContentColor = Variables.PrimaryBrand,
-                unselectedContentColor = Variables.SchemesOnSurfaceVariant
+                selectedContentColor = MaterialTheme.colorScheme.primary,
+                unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

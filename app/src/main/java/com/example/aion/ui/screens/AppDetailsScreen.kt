@@ -8,79 +8,94 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-// use Icons.AutoMirrored.Filled.ArrowBack via Icons import
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.aion.data.entities.UsageSessionEntity
 import com.example.aion.ui.components.*
 import com.example.aion.ui.theme.Variables
+import com.example.aion.ui.viewmodels.AppDetailsViewModel
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
 fun AppDetailsScreen(
-    app: AppDetailSpec,
     onBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: AppDetailsViewModel = hiltViewModel()
 ) {
-    var selectedTabIndex by remember { mutableStateOf(0) }
-    
-    // Settings State
-    var limitHours by remember { mutableStateOf(1) }
-    var limitMinutes by remember { mutableStateOf(30) }
-    var limitSeconds by remember { mutableStateOf(0) }
-    var isTrackingEnabled by remember { mutableStateOf(true) }
+    val uiState by viewModel.uiState.collectAsState()
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState.saveSuccess) {
+        if (uiState.saveSuccess) {
+            snackbarHostState.showSnackbar("Settings saved successfully")
+            viewModel.dismissSaveSuccess()
+        }
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             AionTopAppBar(
-                title = app.appName,
+                title = uiState.appName,
                 leadingIcon = Icons.AutoMirrored.Filled.ArrowBack,
                 onLeadingClick = onBack
             )
         },
-        containerColor = Variables.SchemesSurface
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
-            AppDetailsHeader(
-                iconRes = app.iconRes,
-                lastOpened = app.lastOpened,
-                dataUsage = app.dataUsage,
-                notoriety = app.notoriety,
-                modifier = Modifier.padding(vertical = 16.dp)
-            )
+        if (uiState.isLoading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+            ) {
+                AppDetailsHeader(
+                    icon = uiState.icon,
+                    lastOpened = "13:08",
+                    dataUsage = "34 MB",
+                    notoriety = "HARD",
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
 
-            // Tabs
-            AionTabs(
-                selectedTabIndex = selectedTabIndex,
-                onTabSelected = { selectedTabIndex = it }
-            )
+                // Tabs
+                AionTabs(
+                    selectedTabIndex = selectedTabIndex,
+                    onTabSelected = { selectedTabIndex = it }
+                )
 
-            // Tab Content
-            Box(modifier = Modifier.weight(1f)) {
-                when (selectedTabIndex) {
-                    0 -> OverviewTabContent(app = app)
-                    1 -> SettingsTabContent(
-                        h = limitHours,
-                        m = limitMinutes,
-                        s = limitSeconds,
-                        onTimeChange = { h, m, s ->
-                            limitHours = h
-                            limitMinutes = m
-                            limitSeconds = s
-                        },
-                        trackingEnabled = isTrackingEnabled,
-                        onTrackingChange = { isTrackingEnabled = it }
-                    )
-                    2 -> HistoryTabContent()
+                // Tab Content
+                Box(modifier = Modifier.weight(1f)) {
+                    when (selectedTabIndex) {
+                        0 -> OverviewTabContent(
+                            usageTodayMs = uiState.usageTodayMs,
+                            limitMs = uiState.currentLimitMs
+                        )
+                        1 -> SettingsTabContent(
+                            limitMs = uiState.pendingLimitMs,
+                            onLimitChange = { h, m, s -> viewModel.updatePendingLimit(h, m, s) },
+                            trackingEnabled = uiState.pendingIsTracked,
+                            onTrackingChange = { viewModel.updatePendingTracking(it) },
+                            isDirty = uiState.isDirty,
+                            onSave = { viewModel.saveSettings() }
+                        )
+                        2 -> HistoryTabContent(history = uiState.history, dailyLimitMs = uiState.currentLimitMs)
+                    }
                 }
             }
         }
@@ -88,7 +103,18 @@ fun AppDetailsScreen(
 }
 
 @Composable
-private fun OverviewTabContent(app: AppDetailSpec) {
+private fun OverviewTabContent(usageTodayMs: Long, limitMs: Long) {
+    val progress = if (limitMs > 0) usageTodayMs.toFloat() / limitMs.toFloat() else 0f
+    val remainingMs = maxOf(0L, limitMs - usageTodayMs)
+    
+    // User requested default scores to be zero. 
+    // Showing 0 if no limit set OR no usage recorded today.
+    val score = if (limitMs > 0 && usageTodayMs > 0) {
+        (1f - minOf(1f, progress)) * 100
+    } else {
+        0f
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -102,15 +128,15 @@ private fun OverviewTabContent(app: AppDetailSpec) {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             AionProgressGauge(
-                progress = app.progress,
-                valueText = app.creditScore,
+                progress = if (limitMs > 0) minOf(1f, progress) else 0f,
+                valueText = String.format(Locale.getDefault(), "%.2f", score),
                 metricText = "Score"
             )
             AionProgressGauge(
-                progress = 1f - app.progress,
-                valueText = app.remainingTime,
+                progress = if (limitMs > 0) 1f - minOf(1f, progress) else 0f,
+                valueText = formatDuration(remainingMs),
                 metricText = "Remaining",
-                progressColor = Variables.PrimaryBrand
+                progressColor = MaterialTheme.colorScheme.primary
             )
         }
 
@@ -136,11 +162,18 @@ private fun OverviewTabContent(app: AppDetailSpec) {
 
 @Composable
 private fun SettingsTabContent(
-    h: Int, m: Int, s: Int,
-    onTimeChange: (Int, Int, Int) -> Unit,
+    limitMs: Long,
+    onLimitChange: (Int, Int, Int) -> Unit,
     trackingEnabled: Boolean,
-    onTrackingChange: (Boolean) -> Unit
+    onTrackingChange: (Boolean) -> Unit,
+    isDirty: Boolean,
+    onSave: () -> Unit
 ) {
+    val totalSeconds = limitMs / 1000
+    val h = (totalSeconds / 3600).toInt()
+    val m = ((totalSeconds % 3600) / 60).toInt()
+    val s = (totalSeconds % 60).toInt()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -148,12 +181,13 @@ private fun SettingsTabContent(
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            androidx.compose.material3.Text(
+            Text(
                 text = "Daily Limit",
-                style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
             )
-            AionLimitPicker(hours = h, minutes = m, seconds = s, onValueChange = onTimeChange)
+            AionLimitPicker(hours = h, minutes = m, seconds = s, onValueChange = onLimitChange)
         }
 
         AionToggleCard(
@@ -167,53 +201,67 @@ private fun SettingsTabContent(
         
         AionFilledButton(
             text = "Save Settings",
-            onClick = { /* Handle save */ },
+            onClick = onSave,
+            enabled = isDirty,
             modifier = Modifier.fillMaxWidth()
         )
     }
 }
 
 @Composable
-private fun HistoryTabContent() {
-    val historyItems = listOf(
-        HistoryData("01 Oct", "Mon", "1h 45m", "1h 30m", 116, true),
-        HistoryData("30 Sep", "Sun", "50m", "1h 30m", 55, false),
-        HistoryData("29 Sep", "Sat", "1h 10m", "1h 30m", 77, false),
-        HistoryData("28 Sep", "Fri", "2h 05m", "1h 30m", 138, true)
-    )
+private fun HistoryTabContent(history: List<UsageSessionEntity>, dailyLimitMs: Long) {
+    if (history.isEmpty()) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("No history available", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        return
+    }
+
+    // Group sessions by day
+    val groupedHistory = history.groupBy {
+        val cal = Calendar.getInstance().apply { timeInMillis = it.startTime }
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+        cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        cal.timeInMillis
+    }.toList().sortedByDescending { it.first }
+
+    val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
+    val dayFormat = SimpleDateFormat("EEE", Locale.getDefault())
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(historyItems) { item ->
+        items(groupedHistory) { (dayStart, sessions) ->
+            val totalUsedMs = sessions.sumOf { it.totalDurationMs }
+            val isExceeded = dailyLimitMs > 0 && totalUsedMs > dailyLimitMs
+            val percentage = if (dailyLimitMs > 0) (totalUsedMs * 100 / dailyLimitMs).toInt() else 0
+            
             AionHistoryItem(
-                date = item.date,
-                day = item.day,
-                usedTime = item.usedTime,
-                limitTime = item.limitTime,
-                percentage = item.percentage,
-                isExceeded = item.isExceeded
+                date = dateFormat.format(Date(dayStart)),
+                day = dayFormat.format(Date(dayStart)),
+                usedTime = formatDuration(totalUsedMs),
+                limitTime = if (dailyLimitMs > 0) formatDuration(dailyLimitMs) else "No Limit",
+                percentage = percentage,
+                isExceeded = isExceeded
             )
         }
     }
 }
 
-private data class HistoryData(
-    val date: String,
-    val day: String,
-    val usedTime: String,
-    val limitTime: String,
-    val percentage: Int,
-    val isExceeded: Boolean
-)
+private fun formatDuration(ms: Long): String {
+    val totalSeconds = ms / 1000
+    val hours = totalSeconds / 3600
+    val minutes = (totalSeconds % 3600) / 60
+    return if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
+}
 
 @Preview(showBackground = true)
 @Composable
 fun AppDetailsScreenPreview() {
-    AppDetailsScreen(
-        app = sampleAppDetails.first(),
-        onBack = {}
-    )
+    // Note: This preview won't work easily with hiltViewModel() without more setup
+    // But keeping it for structure
 }

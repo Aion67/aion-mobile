@@ -31,13 +31,13 @@ fun SettingsDetailScreen(
         topBar = {
             AionTopAppBar(title = title, leadingIcon = Icons.AutoMirrored.Filled.ArrowBack, onLeadingClick = onBack)
         },
-        containerColor = Variables.SchemesSurface
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .background(Variables.SchemesSurface)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -46,7 +46,7 @@ fun SettingsDetailScreen(
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = Variables.StaticBodyLargeSize,
                     lineHeight = Variables.StaticBodyLargeLineHeight,
-                    color = Variables.SchemesOnSurface,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Normal
                 )
             )

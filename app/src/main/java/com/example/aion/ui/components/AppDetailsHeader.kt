@@ -1,19 +1,24 @@
 package com.example.aion.ui.components
 
+import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
+import coil.compose.AsyncImage
 import com.example.aion.R
 import com.example.aion.ui.theme.Variables
 
@@ -23,7 +28,7 @@ import com.example.aion.ui.theme.Variables
  */
 @Composable
 fun AppDetailsHeader(
-    iconRes: Int,
+    icon: Drawable?,
     lastOpened: String,
     dataUsage: String,
     notoriety: String,
@@ -35,7 +40,7 @@ fun AppDetailsHeader(
         lineHeight = Variables.StaticBodyMediumLineHeight,
         letterSpacing = Variables.StaticBodyMediumTracking,
         fontWeight = FontWeight.Normal,
-        color = Color.Black
+        color = MaterialTheme.colorScheme.onSurface
     )
 
     Row(
@@ -46,14 +51,25 @@ fun AppDetailsHeader(
         verticalAlignment = Alignment.Bottom
     ) {
         // App Icon
-        Image(
-            painter = painterResource(id = iconRes),
-            contentDescription = null,
-            modifier = Modifier
-                .size(117.dp)
-                .clip(RoundedCornerShape(19.dp)),
-            contentScale = ContentScale.Crop
-        )
+        if (icon != null) {
+            Image(
+                bitmap = icon.toBitmap().asImageBitmap(),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(117.dp)
+                    .clip(RoundedCornerShape(19.dp)),
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            Image(
+                painter = painterResource(id = R.drawable.tiktok),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(117.dp)
+                    .clip(RoundedCornerShape(19.dp)),
+                contentScale = ContentScale.Crop
+            )
+        }
 
         // Metadata Table
         Row(
@@ -91,7 +107,7 @@ fun AppDetailsHeader(
 @Composable
 fun AppDetailsHeaderPreview() {
     AppDetailsHeader(
-        iconRes = R.drawable.tiktok, // Placeholder
+        icon = null,
         lastOpened = "13:08",
         dataUsage = "34 MB",
         notoriety = "HARD"

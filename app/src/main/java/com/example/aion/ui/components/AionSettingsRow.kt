@@ -63,7 +63,7 @@ fun AionSettingsRow(
         Icon(
             imageVector = leadingIcon,
             contentDescription = title,
-            tint = Variables.SchemesOnSurfaceVariant,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(24.dp)
         )
 
@@ -76,7 +76,7 @@ fun AionSettingsRow(
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = Variables.StaticBodyLargeSize,
                     lineHeight = Variables.StaticBodyLargeLineHeight,
-                    color = Variables.SchemesOnSurface,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Normal
                 ),
                 maxLines = 1
@@ -88,7 +88,7 @@ fun AionSettingsRow(
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontSize = Variables.StaticBodyMediumSize,
                         lineHeight = Variables.StaticBodyMediumLineHeight,
-                        color = Variables.SchemesOnSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Normal
                     ),
                     maxLines = 2
@@ -103,12 +103,12 @@ fun AionSettingsRow(
                     onCheckedChange = onCheckedChange,
                     enabled = enabled,
                     colors = SwitchDefaults.colors(
-                        checkedThumbColor = Variables.SchemesSurface,
-                        checkedTrackColor = Variables.PrimaryBrand,
-                        checkedBorderColor = Variables.PrimaryBrand,
-                        uncheckedThumbColor = Variables.SchemesSurface,
-                        uncheckedTrackColor = Variables.SchemesOutline.copy(alpha = 0.38f),
-                        uncheckedBorderColor = Variables.SchemesOutline.copy(alpha = 0.38f)
+                        checkedThumbColor = MaterialTheme.colorScheme.surface,
+                        checkedTrackColor = MaterialTheme.colorScheme.primary,
+                        checkedBorderColor = MaterialTheme.colorScheme.primary,
+                        uncheckedThumbColor = MaterialTheme.colorScheme.surface,
+                        uncheckedTrackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.38f),
+                        uncheckedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.38f)
                     )
                 )
             }
@@ -118,7 +118,7 @@ fun AionSettingsRow(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = "Open $title",
-                        tint = Variables.SchemesOnSurfaceVariant
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

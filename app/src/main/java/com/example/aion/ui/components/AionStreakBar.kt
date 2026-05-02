@@ -13,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.aion.ui.theme.Variables
 
 /**
@@ -37,7 +38,7 @@ fun AionStreakBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp),
+            .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -53,11 +54,11 @@ private fun StreakDayItem(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(64.dp)
+                .size(44.dp) // Reduced from 64.dp
                 .background(
                     color = if (day.isCompleted) Variables.PrimaryBrand else Variables.NeutralGray.copy(alpha = 0.2f),
                     shape = CircleShape
@@ -71,7 +72,7 @@ private fun StreakDayItem(
         ) {
             Box(
                 modifier = Modifier
-                    .size(54.dp)
+                    .size(36.dp) // Reduced from 54.dp
                     .background(
                         color = if (day.isCompleted) Color.White else Color.Transparent,
                         shape = CircleShape
@@ -81,9 +82,9 @@ private fun StreakDayItem(
                 Text(
                     text = day.dateNumber,
                     style = androidx.compose.ui.text.TextStyle(
-                        fontSize = Variables.StaticTitleLargeSize,
-                        lineHeight = Variables.StaticTitleLargeLineHeight,
-                        fontWeight = FontWeight.Normal,
+                        fontSize = 16.sp, // Reduced from Variables.StaticTitleLargeSize
+                        lineHeight = 24.sp,
+                        fontWeight = FontWeight.Medium,
                         color = if (day.isCompleted) Color.Black else Variables.SchemesOnSurface.copy(alpha = 0.5f)
                     ),
                     textAlign = TextAlign.Center
@@ -94,8 +95,8 @@ private fun StreakDayItem(
         Text(
             text = day.dayName,
             style = androidx.compose.ui.text.TextStyle(
-                fontSize = Variables.StaticBodyMediumSize,
-                lineHeight = Variables.StaticBodyMediumLineHeight,
+                fontSize = 12.sp, // Reduced from Variables.StaticBodyMediumSize
+                lineHeight = 16.sp,
                 fontWeight = FontWeight.Normal,
                 color = if (day.isToday) Variables.PrimaryBrand else Variables.SchemesOnSurface
             ),

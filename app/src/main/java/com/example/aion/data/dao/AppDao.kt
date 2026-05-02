@@ -14,13 +14,16 @@ interface AppDao {
     @Query("SELECT * FROM tracked_apps")
     fun getAllTrackedApps(): Flow<List<TrackedAppEntity>>
 
+    @Query("SELECT * FROM tracked_apps WHERE packageName = :packageName")
+    suspend fun getTrackedAppByPackageName(packageName: String): TrackedAppEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTrackedApp(app: TrackedAppEntity)
 
     @Query("SELECT * FROM app_settings WHERE appPackageName = :packageName")
     fun getSettingsForApp(packageName: String): Flow<AppSettingsEntity?>
 
-    @Update
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateSettings(settings: AppSettingsEntity)
 
     @Query("DELETE FROM tracked_apps WHERE packageName = :packageName")

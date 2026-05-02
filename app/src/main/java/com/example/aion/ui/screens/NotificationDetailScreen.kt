@@ -32,13 +32,13 @@ fun NotificationDetailScreen(
         topBar = {
             AionTopAppBar(title = "Notification", leadingIcon = Icons.AutoMirrored.Filled.ArrowBack, onLeadingClick = onBack)
         },
-        containerColor = Variables.SchemesSurface
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .background(Variables.SchemesSurface)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp)
         ) {
             Image(
@@ -50,17 +50,25 @@ fun NotificationDetailScreen(
 
             Text(
                 text = notification.title,
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
             )
 
             Text(
                 text = "From: ${notification.appName} • ${notification.timestamp}",
-                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium)
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             )
 
             Text(
                 text = notification.message,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = MaterialTheme.colorScheme.onSurface
+                ),
                 modifier = Modifier.padding(top = 12.dp)
             )
         }

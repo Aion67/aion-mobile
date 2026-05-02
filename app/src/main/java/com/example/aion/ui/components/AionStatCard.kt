@@ -29,19 +29,19 @@ import com.example.aion.ui.theme.Variables
 fun AionStatCard(
     percentage: Int,
     label: String,
-    progressColor: Color = Variables.PrimaryBrand,
+    progressColor: Color = MaterialTheme.colorScheme.primary,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(color = Variables.SchemesSurface, shape = RoundedCornerShape(12.dp))
-            .border(width = 1.dp, color = Variables.SchemesOutline, shape = RoundedCornerShape(12.dp))
+            .background(color = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(12.dp))
+            .border(width = 1.dp, color = MaterialTheme.colorScheme.outlineVariant, shape = RoundedCornerShape(12.dp))
             .padding(12.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Circular badge indicating progress visually
@@ -68,7 +68,7 @@ fun AionStatCard(
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontSize = Variables.StaticBodyMediumSize,
                         lineHeight = Variables.StaticBodyMediumLineHeight,
-                        color = Variables.SchemesOnSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 )
             }

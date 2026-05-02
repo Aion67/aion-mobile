@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -15,9 +16,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.aion.ui.viewmodels.HomeViewModel
 import com.example.aion.util.TimeUtils
+import java.util.Locale
 import com.example.aion.ui.components.*
 import com.example.aion.ui.theme.Variables
 
@@ -35,7 +37,6 @@ fun HomeScreen(
         topBar = {
             AionTopAppBar(
                 title = "",
-                avatarRes = com.example.aion.R.drawable.tiktok,
                 actions = {
                     AionProfileActionButton(
                         avatarRes = com.example.aion.R.drawable.tiktok,
@@ -44,18 +45,22 @@ fun HomeScreen(
                 }
             )
         },
-        containerColor = Variables.SchemesSurface
+        containerColor = MaterialTheme.colorScheme.background
     ) { inner ->
         LazyColumn(
             modifier = Modifier
                 .padding(inner)
                 .fillMaxSize()
-                .background(Variables.SchemesSurface)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                AionHomeHeader(userName = "Alex", avatarRes = com.example.aion.R.drawable.tiktok)
+                AionHomeHeader(
+                    userName = uiState.displayName,
+                    improvementPercentage = uiState.improvementPercentage,
+                    avatarRes = com.example.aion.R.drawable.tiktok
+                )
             }
 
             item {
@@ -65,8 +70,8 @@ fun HomeScreen(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     AionProgressGauge(
-                        progress = 0.7623f, // Score logic still static for now
-                        valueText = "76.23",
+                        progress = uiState.score / 100f,
+                        valueText = String.format(Locale.US, "%.2f", uiState.score),
                         metricText = "Score",
                         modifier = Modifier.weight(1f)
                     )
@@ -81,11 +86,10 @@ fun HomeScreen(
             }
 
             item {
-                AionStatCard(percentage = 30, label = "Improvement from yesterday")
-            }
-
-            item {
-                AionStatCard(percentage = -10, label = "Improvement from last week")
+                AionStatCard(
+                    percentage = (uiState.improvementPercentage * 100).toInt(),
+                    label = "Improvement from yesterday"
+                )
             }
 
             items(uiState.trackedApps) { trackedAppUsage ->
@@ -95,7 +99,7 @@ fun HomeScreen(
                 PlanAppCard(
                     appName = trackedAppUsage.app.appName,
                     icon = trackedAppUsage.icon,
-                    creditScore = "76.23", // Static for now
+                    creditScore = "0.00", // Default to 0 as requested
                     usedTime = TimeUtils.formatDuration(trackedAppUsage.usageMs),
                     remainingTime = TimeUtils.formatDuration(remainingMs),
                     progress = progress,

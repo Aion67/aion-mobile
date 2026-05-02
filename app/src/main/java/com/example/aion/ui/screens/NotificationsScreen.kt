@@ -7,11 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -33,7 +29,7 @@ import com.example.aion.ui.screens.NotificationSpec
 import com.example.aion.ui.screens.sampleNotifications
 
 import androidx.compose.runtime.collectAsState
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.aion.ui.viewmodels.NotificationsViewModel
 import com.example.aion.data.entities.NotificationEntity
 
@@ -63,8 +59,7 @@ fun NotificationsScreen(
                         IconButton(onClick = { showMenu = true }) {
                             Icon(
                                 imageVector = Icons.Default.MoreVert,
-                                contentDescription = "More options",
-                                tint = Variables.SchemesOnSurface
+                                contentDescription = "More options"
                             )
                         }
 
@@ -73,7 +68,7 @@ fun NotificationsScreen(
                             onDismissRequest = { showMenu = false }
                         ) {
                             DropdownMenuItem(
-                                text = { androidx.compose.material3.Text("Mark all as read") },
+                                text = { Text("Mark all as read") },
                                 onClick = {
                                     showMenu = false
                                     viewModel.markAllAsRead()
@@ -84,13 +79,13 @@ fun NotificationsScreen(
                 }
             )
         },
-        containerColor = Color.White
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .background(Variables.SchemesSurface)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             SortHeader(
                 title = "Notifications",

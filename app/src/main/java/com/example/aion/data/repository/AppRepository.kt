@@ -9,6 +9,7 @@ import javax.inject.Singleton
 
 interface AppRepository {
     fun getAllTrackedApps(): Flow<List<TrackedAppEntity>>
+    suspend fun getTrackedApp(packageName: String): TrackedAppEntity?
     suspend fun addTrackedApp(app: TrackedAppEntity)
     fun getSettingsForApp(packageName: String): Flow<AppSettingsEntity?>
     suspend fun updateAppSettings(settings: AppSettingsEntity)
@@ -20,6 +21,10 @@ class AppRepositoryImpl @Inject constructor(
     private val appDao: AppDao
 ) : AppRepository {
     override fun getAllTrackedApps() = appDao.getAllTrackedApps()
+
+    override suspend fun getTrackedApp(packageName: String): TrackedAppEntity? {
+        return appDao.getTrackedAppByPackageName(packageName)
+    }
     
     override suspend fun addTrackedApp(app: TrackedAppEntity) {
         appDao.insertTrackedApp(app)

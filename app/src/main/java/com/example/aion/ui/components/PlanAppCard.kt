@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import com.example.aion.R
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,7 +57,7 @@ fun PlanAppCard(
         lineHeight = Variables.StaticLabelLargeLineHeight,
         fontFamily = Variables.TitleFontFamily,
         letterSpacing = Variables.StaticLabelLargeTracking,
-        color = Color(0xFF000000)
+        color = MaterialTheme.colorScheme.onSurface
     )
 
     Row(
@@ -131,7 +132,7 @@ fun PlanAppCard(
                         lineHeight = Variables.StaticTitleLargeLineHeight,
                         fontFamily = Variables.TitleFontFamily,
                         fontWeight = FontWeight.Normal,
-                        color = Variables.SchemesOnSurface,
+                        color = MaterialTheme.colorScheme.onSurface,
                     ),
                     modifier = Modifier.weight(1f).height(28.dp)
                 )
@@ -141,7 +142,7 @@ fun PlanAppCard(
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Remove App",
-                            tint = Variables.WarningRed
+                            tint = MaterialTheme.colorScheme.error
                         )
                     }
                 }
@@ -172,7 +173,7 @@ private fun TimeRow(label: String, value: String, style: androidx.compose.ui.tex
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(text = label, style = style.copy(fontWeight = FontWeight.SemiBold))
+        Text(text = label, style = style.copy(fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant))
         Text(text = value, style = style.copy(fontWeight = FontWeight.SemiBold), textAlign = TextAlign.End)
     }
 }

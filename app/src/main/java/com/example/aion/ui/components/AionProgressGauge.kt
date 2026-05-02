@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,8 +33,8 @@ fun AionProgressGauge(
     valueText: String,
     metricText: String,
     modifier: Modifier = Modifier,
-    progressColor: Color = Variables.SuccessGreen,
-    trackColor: Color = Variables.NeutralGray
+    progressColor: Color = MaterialTheme.colorScheme.primary,
+    trackColor: Color = MaterialTheme.colorScheme.outlineVariant
 ) {
     // Animatable ensures the "filling up" animation triggers on entry
     val animatedProgress = remember { Animatable(0f) }
@@ -91,7 +92,7 @@ fun AionProgressGauge(
             text = valueText,
             fontSize = 40.sp,
             fontWeight = FontWeight.ExtraBold,
-            color = Variables.SchemesOnSurface,
+            color = MaterialTheme.colorScheme.onSurface,
             fontFamily = Variables.TitleFontFamily,
             modifier = Modifier.align(Alignment.Center)
         )
@@ -100,7 +101,7 @@ fun AionProgressGauge(
         Text(
             text = metricText,
             fontSize = 16.sp,
-            color = Variables.SchemesOnSurface.copy(alpha = 0.5f),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
             fontFamily = Variables.BodyFontFamily,
             modifier = Modifier
                 .align(Alignment.BottomCenter)

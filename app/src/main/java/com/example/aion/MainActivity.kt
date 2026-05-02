@@ -12,8 +12,7 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,6 +33,9 @@ import com.example.aion.ui.navigation.Screen
 import com.example.aion.ui.screens.*
 import com.example.aion.ui.theme.AionTheme
 import com.example.aion.data.manager.WorkScheduler
+import com.example.aion.ui.viewmodels.SettingsViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.runtime.collectAsState
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -50,7 +52,10 @@ class MainActivity : ComponentActivity() {
         workScheduler.scheduleUsageSync()
 
         setContent {
-            AionTheme {
+            val settingsViewModel: SettingsViewModel = hiltViewModel()
+            val settingsUiState by settingsViewModel.uiState.collectAsState()
+
+            AionTheme(themeMode = settingsUiState.theme) {
                 AionApp()
             }
         }
@@ -89,89 +94,82 @@ fun AionApp() {
             }
         }
     ) {
-        NavHost(navController = navController, startDestination = Screen.Home.route) {
-            composable(Screen.Home.route) {
-                HomeScreen(
-                    onAppClick = { packageName ->
-                        navController.navigate(Screen.AppDetails.createRoute(packageName))
-                    },
-                    onProfileClick = {
-                        navController.navigate(Screen.Profile.route)
-                    }
-                )
-            }
-            composable(Screen.Plan.route) {
-                PlanScreen(
-                    onNavigateToAddApps = { navController.navigate(Screen.AddApps.route) },
-                    onAppClick = { packageName ->
-                        navController.navigate(Screen.AppDetails.createRoute(packageName))
-                    }
-                )
-            }
-            composable(Screen.AddApps.route) {
-                AddAppsScreen(onNavigateBack = { navController.popBackStack() })
-            }
-            composable(Screen.Notifications.route) {
-                NotificationsScreen(
-                    onNotificationClick = { notification ->
-                        navController.navigate(Screen.NotificationDetails.createRoute(notification.id))
-                    }
-                )
-            }
-            composable(Screen.Settings.route) {
-                SettingsScreen(
-                    onThemeClick = { navController.navigate("settings_theme") },
-                    onAccentClick = { navController.navigate("settings_accent") },
-                    onProfileClick = { navController.navigate(Screen.Profile.route) },
-                    onFaqClick = { /* TODO */ },
-                    onFeedbackClick = { /* TODO */ },
-                    onPrivacyClick = { /* TODO */ },
-                    onVersionClick = { /* TODO */ }
-                )
-            }
-            composable("settings_theme") {
-                ThemeSettingsScreen(onBack = { navController.popBackStack() })
-            }
-            composable("settings_accent") {
-                AccentSettingsScreen(onBack = { navController.popBackStack() })
-            }
-            composable(Screen.Profile.route) {
-                ProfileScreen(
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            composable(
-                route = Screen.AppDetails.route,
-                arguments = listOf(navArgument("packageName") { type = NavType.StringType })
-            ) { backStackEntry ->
-                val packageName = backStackEntry.arguments?.getString("packageName")
-                AppDetailsScreen(
-                    app = sampleAppDetails.first { it.appName == "TikTok" }, // Placeholder
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            composable(
-                route = Screen.NotificationDetails.route,
-                arguments = listOf(navArgument("id") { type = NavType.LongType })
-            ) { backStackEntry ->
-                val id = backStackEntry.arguments?.getLong("id")
-                NotificationDetailScreen(
-                    notification = sampleNotifications.first(), // Placeholder
-                    onBack = { navController.popBackStack() }
-                )
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            NavHost(navController = navController, startDestination = Screen.Home.route) {
+                composable(Screen.Home.route) {
+                    HomeScreen(
+                        onAppClick = { packageName ->
+                            navController.navigate(Screen.AppDetails.createRoute(packageName))
+                        },
+                        onProfileClick = {
+                            navController.navigate(Screen.Profile.route)
+                        }
+                    )
+                }
+                composable(Screen.Plan.route) {
+                    PlanScreen(
+                        onNavigateToAddApps = { navController.navigate(Screen.AddApps.route) },
+                        onAppClick = { packageName ->
+                            navController.navigate(Screen.AppDetails.createRoute(packageName))
+                        }
+                    )
+                }
+                composable(Screen.AddApps.route) {
+                    AddAppsScreen(onNavigateBack = { navController.popBackStack() })
+                }
+                composable(Screen.Notifications.route) {
+                    NotificationsScreen(
+                        onNotificationClick = { notification ->
+                            navController.navigate(Screen.NotificationDetails.createRoute(notification.id))
+                        }
+                    )
+                }
+                composable(Screen.Settings.route) {
+                    SettingsScreen(
+                        onThemeClick = { navController.navigate("settings_theme") },
+                        onAccentClick = { navController.navigate("settings_accent") },
+                        onProfileClick = { navController.navigate(Screen.Profile.route) },
+                        onFaqClick = { /* TODO */ },
+                        onFeedbackClick = { /* TODO */ },
+                        onPrivacyClick = { /* TODO */ },
+                        onVersionClick = { /* TODO */ }
+                    )
+                }
+                composable("settings_theme") {
+                    ThemeSettingsScreen(onBack = { navController.popBackStack() })
+                }
+                composable("settings_accent") {
+                    AccentSettingsScreen(onBack = { navController.popBackStack() })
+                }
+                composable(Screen.Profile.route) {
+                    ProfileScreen(
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+                composable(
+                    route = Screen.AppDetails.route,
+                    arguments = listOf(navArgument("packageName") { type = NavType.StringType })
+                ) {
+                    AppDetailsScreen(
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+                composable(
+                    route = Screen.NotificationDetails.route,
+                    arguments = listOf(navArgument("id") { type = NavType.LongType })
+                ) { backStackEntry ->
+                    val id = backStackEntry.arguments?.getLong("id")
+                    NotificationDetailScreen(
+                        notification = sampleNotifications.first(), // Placeholder
+                        onBack = { navController.popBackStack() }
+                    )
+                }
             }
         }
     }
-}
-
-private enum class SettingsDestinations {
-    LIST,
-    THEME,
-    ACCENT,
-    FAQ,
-    FEEDBACK,
-    PRIVACY,
-    VERSION,
 }
 
 enum class AppDestinations(

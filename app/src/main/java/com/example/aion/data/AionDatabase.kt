@@ -24,7 +24,7 @@ import com.example.aion.data.entities.*
         SquadEntity::class,
         SquadMemberEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(AionConverters::class)

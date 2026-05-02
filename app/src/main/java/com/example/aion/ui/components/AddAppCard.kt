@@ -61,7 +61,7 @@ fun AddAppCard(
                 modifier = Modifier
                     .size(76.dp)
                     .clip(RoundedCornerShape(19.dp))
-                    .background(Variables.SchemesSurfaceVariant),
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
                 // Fallback icon
@@ -80,7 +80,7 @@ fun AddAppCard(
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontSize = Variables.StaticTitleLargeSize,
                     lineHeight = Variables.StaticTitleLargeLineHeight,
-                    color = Variables.SchemesOnSurface,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Normal
                 ),
                 maxLines = 1
@@ -93,8 +93,8 @@ fun AddAppCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(8.dp),
-                    color = Variables.PrimaryBrand,
-                    trackColor = Variables.PrimaryBrand.copy(alpha = 0.2f),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
                     strokeCap = StrokeCap.Round
                 )
             } else if (usedTime != null) {
@@ -102,7 +102,7 @@ fun AddAppCard(
                 Text(
                     text = "Used: $usedTime",
                     style = MaterialTheme.typography.labelMedium.copy(
-                        color = Variables.SchemesOnSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 )
             }

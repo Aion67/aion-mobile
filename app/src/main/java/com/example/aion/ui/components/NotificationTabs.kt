@@ -26,13 +26,13 @@ fun NotificationTabs(
     TabRow(
         selectedTabIndex = selectedTabIndex,
         modifier = modifier.fillMaxWidth(),
-        containerColor = Variables.SchemesSurface,
-        contentColor = Variables.PrimaryBrand,
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.primary,
         divider = {
             HorizontalDivider(
                 modifier = Modifier.fillMaxWidth(),
                 thickness = 1.dp,
-                color = Variables.NeutralGray.copy(alpha = 0.2f)
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)
             )
         },
         indicator = { tabPositions ->
@@ -40,7 +40,7 @@ fun NotificationTabs(
                 TabRowDefaults.SecondaryIndicator(
                     modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
                     height = 3.dp,
-                    color = Variables.PrimaryBrand
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -58,8 +58,8 @@ fun NotificationTabs(
                     )
                 )
             },
-            selectedContentColor = Variables.PrimaryBrand,
-            unselectedContentColor = Variables.SchemesOnSurfaceVariant,
+            selectedContentColor = MaterialTheme.colorScheme.primary,
+            unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         Tab(
@@ -75,8 +75,8 @@ fun NotificationTabs(
                     )
                 )
             },
-            selectedContentColor = Variables.PrimaryBrand,
-            unselectedContentColor = Variables.SchemesOnSurfaceVariant,
+            selectedContentColor = MaterialTheme.colorScheme.primary,
+            unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

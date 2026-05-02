@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class ProfileUiState(
-    val profile: UserProfileEntity = UserProfileEntity(username = "New User"),
+    val profile: UserProfileEntity = UserProfileEntity(username = "User", displayName = "New User"),
     val isLoading: Boolean = false
 )
 
@@ -21,7 +21,7 @@ class ProfileViewModel @Inject constructor(
 
     val uiState: StateFlow<ProfileUiState> = userRepository.getUserProfile()
         .map { profile -> 
-            ProfileUiState(profile = profile ?: UserProfileEntity(username = "User")) 
+            ProfileUiState(profile = profile ?: UserProfileEntity(username = "User", displayName = "User")) 
         }
         .stateIn(
             scope = viewModelScope,
@@ -29,10 +29,10 @@ class ProfileViewModel @Inject constructor(
             initialValue = ProfileUiState(isLoading = true)
         )
 
-    fun updateUsername(username: String) {
+    fun updateDisplayName(displayName: String) {
         viewModelScope.launch {
             val current = uiState.value.profile
-            userRepository.saveUserProfile(current.copy(username = username))
+            userRepository.saveUserProfile(current.copy(displayName = displayName))
         }
     }
 

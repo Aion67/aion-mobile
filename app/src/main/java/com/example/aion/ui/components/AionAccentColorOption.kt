@@ -51,7 +51,7 @@ fun AionAccentColorOption(
                 )
                 .border(
                     width = if (isSelected) 3.dp else 2.dp,
-                    color = if (isSelected) Variables.PrimaryBrand else Variables.SchemesOutline.copy(alpha = 0.5f),
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                     shape = CircleShape
                 )
         ) {
@@ -61,7 +61,7 @@ fun AionAccentColorOption(
                         .align(Alignment.Center)
                         .size(22.dp)
                         .background(
-                            color = Variables.SchemesSurface.copy(alpha = 0.18f),
+                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.18f),
                             shape = CircleShape
                         ),
                     contentAlignment = Alignment.Center
@@ -69,7 +69,7 @@ fun AionAccentColorOption(
                     Icon(
                         imageVector = Icons.Filled.Check,
                         contentDescription = null,
-                        tint = Variables.SchemesSurface,
+                        tint = MaterialTheme.colorScheme.surface,
                     )
                 }
             }
@@ -80,7 +80,7 @@ fun AionAccentColorOption(
             style = MaterialTheme.typography.bodySmall.copy(
                 fontSize = Variables.StaticBodySmallSize,
                 lineHeight = Variables.StaticBodySmallLineHeight,
-                color = Variables.SchemesOnSurface,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Normal
             )
         )
@@ -92,7 +92,7 @@ fun AionAccentColorOption(
 fun AionAccentColorOptionPreview() {
     Column(
         modifier = Modifier
-            .background(Variables.SchemesSurface)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally

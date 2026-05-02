@@ -8,7 +8,9 @@ import androidx.room.PrimaryKey
  */
 @Entity(tableName = "user_profiles")
 data class UserProfileEntity(
-    @PrimaryKey val username: String,
+    @PrimaryKey val id: Long = 0,
+    val username: String,
+    val displayName: String = "",
     val avatarUri: String? = null,
     val createdDate: Long = System.currentTimeMillis()
 )

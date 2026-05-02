@@ -10,6 +10,7 @@ interface UsageRepository {
     fun getSessionsForApp(packageName: String): Flow<List<UsageSessionEntity>>
     suspend fun logUsageSession(session: UsageSessionEntity)
     fun getTotalUsageForApp(packageName: String, since: Long): Flow<Long?>
+    fun getTotalUsageForAppInRange(packageName: String, start: Long, end: Long): Flow<Long?>
 }
 
 @Singleton
@@ -24,4 +25,7 @@ class UsageRepositoryImpl @Inject constructor(
 
     override fun getTotalUsageForApp(packageName: String, since: Long) = 
         usageDao.getTotalDurationForApp(packageName, since)
+
+    override fun getTotalUsageForAppInRange(packageName: String, start: Long, end: Long) =
+        usageDao.getTotalDurationForAppInRange(packageName, start, end)
 }

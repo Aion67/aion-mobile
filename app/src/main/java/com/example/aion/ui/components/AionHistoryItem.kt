@@ -31,7 +31,7 @@ fun AionHistoryItem(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Variables.SchemesSurface
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
@@ -46,11 +46,11 @@ fun AionHistoryItem(
                         text = "$day, $date",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Variables.SchemesOnSurface
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = if (isExceeded) "Exceeded" else "Within Limit",
-                        color = if (isExceeded) Variables.WarningRed else Variables.SuccessGreen,
+                        color = if (isExceeded) MaterialTheme.colorScheme.error else Variables.SuccessGreen,
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -60,7 +60,7 @@ fun AionHistoryItem(
                     text = "$percentage%",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Black,
-                    color = if (isExceeded) Variables.WarningRed else Variables.PrimaryBrand
+                    color = if (isExceeded) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
                 )
             }
             
@@ -83,13 +83,13 @@ private fun HistoryStat(label: String, value: String) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelSmall,
-            color = Variables.SchemesOnSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
-            color = Variables.SchemesOnSurface
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

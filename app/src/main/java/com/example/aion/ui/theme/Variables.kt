@@ -5,7 +5,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
 
 object Variables {
-    // Brand Colors
+    // Brand Colors (Constant across themes)
     val PrimaryBrand = Color(0xFF6750A4)
     val SuccessGreen = Color(0xFF4CAF50)
     val WarningRed = Color(0xFFF44336)
@@ -14,24 +14,19 @@ object Variables {
     val EmeraldGreen = Color(0xFF10B981)
     val SelectionBlue = Color(0xFF007BFF)
     
-    // Dark Theme Palette
-    val CardBackground = Color(0xFF0F172A)
-    val CardBorder = Color(0xFF1E293B)
-    val TextPrimary = Color(0xFFF1F5F9)
-    val TextSecondary = Color(0xFF94A3B8)
-    
-    // M3 System Colors (Light/Standard references for the Time Picker)
-    val SchemesSurfaceContainerHigh = Color(0xFFECE6F0)
-    val SchemesSurfaceContainerHighest = Color(0xFFE6E0E9)
-    val SchemesPrimaryContainer = Color(0xFFEADDFF)
-    val SchemesOnPrimaryContainer = Color(0xFF4F378A)
+    // Default Light Theme Colors (Reference only, components should use MaterialTheme.colorScheme)
+    val SchemesSurface = Color(0xFFFEF7FF)
+    val SchemesOnSurface = Color(0xFF1D1B20)
+    val SchemesSurfaceVariant = Color(0xFFE7E0EB)
     val SchemesOnSurfaceVariant = Color(0xFF49454F)
     val SchemesOutline = Color(0xFF79747E)
+    val SchemesPrimaryContainer = Color(0xFFEADDFF)
+    
+    val SchemesSurfaceContainerHigh = Color(0xFFECE6F0)
+    val SchemesSurfaceContainerHighest = Color(0xFFE6E0E9)
+    val SchemesOnPrimaryContainer = Color(0xFF4F378A)
     val SchemesTertiaryContainer = Color(0xFFFFD8E4)
     val SchemesOnTertiaryContainer = Color(0xFF633B48)
-    val SchemesSurface = Color(0xFFFEF7FF)
-    val SchemesSurfaceVariant = Color(0xFFE7E0EB)
-    val SchemesOnSurface = Color(0xFF1D1B20)
 
     // Typography Sizes
     val StaticHeadlineSmallSize = 24.sp

@@ -20,7 +20,7 @@ import com.example.aion.ui.components.SortHeader
 import com.example.aion.ui.theme.Variables
 
 import androidx.compose.runtime.collectAsState
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.aion.ui.viewmodels.PlanViewModel
 import com.example.aion.util.TimeUtils
 
@@ -34,20 +34,19 @@ fun PlanScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showMenu by remember { mutableStateOf(false) }
+    var showSortMenu by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             AionTopAppBar(
                 title = "Plan",
-                avatarRes = com.example.aion.R.drawable.tiktok, // Placeholder avatar
                 actions = {
                     Box {
                         IconButton(onClick = { showMenu = true }) {
                             Icon(
                                 imageVector = Icons.Default.MoreVert,
-                                contentDescription = "More options",
-                                tint = Variables.SchemesOnSurface
+                                contentDescription = "More options"
                             )
                         }
                         DropdownMenu(
@@ -79,18 +78,34 @@ fun PlanScreen(
                 }
             )
         },
-        containerColor = Color.White
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .background(Variables.SchemesSurface)
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            SortHeader(
-                title = "Apps",
-                onSortClick = { /* Handle sort */ }
-            )
+            Box {
+                SortHeader(
+                    title = "Apps",
+                    onSortClick = { showSortMenu = true }
+                )
+                DropdownMenu(
+                    expanded = showSortMenu,
+                    onDismissRequest = { showSortMenu = false }
+                ) {
+                    com.example.aion.ui.viewmodels.PlanSort.values().forEach { sort ->
+                        DropdownMenuItem(
+                            text = { Text(sort.name.lowercase().replaceFirstChar { it.uppercase() }) },
+                            onClick = {
+                                viewModel.setSort(sort)
+                                showSortMenu = false
+                            }
+                        )
+                    }
+                }
+            }
             
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -101,10 +116,10 @@ fun PlanScreen(
                     PlanAppCard(
                         appName = item.app.appName,
                         icon = item.icon,
-                        creditScore = "76.23",
-                        usedTime = "0m", // Needs actual usage
+                        creditScore = "0.00",
+                        usedTime = TimeUtils.formatDuration(item.usageMs),
                         remainingTime = TimeUtils.formatDuration(item.settings.dailyLimitMs),
-                        progress = 0f,
+                        progress = if (item.settings.dailyLimitMs > 0) item.usageMs.toFloat() / item.settings.dailyLimitMs else 0f,
                         onClick = { onAppClick(item.app.packageName) },
                         onDeleteClick = { viewModel.removeApp(item.app.packageName) }
                     )

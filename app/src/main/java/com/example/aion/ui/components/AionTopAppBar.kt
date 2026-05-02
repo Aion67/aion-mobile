@@ -49,7 +49,7 @@ fun AionTopAppBar(
                     fontSize = Variables.StaticTitleLargeSize,
                     lineHeight = Variables.StaticTitleLargeLineHeight,
                     fontWeight = FontWeight.Normal,
-                    color = Variables.SchemesOnSurface
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             )
         },
@@ -70,17 +70,17 @@ fun AionTopAppBar(
                     Icon(
                         imageVector = leadingIcon,
                         contentDescription = "Back",
-                        tint = Variables.SchemesOnSurface
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
         },
         actions = actions,
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = Variables.SchemesSurface,
-            titleContentColor = Variables.SchemesOnSurface,
-            navigationIconContentColor = Variables.SchemesOnSurface,
-            actionIconContentColor = Variables.SchemesOnSurface
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+            actionIconContentColor = MaterialTheme.colorScheme.onSurface
         )
     )
 }

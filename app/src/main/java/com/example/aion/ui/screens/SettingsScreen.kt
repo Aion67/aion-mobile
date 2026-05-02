@@ -1,52 +1,31 @@
 package com.example.aion.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.Feedback
-import androidx.compose.material.icons.filled.HelpOutline
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.PrivacyTip
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.aion.ui.components.AionAccentColorOption
-import com.example.aion.ui.components.AionSettingsRow
-import com.example.aion.ui.components.AionSettingsSection
-import com.example.aion.ui.components.AionProfileActionButton
-import com.example.aion.ui.components.AionThemeOption
-import com.example.aion.ui.components.AionTopAppBar
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.example.aion.ui.components.*
 import com.example.aion.ui.theme.Variables
-
-import androidx.compose.runtime.collectAsState
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.aion.utils.PermissionUtils
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.aion.ui.viewmodels.SettingsViewModel
 
 @Composable
@@ -62,6 +41,23 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.updatePermissionStatus(
+                    usage = PermissionUtils.hasUsageStatsPermission(context),
+                    overlay = PermissionUtils.hasOverlayPermission(context)
+                )
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -76,13 +72,13 @@ fun SettingsScreen(
                 }
             )
         },
-        containerColor = Variables.SchemesSurface
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .background(Variables.SchemesSurface),
+                .background(MaterialTheme.colorScheme.background),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(vertical = 8.dp)
         ) {
@@ -108,10 +104,25 @@ fun SettingsScreen(
                     )
                     AionSettingsRow(
                         title = "Display over other Apps",
-                        subtitle = "Display over tracked apps when time is up",
+                        subtitle = "Required for time limit alerts",
                         leadingIcon = Icons.Filled.Apps,
-                        checked = true,
-                        onCheckedChange = { }
+                        checked = uiState.hasOverlayPermission,
+                        onCheckedChange = {
+                            if (!uiState.hasOverlayPermission) {
+                                context.startActivity(PermissionUtils.getOverlayIntent(context))
+                            }
+                        }
+                    )
+                    AionSettingsRow(
+                        title = "Usage Access",
+                        subtitle = "Required to track app usage",
+                        leadingIcon = Icons.Filled.Info,
+                        checked = uiState.hasUsageAccess,
+                        onCheckedChange = {
+                            if (!uiState.hasUsageAccess) {
+                                context.startActivity(PermissionUtils.getUsageStatsIntent())
+                            }
+                        }
                     )
                 }
             }
@@ -137,7 +148,7 @@ fun SettingsScreen(
                 AionSettingsSection(title = "About") {
                     AionSettingsRow(
                         title = "FAQ",
-                        leadingIcon = Icons.Filled.HelpOutline,
+                        leadingIcon = Icons.AutoMirrored.Filled.HelpOutline,
                         onClick = onFaqClick
                     )
                     AionSettingsRow(
@@ -176,17 +187,17 @@ fun ThemeSettingsScreen(
             AionTopAppBar(
                 title = "Theme",
                 leadingIcon = Icons.AutoMirrored.Filled.ArrowBack,
-                onLeadingClick = onBack
+                onLeadingClick = onBack,
             )
         },
-        containerColor = Variables.SchemesSurface
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .background(Variables.SchemesSurface)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
@@ -195,7 +206,7 @@ fun ThemeSettingsScreen(
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = Variables.StaticBodyLargeSize,
                     lineHeight = Variables.StaticBodyLargeLineHeight,
-                    color = Variables.SchemesOnSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Normal
                 )
             )
@@ -261,17 +272,17 @@ fun AccentSettingsScreen(
             AionTopAppBar(
                 title = "Accent color",
                 leadingIcon = Icons.AutoMirrored.Filled.ArrowBack,
-                onLeadingClick = onBack
+                onLeadingClick = onBack,
             )
         },
-        containerColor = Variables.SchemesSurface
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .background(Variables.SchemesSurface)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
@@ -280,17 +291,17 @@ fun AccentSettingsScreen(
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = Variables.StaticBodyLargeSize,
                     lineHeight = Variables.StaticBodyLargeLineHeight,
-                    color = Variables.SchemesOnSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Normal
                 )
             )
 
-            accentOptions.chunked(4).forEachIndexed { rowIndex, rowOptions ->
+            accentOptions.chunked(4).forEach { rowOptions ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    rowOptions.forEachIndexed { columnIndex, option ->
+                    rowOptions.forEach { option ->
                         AionAccentColorOption(
                             color = option.color,
                             label = option.label,

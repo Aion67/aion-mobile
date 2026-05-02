@@ -31,13 +31,13 @@ import com.example.aion.ui.theme.Variables
 @Composable
 fun AionHomeHeader(
     userName: String,
+    improvementPercentage: Float,
     avatarRes: Int? = null,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(Variables.SchemesSurface)
             .padding(horizontal = 16.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -48,7 +48,7 @@ fun AionHomeHeader(
                 style = MaterialTheme.typography.labelLarge.copy(
                     fontSize = Variables.StaticLabelLargeSize,
                     lineHeight = Variables.StaticLabelLargeLineHeight,
-                    color = Variables.SchemesOnSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Normal
                 )
             )
@@ -57,8 +57,29 @@ fun AionHomeHeader(
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontSize = Variables.StaticHeadlineSmallSize,
                     lineHeight = Variables.StaticHeadlineSmallLineHeight,
-                    color = Variables.SchemesOnSurface,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold
+                )
+            )
+
+            val improvementText = if (improvementPercentage >= 0) {
+                "+${(improvementPercentage * 100).toInt()}% Improvement"
+            } else {
+                "${(improvementPercentage * 100).toInt()}% Improvement"
+            }
+            val improvementColor = if (improvementPercentage >= 0) {
+                Variables.SuccessGreen
+            } else {
+                Variables.WarningRed
+            }
+
+            Text(
+                text = improvementText,
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = Variables.StaticLabelMediumSize,
+                    lineHeight = Variables.StaticLabelMediumLineHeight,
+                    color = improvementColor,
+                    fontWeight = FontWeight.Medium
                 )
             )
         }
@@ -83,5 +104,5 @@ fun AionHomeHeader(
 @Preview(showBackground = true)
 @Composable
 fun AionHomeHeaderPreview() {
-    AionHomeHeader(userName = "Alex", avatarRes = R.drawable.tiktok)
+    AionHomeHeader(userName = "Alex", improvementPercentage = 0.05f, avatarRes = R.drawable.tiktok)
 }

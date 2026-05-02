@@ -60,7 +60,7 @@ fun NotificationItem(
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontSize = Variables.StaticTitleLargeSize,
                     lineHeight = Variables.StaticTitleLargeLineHeight,
-                    color = Variables.SchemesOnSurface,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Normal
                 ),
                 maxLines = 1
@@ -75,7 +75,7 @@ fun NotificationItem(
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontSize = Variables.StaticBodyMediumSize,
                         lineHeight = Variables.StaticBodyMediumLineHeight,
-                        color = Variables.SchemesOnSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
                     maxLines = 1
                 )
@@ -85,7 +85,7 @@ fun NotificationItem(
                     style = MaterialTheme.typography.bodySmall.copy(
                         fontSize = Variables.StaticBodySmallSize,
                         lineHeight = Variables.StaticBodySmallLineHeight,
-                        color = Variables.SchemesOnSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         letterSpacing = Variables.StaticBodySmallTracking,
                         fontWeight = FontWeight.Medium
                     )
