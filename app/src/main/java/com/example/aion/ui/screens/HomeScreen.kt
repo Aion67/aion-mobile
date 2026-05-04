@@ -39,7 +39,6 @@ fun HomeScreen(
                 title = "",
                 actions = {
                     AionProfileActionButton(
-                        avatarRes = com.example.aion.R.drawable.tiktok,
                         onClick = onProfileClick
                     )
                 }
@@ -59,7 +58,7 @@ fun HomeScreen(
                 AionHomeHeader(
                     userName = uiState.displayName,
                     improvementPercentage = uiState.improvementPercentage,
-                    avatarRes = com.example.aion.R.drawable.tiktok
+                    onAvatarClick = onProfileClick
                 )
             }
 
@@ -86,9 +85,20 @@ fun HomeScreen(
             }
 
             item {
+                val yesterdayPercentage = (uiState.improvementPercentage * 100).toInt()
                 AionStatCard(
-                    percentage = (uiState.improvementPercentage * 100).toInt(),
-                    label = "Improvement from yesterday"
+                    percentage = yesterdayPercentage,
+                    label = "Improvement from yesterday",
+                    progressColor = if (yesterdayPercentage >= 0) Variables.SuccessGreen else Variables.WarningRed
+                )
+            }
+
+            item {
+                val weeklyPercentage = (uiState.weeklyImprovementPercentage * 100).toInt()
+                AionStatCard(
+                    percentage = weeklyPercentage,
+                    label = "Improvement from last week",
+                    progressColor = if (weeklyPercentage >= 0) Variables.SuccessGreen else Variables.WarningRed
                 )
             }
 
@@ -99,7 +109,7 @@ fun HomeScreen(
                 PlanAppCard(
                     appName = trackedAppUsage.app.appName,
                     icon = trackedAppUsage.icon,
-                    creditScore = "0.00", // Default to 0 as requested
+                    creditScore = String.format(Locale.US, "%.2f", trackedAppUsage.score),
                     usedTime = TimeUtils.formatDuration(trackedAppUsage.usageMs),
                     remainingTime = TimeUtils.formatDuration(remainingMs),
                     progress = progress,

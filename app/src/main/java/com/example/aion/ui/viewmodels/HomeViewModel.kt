@@ -8,6 +8,7 @@ import com.example.aion.data.entities.TrackedAppEntity
 import com.example.aion.data.repository.AppRepository
 import com.example.aion.data.repository.UsageRepository
 import com.example.aion.data.repository.UserRepository
+import com.example.aion.util.ScoreUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.*
@@ -17,6 +18,9 @@ data class HomeUiState(
     val trackedApps: List<TrackedAppUsage> = emptyList(),
     val score: Float = 0f,
     val improvementPercentage: Float = 0f,
+    val weeklyImprovementPercentage: Float = 0f,
+    val totalTimeSavedMs: Long = 0L,
+    val rank: String = "Beginner",
     val displayName: String = "User",
     val isLoading: Boolean = false
 )
@@ -25,7 +29,8 @@ data class TrackedAppUsage(
     val app: TrackedAppEntity,
     val icon: Drawable?,
     val usageMs: Long,
-    val limitMs: Long
+    val limitMs: Long,
+    val score: Float = 0f
 )
 
 @HiltViewModel
@@ -49,54 +54,60 @@ class HomeViewModel @Inject constructor(
         } else {
             val todayStart = getTodayStartMs()
             val yesterdayStart = todayStart - 24 * 60 * 60 * 1000L
+            val weekStart = todayStart - 7 * 24 * 60 * 60 * 1000L
             
             val usageFlows = apps.map { app ->
                 combine(
                     usageRepository.getTotalUsageForApp(app.packageName, todayStart),
                     usageRepository.getTotalUsageForAppInRange(app.packageName, yesterdayStart, todayStart),
+                    usageRepository.getTotalUsageForAppInRange(app.packageName, weekStart, todayStart),
                     appRepository.getSettingsForApp(app.packageName)
-                ) { todayUsage, yesterdayUsage, settings ->
+                ) { todayUsage, yesterdayUsage, weekUsage, settings ->
                     val icon = try {
                         pm.getApplicationIcon(app.packageName)
                     } catch (e: Exception) {
                         null
                     }
-                    Triple(
-                        TrackedAppUsage(app, icon, todayUsage ?: 0L, settings?.dailyLimitMs ?: 0L),
-                        yesterdayUsage ?: 0L,
-                        settings?.dailyLimitMs ?: 0L
+                    val today = todayUsage ?: 0L
+                    val limit = settings?.dailyLimitMs ?: 0L
+                    
+                    val appScore = ScoreUtils.calculateScore(today, limit)
+
+                    DataSnapshot(
+                        usage = TrackedAppUsage(app, icon, today, limit, appScore),
+                        yesterdayUsage = yesterdayUsage ?: 0L,
+                        weekUsage = weekUsage ?: 0L
                     )
                 }
             }
-            combine(usageFlows) { triples ->
-                val usages = triples.map { it.first }
+            combine(usageFlows) { snapshots ->
+                val usages = snapshots.map { it.usage }
                 val totalTodayUsage = usages.sumOf { it.usageMs }
                 val totalTodayLimit = usages.sumOf { it.limitMs }
-                val totalYesterdayUsage = triples.sumOf { it.second }
+                val totalYesterdayUsage = snapshots.sumOf { it.yesterdayUsage }
+                val totalWeekUsage = snapshots.sumOf { it.weekUsage }
                 
-                // Default Score calculation: 100 - (usage/limit * 100), capped at 0-100
-                // User requested default scores to be zero. 
-                // Showing 0 if no total limit set OR no total usage recorded today.
-                val score = if (totalTodayLimit > 0L && totalTodayUsage > 0L) {
-                    val ratio = totalTodayUsage.toFloat() / totalTodayLimit
-                    (100f * (1f - ratio)).coerceIn(0f, 100f)
-                } else {
-                    0f // Default to 0 as requested
-                }
+                val score = ScoreUtils.calculateScore(totalTodayUsage, totalTodayLimit)
+                val improvement = ScoreUtils.calculateImprovement(totalYesterdayUsage, totalTodayUsage)
+                val weeklyImprovement = ScoreUtils.calculateImprovement(totalWeekUsage / 7, totalTodayUsage)
 
-                // Improvement: (Yesterday - Today) / Yesterday
-                val improvement = if (totalYesterdayUsage > 0L) {
-                    (totalYesterdayUsage - totalTodayUsage).toFloat() / totalYesterdayUsage
-                } else if (totalTodayUsage == 0L) {
-                    0f
-                } else {
-                    -1f // Today is worse since we had 0 yesterday
+                val timeSaved = if (totalTodayLimit > totalTodayUsage) totalTodayLimit - totalTodayUsage else 0L
+
+                val rank = when {
+                    score >= 90 -> "Legend"
+                    score >= 70 -> "Expert"
+                    score >= 50 -> "Pro"
+                    score >= 30 -> "Intermediate"
+                    else -> "Beginner"
                 }
 
                 HomeUiState(
                     trackedApps = usages.toList(),
                     score = score,
                     improvementPercentage = improvement,
+                    weeklyImprovementPercentage = weeklyImprovement,
+                    totalTimeSavedMs = timeSaved,
+                    rank = rank,
                     displayName = profile?.displayName ?: "User"
                 )
             }
@@ -115,4 +126,10 @@ class HomeViewModel @Inject constructor(
         calendar.set(java.util.Calendar.MILLISECOND, 0)
         return calendar.timeInMillis
     }
+
+    private data class DataSnapshot(
+        val usage: TrackedAppUsage,
+        val yesterdayUsage: Long,
+        val weekUsage: Long
+    )
 }

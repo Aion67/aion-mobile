@@ -3,8 +3,8 @@ package com.example.aion.ui.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Dashboard
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
@@ -29,9 +29,9 @@ fun AionTabs(
     modifier: Modifier = Modifier
 ) {
     val tabs = listOf(
-        TabItem("Overview", Icons.Default.Info),
+        TabItem("Overview", Icons.Default.Dashboard),
         TabItem("Settings", Icons.Default.Settings),
-        TabItem("History", Icons.Default.Refresh)
+        TabItem("History", Icons.Default.History)
     )
 
     TabRow(

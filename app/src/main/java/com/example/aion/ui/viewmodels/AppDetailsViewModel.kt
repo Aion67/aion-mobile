@@ -13,7 +13,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import com.example.aion.ui.components.StreakDay
 import java.util.Calendar
+import java.util.Locale
+import java.text.SimpleDateFormat
 import javax.inject.Inject
 
 data class AppDetailsUiState(
@@ -27,6 +30,7 @@ data class AppDetailsUiState(
     val pendingIsTracked: Boolean = true,
     val usageTodayMs: Long = 0,
     val history: List<UsageSessionEntity> = emptyList(),
+    val streakDays: List<StreakDay> = emptyList(),
     val isSaving: Boolean = false,
     val saveSuccess: Boolean = false,
     val isLoading: Boolean = true
@@ -70,6 +74,8 @@ class AppDetailsViewModel @Inject constructor(
         val limit = settings?.dailyLimitMs ?: 0L
         val tracked = settings?.isTracked ?: true
         
+        val streakDays = calculateStreakDays(history, limit)
+        
         AppDetailsUiState(
             appName = appInfo.first,
             packageName = packageName,
@@ -81,6 +87,7 @@ class AppDetailsViewModel @Inject constructor(
             pendingIsTracked = pending.second ?: tracked,
             usageTodayMs = usageToday ?: 0L,
             history = history.sortedByDescending { it.startTime },
+            streakDays = streakDays,
             saveSuccess = saveSuccess,
             isSaving = isSaving,
             isLoading = false
@@ -90,6 +97,45 @@ class AppDetailsViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = AppDetailsUiState(packageName = packageName, isLoading = true)
     )
+
+    private fun calculateStreakDays(history: List<UsageSessionEntity>, limitMs: Long): List<StreakDay> {
+        val today = Calendar.getInstance()
+        val days = mutableListOf<StreakDay>()
+        
+        val dayNameFormat = SimpleDateFormat("EEE", Locale.US)
+        val dateNumberFormat = SimpleDateFormat("dd", Locale.US)
+
+        // Generate last 7 days (including today)
+        for (i in 6 downTo 0) {
+            val cal = Calendar.getInstance()
+            cal.add(Calendar.DAY_OF_YEAR, -i)
+            
+            val startOfDay = cal.apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.timeInMillis
+            
+            val endOfDay = startOfDay + 24 * 60 * 60 * 1000L
+            
+            val dayUsage = history.filter { it.startTime >= startOfDay && it.startTime < endOfDay }
+                .sumOf { it.totalDurationMs }
+            
+            // Passed if usage <= limit and limit > 0
+            val isCompleted = limitMs > 0 && dayUsage <= limitMs && dayUsage > 0
+            
+            days.add(
+                StreakDay(
+                    dayName = dayNameFormat.format(cal.time),
+                    dateNumber = dateNumberFormat.format(cal.time),
+                    isCompleted = isCompleted,
+                    isToday = i == 0
+                )
+            )
+        }
+        return days
+    }
 
     private fun getAppInfoFlow() = flow {
         val app = appRepository.getTrackedApp(packageName)
@@ -106,14 +152,17 @@ class AppDetailsViewModel @Inject constructor(
         }
     }
 
-    private fun getUsageTodayFlow(): Flow<Long?> {
+    private fun getUsageTodayFlow(): Flow<Long?> = flow {
+        // Today's start might change if the app stays open past midnight
+        // But for most cases, getting it once is fine for the flow's lifecycle.
         val todayStart = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }.timeInMillis
-        return usageRepository.getTotalUsageForApp(packageName, todayStart)
+        
+        emitAll(usageRepository.getTotalUsageForApp(packageName, todayStart))
     }
 
     fun updatePendingLimit(hours: Int, minutes: Int, seconds: Int) {
@@ -157,5 +206,18 @@ class AppDetailsViewModel @Inject constructor(
     
     fun dismissSaveSuccess() {
         _saveSuccess.value = false
+    }
+
+    fun resetProgress() {
+        viewModelScope.launch {
+            val todayStart = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.timeInMillis
+            
+            usageRepository.resetTodayUsage(packageName, todayStart)
+        }
     }
 }

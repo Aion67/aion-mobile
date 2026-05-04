@@ -23,6 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.aion.ui.viewmodels.PlanViewModel
 import com.example.aion.util.TimeUtils
+import java.util.Locale
 
 @Composable
 fun PlanScreen(
@@ -116,7 +117,7 @@ fun PlanScreen(
                     PlanAppCard(
                         appName = item.app.appName,
                         icon = item.icon,
-                        creditScore = "0.00",
+                        creditScore = String.format(Locale.US, "%.2f", item.score),
                         usedTime = TimeUtils.formatDuration(item.usageMs),
                         remainingTime = TimeUtils.formatDuration(item.settings.dailyLimitMs),
                         progress = if (item.settings.dailyLimitMs > 0) item.usageMs.toFloat() / item.settings.dailyLimitMs else 0f,

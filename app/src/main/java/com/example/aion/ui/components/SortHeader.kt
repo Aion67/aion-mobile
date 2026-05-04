@@ -3,7 +3,7 @@ package com.example.aion.ui.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -36,15 +36,15 @@ fun SortHeader(
         // Left Side: Title (e.g., "Apps")
         Text(
             text = title,
-            style = androidx.compose.ui.text.TextStyle(
+            style = MaterialTheme.typography.headlineSmall.copy(
                 fontSize = Variables.StaticHeadlineSmallSize,
                 lineHeight = Variables.StaticHeadlineSmallLineHeight,
                 fontWeight = FontWeight.Normal,
-                color = Variables.SchemesOnSurface
+                color = MaterialTheme.colorScheme.onSurface
             )
         )
 
-        // Right Side: Sort by + Star Icon
+        // Right Side: Sort by + Sort Icon
         Row(
             modifier = Modifier
                 .clickable(onClick = onSortClick)
@@ -54,19 +54,19 @@ fun SortHeader(
         ) {
             Text(
                 text = "Sort by",
-                style = androidx.compose.ui.text.TextStyle(
+                style = MaterialTheme.typography.labelMedium.copy(
                     fontSize = Variables.StaticLabelMediumSize,
                     lineHeight = Variables.StaticLabelMediumLineHeight,
                     letterSpacing = Variables.StaticLabelMediumTracking,
                     fontWeight = FontWeight.Medium,
-                    color = Variables.SchemesOnSurface
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             )
             Icon(
-                imageVector = Icons.Default.Star,
+                imageVector = Icons.AutoMirrored.Filled.Sort,
                 contentDescription = "Sort Icon",
                 modifier = Modifier.size(24.dp),
-                tint = Variables.SchemesOnSurface
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
     }

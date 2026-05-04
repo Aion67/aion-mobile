@@ -8,6 +8,7 @@ import com.example.aion.data.entities.AppSettingsEntity
 import com.example.aion.data.entities.TrackedAppEntity
 import com.example.aion.data.repository.AppRepository
 import com.example.aion.data.repository.UsageRepository
+import com.example.aion.util.ScoreUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.*
@@ -30,7 +31,8 @@ data class TrackedAppWithSettings(
     val app: TrackedAppEntity,
     val settings: AppSettingsEntity,
     val icon: Drawable?,
-    val usageMs: Long = 0L
+    val usageMs: Long = 0L,
+    val score: Float = 0f
 )
 
 @HiltViewModel
@@ -63,11 +65,16 @@ class PlanViewModel @Inject constructor(
                         } catch (e: Exception) {
                             null
                         }
+                        val todayUsage = usage ?: 0L
+                        val limit = settings?.dailyLimitMs ?: 0L
+                        val score = ScoreUtils.calculateScore(todayUsage, limit)
+
                         TrackedAppWithSettings(
                             app, 
                             settings ?: AppSettingsEntity(appPackageName = app.packageName), 
                             icon,
-                            usage ?: 0L
+                            todayUsage,
+                            score
                         )
                     }
                 }

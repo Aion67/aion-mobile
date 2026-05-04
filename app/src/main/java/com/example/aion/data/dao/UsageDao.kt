@@ -19,4 +19,7 @@ interface UsageDao {
 
     @Query("SELECT SUM(totalDurationMs) FROM usage_sessions WHERE appPackageName = :packageName AND startTime >= :start AND startTime < :end")
     fun getTotalDurationForAppInRange(packageName: String, start: Long, end: Long): Flow<Long?>
+
+    @Query("DELETE FROM usage_sessions WHERE appPackageName = :packageName AND startTime >= :since")
+    suspend fun deleteSessionsForAppSince(packageName: String, since: Long)
 }

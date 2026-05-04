@@ -22,6 +22,8 @@ import com.example.aion.data.entities.UsageSessionEntity
 import com.example.aion.ui.components.*
 import com.example.aion.ui.theme.Variables
 import com.example.aion.ui.viewmodels.AppDetailsViewModel
+import com.example.aion.util.ScoreUtils
+import com.example.aion.util.TimeUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -84,7 +86,9 @@ fun AppDetailsScreen(
                     when (selectedTabIndex) {
                         0 -> OverviewTabContent(
                             usageTodayMs = uiState.usageTodayMs,
-                            limitMs = uiState.currentLimitMs
+                            limitMs = uiState.currentLimitMs,
+                            streakDays = uiState.streakDays,
+                            onResetProgress = { viewModel.resetProgress() }
                         )
                         1 -> SettingsTabContent(
                             limitMs = uiState.pendingLimitMs,
@@ -103,17 +107,16 @@ fun AppDetailsScreen(
 }
 
 @Composable
-private fun OverviewTabContent(usageTodayMs: Long, limitMs: Long) {
+private fun OverviewTabContent(
+    usageTodayMs: Long,
+    limitMs: Long,
+    streakDays: List<StreakDay>,
+    onResetProgress: () -> Unit
+) {
     val progress = if (limitMs > 0) usageTodayMs.toFloat() / limitMs.toFloat() else 0f
     val remainingMs = maxOf(0L, limitMs - usageTodayMs)
     
-    // User requested default scores to be zero. 
-    // Showing 0 if no limit set OR no usage recorded today.
-    val score = if (limitMs > 0 && usageTodayMs > 0) {
-        (1f - minOf(1f, progress)) * 100
-    } else {
-        0f
-    }
+    val score = ScoreUtils.calculateScore(usageTodayMs, limitMs)
 
     Column(
         modifier = Modifier
@@ -128,33 +131,23 @@ private fun OverviewTabContent(usageTodayMs: Long, limitMs: Long) {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             AionProgressGauge(
-                progress = if (limitMs > 0) minOf(1f, progress) else 0f,
-                valueText = String.format(Locale.getDefault(), "%.2f", score),
+                progress = score / 100f,
+                valueText = String.format(Locale.US, "%.2f", score),
                 metricText = "Score"
             )
             AionProgressGauge(
                 progress = if (limitMs > 0) 1f - minOf(1f, progress) else 0f,
-                valueText = formatDuration(remainingMs),
+                valueText = TimeUtils.formatDuration(remainingMs),
                 metricText = "Remaining",
                 progressColor = MaterialTheme.colorScheme.primary
             )
         }
 
-        AionStreakBar(
-            days = listOf(
-                StreakDay("Mon", "01", true),
-                StreakDay("Tue", "02", true),
-                StreakDay("Wed", "03", true, isToday = true),
-                StreakDay("Thu", "04", false),
-                StreakDay("Fri", "05", false),
-                StreakDay("Sat", "06", false),
-                StreakDay("Sun", "07", false)
-            )
-        )
+        AionStreakBar(days = streakDays)
         
         AionFilledButton(
             text = "Reset Progress",
-            onClick = { /* Handle reset */ },
+            onClick = onResetProgress,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -243,20 +236,13 @@ private fun HistoryTabContent(history: List<UsageSessionEntity>, dailyLimitMs: L
             AionHistoryItem(
                 date = dateFormat.format(Date(dayStart)),
                 day = dayFormat.format(Date(dayStart)),
-                usedTime = formatDuration(totalUsedMs),
-                limitTime = if (dailyLimitMs > 0) formatDuration(dailyLimitMs) else "No Limit",
+                usedTime = TimeUtils.formatDuration(totalUsedMs),
+                limitTime = if (dailyLimitMs > 0) TimeUtils.formatDuration(dailyLimitMs) else "No Limit",
                 percentage = percentage,
                 isExceeded = isExceeded
             )
         }
     }
-}
-
-private fun formatDuration(ms: Long): String {
-    val totalSeconds = ms / 1000
-    val hours = totalSeconds / 3600
-    val minutes = (totalSeconds % 3600) / 60
-    return if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
 }
 
 @Preview(showBackground = true)

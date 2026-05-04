@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,6 +36,7 @@ fun AionHomeHeader(
     userName: String,
     improvementPercentage: Float,
     avatarRes: Int? = null,
+    onAvatarClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -84,8 +88,8 @@ fun AionHomeHeader(
             )
         }
 
-        if (avatarRes != null) {
-            IconButton(onClick = { /* open profile */ }) {
+        IconButton(onClick = onAvatarClick) {
+            if (avatarRes != null) {
                 Image(
                     painter = painterResource(id = avatarRes),
                     contentDescription = "Avatar",
@@ -94,9 +98,14 @@ fun AionHomeHeader(
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = "Avatar",
+                    modifier = Modifier.size(48.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
-        } else {
-            Box(modifier = Modifier.size(48.dp)) { /* spacer */ }
         }
     }
 }

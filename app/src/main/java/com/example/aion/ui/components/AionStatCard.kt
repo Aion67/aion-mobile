@@ -52,7 +52,7 @@ fun AionStatCard(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "$percentage%",
+                    text = if (percentage >= 0) "+$percentage%" else "$percentage%",
                     style = MaterialTheme.typography.titleSmall.copy(
                         fontSize = Variables.StaticTitleSmallSize,
                         lineHeight = Variables.StaticTitleSmallLineHeight,

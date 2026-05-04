@@ -66,7 +66,6 @@ fun SettingsScreen(
                 title = "Settings",
                 actions = {
                     AionProfileActionButton(
-                        avatarRes = com.example.aion.R.drawable.tiktok,
                         onClick = onProfileClick
                     )
                 }
@@ -105,23 +104,19 @@ fun SettingsScreen(
                     AionSettingsRow(
                         title = "Display over other Apps",
                         subtitle = "Required for time limit alerts",
-                        leadingIcon = Icons.Filled.Apps,
+                        leadingIcon = Icons.Filled.Layers,
                         checked = uiState.hasOverlayPermission,
                         onCheckedChange = {
-                            if (!uiState.hasOverlayPermission) {
-                                context.startActivity(PermissionUtils.getOverlayIntent(context))
-                            }
+                            context.startActivity(PermissionUtils.getOverlayIntent(context))
                         }
                     )
                     AionSettingsRow(
                         title = "Usage Access",
                         subtitle = "Required to track app usage",
-                        leadingIcon = Icons.Filled.Info,
+                        leadingIcon = Icons.Filled.Assessment,
                         checked = uiState.hasUsageAccess,
                         onCheckedChange = {
-                            if (!uiState.hasUsageAccess) {
-                                context.startActivity(PermissionUtils.getUsageStatsIntent())
-                            }
+                            context.startActivity(PermissionUtils.getUsageStatsIntent())
                         }
                     )
                 }
