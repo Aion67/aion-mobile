@@ -1,6 +1,7 @@
 package com.example.aion.ui.navigation
 
 sealed class Screen(val route: String) {
+    object Onboarding : Screen("onboarding")
     object Home : Screen("home")
     object Plan : Screen("plan")
     object AddApps : Screen("add_apps")
