@@ -1,7 +1,5 @@
 {
   "image": "mcr.microsoft.com/devcontainers/universal:2",
-  "features": {"ghcr.io/nordcominc/devcontainer-features/android-sdk:1": {}},
-  
   "customizations": {
     "vscode": {
       "extensions": [
@@ -12,12 +10,10 @@
       ]
     }
   },
-  "postCreateCommand": "chmod +x gradlew && ./gradlew --version && echo 'Installing Android SDK...' && bash -c 'sudo apt-get update && sudo apt-get install -y wget unzip && mkdir -p /opt/android/cmdline-tools && cd /opt/android/cmdline-tools && wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip && unzip -q cmdline-tools.zip && mv cmdline-tools latest && rm cmdline-tools.zip && echo \"export ANDROID_HOME=/opt/android\" >> ~/.bashrc && echo \"export PATH=\\$ANDROID_HOME/cmdline-tools/latest/bin:\\$ANDROID_HOME/platform-tools:\\$PATH\" >> ~/.bashrc && source ~/.bashrc && yes | sdkmanager --licenses && sdkmanager \"platform-tools\" \"platforms;android-34\" \"build-tools;34.0.0\" && echo \"✅ Android SDK setup complete!\"'",
-
+  "postCreateCommand": "chmod +x gradlew && echo '🚀 Setting up Java + Android SDK...' && bash -lc 'sudo apt-get update -qq && sudo apt-get install -y default-jdk wget unzip || sudo apt-get install -y openjdk-17-jdk wget unzip && ./gradlew --version && mkdir -p /opt/android/cmdline-tools && cd /opt/android/cmdline-tools && wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip && unzip -q cmdline-tools.zip && mv cmdline-tools latest && rm cmdline-tools.zip && echo \"export ANDROID_HOME=/opt/android\" >> ~/.bashrc && echo \"export PATH=\\$ANDROID_HOME/cmdline-tools/latest/bin:\\$ANDROID_HOME/platform-tools:\\$PATH\" >> ~/.bashrc && source ~/.bashrc && yes | sdkmanager --licenses && sdkmanager \"platform-tools\" \"platforms;android-34\" \"build-tools;34.0.0\" && echo \"✅ Android SDK setup complete\"'",
   "hostRequirements": {
     "cpus": 4,
     "memory": "8gb"
   },
-
   "remoteUser": "codespace"
 }
