@@ -133,12 +133,12 @@ fun AionTimeInput(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     TextButton(onClick = onCancel) {
-                        Text("Cancel", color = Variables.PrimaryBrand)
+                        Text("Cancel", color = MaterialTheme.colorScheme.primary)
                     }
                     TextButton(onClick = { 
                         onConfirm(hour.toIntOrNull() ?: 0, minute.toIntOrNull() ?: 0, isAm) 
                     }) {
-                        Text("OK", color = Variables.PrimaryBrand)
+                        Text("OK", color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }
@@ -168,7 +168,7 @@ private fun TimeInputField(
                     else Variables.SchemesSurfaceContainerHighest
                 )
                 .then(
-                    if (isFocused) Modifier.border(2.dp, Variables.PrimaryBrand, RoundedCornerShape(8.dp))
+                    if (isFocused) Modifier.border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp))
                     else Modifier
                 ),
             contentAlignment = Alignment.Center

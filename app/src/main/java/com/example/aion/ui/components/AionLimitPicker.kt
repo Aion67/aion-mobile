@@ -81,7 +81,7 @@ private fun TimeInputField(
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         singleLine = true,
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Variables.PrimaryBrand,
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
             unfocusedBorderColor = Variables.NeutralGray
         )
     )

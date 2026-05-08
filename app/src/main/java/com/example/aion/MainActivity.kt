@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity() {
             val settingsViewModel: SettingsViewModel = hiltViewModel()
             val settingsUiState by settingsViewModel.uiState.collectAsState()
 
-            AionTheme(themeMode = settingsUiState.theme) {
+            AionTheme(themeMode = settingsUiState.theme, accentColor = settingsUiState.accentColor) {
                 AionApp()
             }
         }

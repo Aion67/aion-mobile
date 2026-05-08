@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -60,12 +61,12 @@ private fun StreakDayItem(
             modifier = Modifier
                 .size(44.dp) // Reduced from 64.dp
                 .background(
-                    color = if (day.isCompleted) Variables.PrimaryBrand else Variables.NeutralGray.copy(alpha = 0.2f),
+                    color = if (day.isCompleted) MaterialTheme.colorScheme.primary else Variables.NeutralGray.copy(alpha = 0.2f),
                     shape = CircleShape
                 )
                 .then(
                     if (day.isToday) {
-                        Modifier.border(2.dp, Variables.PrimaryBrand, CircleShape)
+                        Modifier.border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
                     } else Modifier
                 ),
             contentAlignment = Alignment.Center
@@ -98,7 +99,7 @@ private fun StreakDayItem(
                 fontSize = 12.sp, // Reduced from Variables.StaticBodyMediumSize
                 lineHeight = 16.sp,
                 fontWeight = FontWeight.Normal,
-                color = if (day.isToday) Variables.PrimaryBrand else Variables.SchemesOnSurface
+                color = if (day.isToday) MaterialTheme.colorScheme.primary else Variables.SchemesOnSurface
             ),
             textAlign = TextAlign.Center
         )

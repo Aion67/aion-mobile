@@ -102,7 +102,7 @@ fun AionAccentColorOptionPreview() {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             AionAccentColorOption(
-                color = Variables.PrimaryBrand,
+                color = Color(0xFF6750A4),
                 label = "Purple",
                 isSelected = true,
                 onClick = {}
