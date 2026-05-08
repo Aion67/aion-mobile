@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import coil.compose.AsyncImage
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +32,7 @@ fun ProfileHeaderCard(
     displayName: String,
     username: String,
     avatarRes: Int,
+    avatarUri: String?,
     bio: String,
     modifier: Modifier = Modifier,
 ) {
@@ -46,14 +48,25 @@ fun ProfileHeaderCard(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Image(
-                painter = painterResource(id = avatarRes),
-                contentDescription = displayName,
-                modifier = Modifier
-                    .size(72.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop,
-            )
+            if (!avatarUri.isNullOrBlank() && !avatarUri.startsWith("res:")) {
+                AsyncImage(
+                    model = avatarUri,
+                    contentDescription = displayName,
+                    modifier = Modifier
+                        .size(72.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop,
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = avatarRes),
+                    contentDescription = displayName,
+                    modifier = Modifier
+                        .size(72.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop,
+                )
+            }
 
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
@@ -89,6 +102,7 @@ fun ProfileHeaderCard(
 @Composable
 fun ProfilePictureCard(
     avatarRes: Int,
+    avatarUri: String?,
     onChangePictureClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -104,15 +118,27 @@ fun ProfilePictureCard(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Image(
-                painter = painterResource(id = avatarRes),
-                contentDescription = "Profile picture preview",
-                modifier = Modifier
-                    .size(112.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentScale = ContentScale.Crop,
-            )
+            if (!avatarUri.isNullOrBlank() && !avatarUri.startsWith("res:")) {
+                AsyncImage(
+                    model = avatarUri,
+                    contentDescription = "Profile picture preview",
+                    modifier = Modifier
+                        .size(112.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentScale = ContentScale.Crop,
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = avatarRes),
+                    contentDescription = "Profile picture preview",
+                    modifier = Modifier
+                        .size(112.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentScale = ContentScale.Crop,
+                )
+            }
 
             Button(onClick = onChangePictureClick) {
                 Text(text = "Change profile picture")
@@ -126,6 +152,7 @@ fun ProfileUsernameCard(
     username: String,
     onUsernameChange: (String) -> Unit,
     onSaveUsername: () -> Unit,
+    isSaveEnabled: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -157,7 +184,7 @@ fun ProfileUsernameCard(
                 label = { Text("Enter display name") },
             )
 
-            Button(onClick = onSaveUsername) {
+            Button(onClick = onSaveUsername, enabled = isSaveEnabled) {
                 Text(text = "Save display name")
             }
         }

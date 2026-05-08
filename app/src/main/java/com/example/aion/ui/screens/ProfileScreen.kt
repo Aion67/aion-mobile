@@ -31,6 +31,7 @@ fun ProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var editDisplayName by remember { mutableStateOf("") }
+    var showAvatarConfirm by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.profile.displayName) {
         editDisplayName = uiState.profile.displayName
@@ -59,7 +60,8 @@ fun ProfileScreen(
             ProfileHeaderCard(
                 displayName = uiState.profile.displayName,
                 username = uiState.profile.username,
-                avatarRes = com.example.aion.R.drawable.tiktok, // Placeholder
+                avatarRes = com.example.aion.R.drawable.tiktok, // Placeholder resource
+                avatarUri = uiState.profile.avatarUri,
                 bio = "Aion user focusing on productivity.",
             )
 
@@ -81,15 +83,39 @@ fun ProfileScreen(
             AionSettingsSection(title = "Profile Picture") {
                 ProfilePictureCard(
                     avatarRes = com.example.aion.R.drawable.tiktok,
-                    onChangePictureClick = { /* Implement file picker later */ },
+                    avatarUri = uiState.profile.avatarUri,
+                    onChangePictureClick = { showAvatarConfirm = true },
                 )
+
+                if (showAvatarConfirm) {
+                    androidx.compose.material3.AlertDialog(
+                        onDismissRequest = { showAvatarConfirm = false },
+                        confirmButton = {
+                            androidx.compose.material3.TextButton(onClick = {
+                                // For now save placeholder resource as a marker value
+                                viewModel.updateAvatar("res:tiktok")
+                                showAvatarConfirm = false
+                            }) { androidx.compose.material3.Text("Use placeholder") }
+                        },
+                        dismissButton = {
+                            androidx.compose.material3.TextButton(onClick = { showAvatarConfirm = false }) {
+                                androidx.compose.material3.Text("Cancel")
+                            }
+                        },
+                        title = { androidx.compose.material3.Text("Change profile picture") },
+                        text = { androidx.compose.material3.Text("This will set a placeholder avatar. Implement picker later.") }
+                    )
+                }
             }
 
             AionSettingsSection(title = "Display Name") {
+                val isNameChanged = editDisplayName.trim().isNotEmpty() && editDisplayName != uiState.profile.displayName
+
                 ProfileUsernameCard(
                     username = editDisplayName,
                     onUsernameChange = { editDisplayName = it },
                     onSaveUsername = { viewModel.updateDisplayName(editDisplayName) },
+                    isSaveEnabled = isNameChanged
                 )
             }
 
