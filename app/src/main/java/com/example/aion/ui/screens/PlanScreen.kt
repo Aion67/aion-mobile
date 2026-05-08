@@ -108,7 +108,7 @@ fun PlanScreen(
                 }
             }
             
-            LazyColumn(
+           /* LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -124,7 +124,7 @@ fun PlanScreen(
                         onClick = { onAppClick(item.app.packageName) },
                         onDeleteClick = { viewModel.removeApp(item.app.packageName) }
                     )
-                }
+                }*/
             }
         }
     }
