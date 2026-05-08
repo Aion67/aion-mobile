@@ -1,5 +1,7 @@
 package com.example.aion.ui.screens
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,12 +11,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,7 +36,20 @@ fun ProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var editDisplayName by remember { mutableStateOf("") }
-    var showAvatarConfirm by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val avatarPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+            try {
+                context.contentResolver.takePersistableUriPermission(uri, flags)
+            } catch (_: SecurityException) {
+                // Fallback: still save the URI even if the provider does not allow persistence.
+            }
+            viewModel.updateAvatar(uri.toString())
+        }
+    }
 
     LaunchedEffect(uiState.profile.displayName) {
         editDisplayName = uiState.profile.displayName
@@ -84,28 +102,8 @@ fun ProfileScreen(
                 ProfilePictureCard(
                     avatarRes = com.example.aion.R.drawable.tiktok,
                     avatarUri = uiState.profile.avatarUri,
-                    onChangePictureClick = { showAvatarConfirm = true },
+                    onChangePictureClick = { avatarPickerLauncher.launch(arrayOf("image/*")) },
                 )
-
-                if (showAvatarConfirm) {
-                    androidx.compose.material3.AlertDialog(
-                        onDismissRequest = { showAvatarConfirm = false },
-                        confirmButton = {
-                            androidx.compose.material3.TextButton(onClick = {
-                                // For now save placeholder resource as a marker value
-                                viewModel.updateAvatar("res:tiktok")
-                                showAvatarConfirm = false
-                            }) { androidx.compose.material3.Text("Use placeholder") }
-                        },
-                        dismissButton = {
-                            androidx.compose.material3.TextButton(onClick = { showAvatarConfirm = false }) {
-                                androidx.compose.material3.Text("Cancel")
-                            }
-                        },
-                        title = { androidx.compose.material3.Text("Change profile picture") },
-                        text = { androidx.compose.material3.Text("This will set a placeholder avatar. Implement picker later.") }
-                    )
-                }
             }
 
             AionSettingsSection(title = "Display Name") {
