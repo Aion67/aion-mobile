@@ -17,6 +17,7 @@ local.properties
 # Logs and captures
 captures/
 *.log
+*.hprof
 
 # Built variants
 *.apk

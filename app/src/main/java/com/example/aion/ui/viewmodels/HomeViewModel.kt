@@ -11,6 +11,7 @@ import com.example.aion.data.repository.UserRepository
 import com.example.aion.util.ScoreUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
@@ -34,8 +35,9 @@ data class TrackedAppUsage(
 )
 
 @HiltViewModel
+@OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val appRepository: AppRepository,
     private val usageRepository: UsageRepository,
     private val userRepository: UserRepository

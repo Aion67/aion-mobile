@@ -34,7 +34,7 @@ data class InstallableApp(
 
 @HiltViewModel
 class AddAppsViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val appRepository: AppRepository
 ) : ViewModel() {
 
