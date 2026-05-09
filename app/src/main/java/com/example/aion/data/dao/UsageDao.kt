@@ -11,6 +11,9 @@ interface UsageDao {
     @Query("SELECT * FROM usage_sessions WHERE appPackageName = :packageName")
     fun getSessionsForApp(packageName: String): Flow<List<UsageSessionEntity>>
 
+    @Query("SELECT * FROM usage_sessions")
+    fun getAllSessions(): Flow<List<UsageSessionEntity>>
+
     @Insert
     suspend fun insertSession(session: UsageSessionEntity)
 

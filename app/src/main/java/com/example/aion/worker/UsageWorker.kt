@@ -56,10 +56,10 @@ class UsageWorker @AssistedInject constructor(
                 val settings = appRepository.getSettingsForApp(app.packageName).first()
                 if (settings != null && settings.isTracked && settings.dailyLimitMs > 0) {
                     if (duration >= settings.dailyLimitMs && settings.notifyOnLimit) {
-                        triggerLimitNotification(app.appName, app.packageName, "You've reached your daily limit for ${app.appName}!")
+                        triggerLimitNotification(app.appName, app.packageName, "⚠️ Intel Alert: ${app.appName} has breached the perimeter. Disengage to protect your streak.")
                     } else if (duration >= settings.dailyLimitMs / 2 && settings.notifyOnHalfLimit) {
                          // Logic to prevent spamming half-limit notification could be added here
-                        triggerLimitNotification(app.appName, app.packageName, "You've used half of your daily limit for ${app.appName}.", NotificationType.HALF_LIMIT_REACHED)
+                        triggerLimitNotification(app.appName, app.packageName, "📡 Recon Update: You've used 50% of your ${app.appName} allowance. Stay sharp, soldier.", NotificationType.HALF_LIMIT_REACHED)
                     }
                 }
             }

@@ -78,6 +78,12 @@ fun HomeScreen(
             }
 
             item {
+                if (uiState.streakDays.isNotEmpty()) {
+                    com.example.aion.ui.components.AionStreakBar(days = uiState.streakDays)
+                }
+            }
+
+            item {
                 val yesterdayPercentage = (uiState.improvementPercentage * 100).toInt()
                 AionStatCard(
                     percentage = yesterdayPercentage,

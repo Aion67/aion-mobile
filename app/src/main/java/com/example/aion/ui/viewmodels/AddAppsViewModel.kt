@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.aion.data.entities.AppSettingsEntity
 import com.example.aion.data.entities.TrackedAppEntity
 import com.example.aion.data.repository.AppRepository
-import com.example.aion.utils.PermissionUtils
+import com.example.aion.util.PermissionUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers

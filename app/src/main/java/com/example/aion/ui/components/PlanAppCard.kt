@@ -3,15 +3,8 @@ package com.example.aion.ui.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import com.example.aion.R
@@ -31,11 +24,13 @@ import androidx.compose.ui.unit.dp
 import com.example.aion.ui.theme.Variables
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 
 import android.graphics.drawable.Drawable
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.graphics.drawable.toBitmap
 
@@ -44,7 +39,7 @@ fun PlanAppCard(
     modifier: Modifier = Modifier,
     appName: String = "TikTok",
     icon: Drawable? = null,
-    iconRes: Int = R.drawable.tiktok,
+    iconRes: Int? = null,
     creditScore: String = "76.23",
     usedTime: String = "12h 35m",
     remainingTime: String = "12h 35m",
@@ -83,24 +78,35 @@ fun PlanAppCard(
             verticalArrangement = Arrangement.spacedBy(7.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            if (icon != null) {
-                Image(
-                    bitmap = icon.toBitmap().asImageBitmap(),
-                    contentDescription = appName,
-                    modifier = Modifier
-                        .width(76.dp)
-                        .height(76.dp),
-                    contentScale = ContentScale.FillBounds
-                )
-            } else {
-                Image(
-                    painter = painterResource(id = iconRes),
-                    contentDescription = appName,
-                    modifier = Modifier
-                        .width(76.dp)
-                        .height(76.dp),
-                    contentScale = ContentScale.FillBounds
-                )
+            Box(
+                modifier = Modifier
+                    .size(76.dp)
+                    .clip(RoundedCornerShape(19.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
+            ) {
+                if (icon != null) {
+                    Image(
+                        bitmap = icon.toBitmap().asImageBitmap(),
+                        contentDescription = appName,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.FillBounds
+                    )
+                } else if (iconRes != null && iconRes != 0) {
+                    Image(
+                        painter = painterResource(id = iconRes),
+                        contentDescription = appName,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.FillBounds
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Apps,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(40.dp)
+                    )
+                }
             }
             Text(
                 text = creditScore,

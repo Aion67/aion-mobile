@@ -40,7 +40,7 @@ class AionNotificationManager @Inject constructor(
 
     fun showLimitAlert(appName: String, message: String) {
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground) // Use a better icon later
+            .setSmallIcon(R.drawable.app_logo) // Use a better icon later
             .setContentTitle("Aion Limit Alert: $appName")
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)

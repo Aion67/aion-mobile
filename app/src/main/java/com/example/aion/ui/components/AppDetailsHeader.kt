@@ -2,8 +2,12 @@ package com.example.aion.ui.components
 
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,10 +34,8 @@ import com.example.aion.ui.theme.Variables
 fun AppDetailsHeader(
     icon: Drawable?,
     lastOpened: String,
-    dataUsage: String,
     notoriety: String,
-    modifier: Modifier = Modifier,
-    notorietyColor: Color = Color(0xFFB3261E) // M3/sys/light/error or custom red
+    modifier: Modifier = Modifier
 ) {
     val textStyle = androidx.compose.ui.text.TextStyle(
         fontSize = Variables.StaticBodyMediumSize,
@@ -43,6 +45,12 @@ fun AppDetailsHeader(
         color = MaterialTheme.colorScheme.onSurface
     )
 
+    val notorietyColor = when (notoriety) {
+        "HARD" -> Color(0xFFB3261E) // Red
+        "MODERATE" -> Color(0xFFE28905) // Orange/Amber
+        else -> Variables.SuccessGreen // Green
+    }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -51,24 +59,28 @@ fun AppDetailsHeader(
         verticalAlignment = Alignment.Bottom
     ) {
         // App Icon
-        if (icon != null) {
-            Image(
-                bitmap = icon.toBitmap().asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(117.dp)
-                    .clip(RoundedCornerShape(19.dp)),
-                contentScale = ContentScale.Crop
-            )
-        } else {
-            Image(
-                painter = painterResource(id = R.drawable.tiktok),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(117.dp)
-                    .clip(RoundedCornerShape(19.dp)),
-                contentScale = ContentScale.Crop
-            )
+        Box(
+            modifier = Modifier
+                .size(117.dp)
+                .clip(RoundedCornerShape(19.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            contentAlignment = Alignment.Center
+        ) {
+            if (icon != null) {
+                Image(
+                    bitmap = icon.toBitmap().asImageBitmap(),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.Apps,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(60.dp)
+                )
+            }
         }
 
         // Metadata Table
@@ -84,7 +96,6 @@ fun AppDetailsHeader(
                 verticalArrangement = Arrangement.spacedBy(0.dp)
             ) {
                 Text(text = "Last opened:", style = textStyle, modifier = Modifier.height(29.dp))
-                Text(text = "Data usage:", style = textStyle, modifier = Modifier.height(29.dp))
                 Text(text = "Notoriety:", style = textStyle, modifier = Modifier.height(29.dp))
             }
 
@@ -96,7 +107,6 @@ fun AppDetailsHeader(
                 verticalArrangement = Arrangement.spacedBy(0.dp)
             ) {
                 Text(text = lastOpened, style = textStyle, modifier = Modifier.height(29.dp))
-                Text(text = dataUsage, style = textStyle, modifier = Modifier.height(29.dp))
                 Text(text = notoriety, style = textStyle.copy(color = notorietyColor), modifier = Modifier.height(29.dp))
             }
         }
@@ -109,7 +119,6 @@ fun AppDetailsHeaderPreview() {
     AppDetailsHeader(
         icon = null,
         lastOpened = "13:08",
-        dataUsage = "34 MB",
         notoriety = "HARD"
     )
 }

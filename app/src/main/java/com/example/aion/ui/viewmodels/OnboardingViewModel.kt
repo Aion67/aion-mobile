@@ -14,7 +14,8 @@ data class OnboardingUiState(
     val isCompleted: Boolean = false,
     val usagePermissionGranted: Boolean = false,
     val overlayPermissionGranted: Boolean = false,
-    val displayName: String = ""
+    val displayName: String = "",
+    val appMode: String = "offline"
 )
 
 @HiltViewModel
@@ -38,8 +39,13 @@ class OnboardingViewModel @Inject constructor(
         _uiState.update { it.copy(displayName = name) }
     }
 
+    fun updateAppMode(mode: String) {
+        _uiState.update { it.copy(appMode = mode) }
+    }
+
     fun completeOnboarding() {
         viewModelScope.launch {
+            userRepository.savePreference(UserPreferenceEntity("app_mode", _uiState.value.appMode))
             userRepository.savePreference(UserPreferenceEntity("onboarding_completed", "true"))
             if (_uiState.value.displayName.isNotBlank()) {
                 userRepository.saveUserProfile(

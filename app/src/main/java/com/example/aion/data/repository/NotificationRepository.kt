@@ -8,6 +8,7 @@ import javax.inject.Singleton
 
 interface NotificationRepository {
     fun getAllNotifications(): Flow<List<NotificationEntity>>
+    fun getNotificationById(id: Long): Flow<NotificationEntity?>
     suspend fun addNotification(notification: NotificationEntity)
     suspend fun markAllAsRead()
 }
@@ -17,6 +18,8 @@ class NotificationRepositoryImpl @Inject constructor(
     private val notificationDao: NotificationDao
 ) : NotificationRepository {
     override fun getAllNotifications() = notificationDao.getAllNotifications()
+
+    override fun getNotificationById(id: Long) = notificationDao.getNotificationById(id)
 
     override suspend fun addNotification(notification: NotificationEntity) {
         notificationDao.insertNotification(notification)

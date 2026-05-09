@@ -8,7 +8,12 @@ import com.example.aion.data.entities.TrackedAppEntity
 import com.example.aion.data.repository.AppRepository
 import com.example.aion.data.repository.UsageRepository
 import com.example.aion.data.repository.UserRepository
-import com.example.aion.util.ScoreUtils
+import com.example.aion.util.ScoringEngine
+import com.example.aion.util.TimeUtils
+import com.example.aion.ui.components.StreakDay
+import java.util.Calendar
+import java.text.SimpleDateFormat
+import java.util.Locale
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,6 +28,7 @@ data class HomeUiState(
     val totalTimeSavedMs: Long = 0L,
     val rank: String = "Beginner",
     val displayName: String = "User",
+    val streakDays: List<StreakDay> = emptyList(),
     val isLoading: Boolean = false
 )
 
@@ -54,9 +60,12 @@ class HomeViewModel @Inject constructor(
         if (apps.isEmpty()) {
             flowOf(HomeUiState(displayName = profile?.displayName ?: "User"))
         } else {
-            val todayStart = getTodayStartMs()
+            val todayStart = TimeUtils.getTodayStartMs()
             val yesterdayStart = todayStart - 24 * 60 * 60 * 1000L
             val weekStart = todayStart - 7 * 24 * 60 * 60 * 1000L
+            
+            // For global streak, we need usage for the last 7 days for ALL apps.
+            val historyFlow = usageRepository.getAllSessions()
             
             val usageFlows = apps.map { app ->
                 combine(
@@ -73,7 +82,7 @@ class HomeViewModel @Inject constructor(
                     val today = todayUsage ?: 0L
                     val limit = settings?.dailyLimitMs ?: 0L
                     
-                    val appScore = ScoreUtils.calculateScore(today, limit)
+                    val appScore = ScoringEngine.calculateAppScore(today, limit)
 
                     DataSnapshot(
                         usage = TrackedAppUsage(app, icon, today, limit, appScore),
@@ -82,16 +91,17 @@ class HomeViewModel @Inject constructor(
                     )
                 }
             }
-            combine(usageFlows) { snapshots ->
+            val snapshotsFlow: Flow<List<DataSnapshot>> = combine(usageFlows) { it.toList() }
+            combine(snapshotsFlow, historyFlow) { snapshots, history ->
                 val usages = snapshots.map { it.usage }
                 val totalTodayUsage = usages.sumOf { it.usageMs }
                 val totalTodayLimit = usages.sumOf { it.limitMs }
                 val totalYesterdayUsage = snapshots.sumOf { it.yesterdayUsage }
                 val totalWeekUsage = snapshots.sumOf { it.weekUsage }
                 
-                val score = ScoreUtils.calculateScore(totalTodayUsage, totalTodayLimit)
-                val improvement = ScoreUtils.calculateImprovement(totalYesterdayUsage, totalTodayUsage)
-                val weeklyImprovement = ScoreUtils.calculateImprovement(totalWeekUsage / 7, totalTodayUsage)
+                val score = ScoringEngine.calculateAppScore(totalTodayUsage, totalTodayLimit)
+                val improvement = ScoringEngine.calculateImprovement(totalYesterdayUsage, totalTodayUsage)
+                val weeklyImprovement = ScoringEngine.calculateImprovement(totalWeekUsage / 7, totalTodayUsage)
 
                 val timeSaved = if (totalTodayLimit > totalTodayUsage) totalTodayLimit - totalTodayUsage else 0L
 
@@ -103,6 +113,8 @@ class HomeViewModel @Inject constructor(
                     else -> "Beginner"
                 }
 
+                val streakDays = calculateGlobalStreak(history, snapshots.associate { it.usage.app.packageName to it.usage.limitMs })
+
                 HomeUiState(
                     trackedApps = usages.toList(),
                     score = score,
@@ -110,7 +122,8 @@ class HomeViewModel @Inject constructor(
                     weeklyImprovementPercentage = weeklyImprovement,
                     totalTimeSavedMs = timeSaved,
                     rank = rank,
-                    displayName = profile?.displayName ?: "User"
+                    displayName = profile?.displayName ?: "User",
+                    streakDays = streakDays
                 )
             }
         }
@@ -120,13 +133,53 @@ class HomeViewModel @Inject constructor(
         initialValue = HomeUiState(isLoading = true)
     )
 
-    private fun getTodayStartMs(): Long {
-        val calendar = java.util.Calendar.getInstance()
-        calendar.set(java.util.Calendar.HOUR_OF_DAY, 0)
-        calendar.set(java.util.Calendar.MINUTE, 0)
-        calendar.set(java.util.Calendar.SECOND, 0)
-        calendar.set(java.util.Calendar.MILLISECOND, 0)
-        return calendar.timeInMillis
+    private fun calculateGlobalStreak(
+        history: List<com.example.aion.data.entities.UsageSessionEntity>,
+        appLimits: Map<String, Long>
+    ): List<StreakDay> {
+        val days = mutableListOf<StreakDay>()
+        val dayNameFormat = SimpleDateFormat("EEE", Locale.US)
+        val dateNumberFormat = SimpleDateFormat("dd", Locale.US)
+        
+        for (i in 6 downTo 0) {
+            val cal = Calendar.getInstance()
+            cal.add(Calendar.DAY_OF_YEAR, -i)
+            
+            val startOfDay = cal.apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.timeInMillis
+            val endOfDay = startOfDay + 24 * 60 * 60 * 1000L
+            
+            val daySessions = history.filter { it.startTime >= startOfDay && it.startTime < endOfDay }
+            
+            // Check if any app exceeded its limit on this day
+            var failed = false
+            var hasAnyLimit = false
+            for ((pkg, limit) in appLimits) {
+                if (limit > 0) {
+                    hasAnyLimit = true
+                    val appUsage = daySessions.filter { it.appPackageName == pkg }.sumOf { it.totalDurationMs }
+                    if (appUsage > limit) {
+                        failed = true
+                        break
+                    }
+                }
+            }
+            
+            val isCompleted = hasAnyLimit && !failed
+            days.add(
+                StreakDay(
+                    dayName = dayNameFormat.format(cal.time),
+                    dateNumber = dateNumberFormat.format(cal.time),
+                    isCompleted = isCompleted,
+                    isToday = i == 0
+                )
+            )
+        }
+        return days
     }
 
     private data class DataSnapshot(

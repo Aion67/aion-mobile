@@ -11,7 +11,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -25,8 +24,6 @@ import com.example.aion.ui.components.NotificationItem
 import com.example.aion.ui.components.SortHeader
 import com.example.aion.ui.theme.Variables
 import com.example.aion.util.TimeUtils
-import com.example.aion.ui.screens.NotificationSpec
-import com.example.aion.ui.screens.sampleNotifications
 
 import androidx.compose.runtime.collectAsState
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -111,8 +108,8 @@ fun NotificationsScreen(
                         title = notification.title,
                         message = notification.message,
                         timestamp = TimeUtils.formatTimestamp(notification.timestamp),
-                        iconRes = com.example.aion.R.drawable.tiktok,
-                        modifier = Modifier.clickable { onNotificationClick(notification) }
+                        modifier = Modifier.clickable { onNotificationClick(notification) },
+                        iconRes = null
                     )
                 }
             }

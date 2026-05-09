@@ -24,7 +24,7 @@ class NotificationDetailViewModel @Inject constructor(
 
     val uiState: StateFlow<NotificationDetailUiState> =
         notificationRepository.getNotificationById(notificationId)
-            .map { notification ->
+            .map { notification: NotificationEntity? ->
                 NotificationDetailUiState(
                     notification = notification,
                     isLoading = false

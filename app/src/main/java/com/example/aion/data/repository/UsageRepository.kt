@@ -8,6 +8,7 @@ import javax.inject.Singleton
 
 interface UsageRepository {
     fun getSessionsForApp(packageName: String): Flow<List<UsageSessionEntity>>
+    fun getAllSessions(): Flow<List<UsageSessionEntity>>
     suspend fun logUsageSession(session: UsageSessionEntity)
     fun getTotalUsageForApp(packageName: String, since: Long): Flow<Long?>
     fun getTotalUsageForAppInRange(packageName: String, start: Long, end: Long): Flow<Long?>
@@ -19,6 +20,8 @@ class UsageRepositoryImpl @Inject constructor(
     private val usageDao: UsageDao
 ) : UsageRepository {
     override fun getSessionsForApp(packageName: String) = usageDao.getSessionsForApp(packageName)
+
+    override fun getAllSessions() = usageDao.getAllSessions()
 
     override suspend fun logUsageSession(session: UsageSessionEntity) {
         usageDao.insertSession(session)

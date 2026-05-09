@@ -1,4 +1,4 @@
-package com.example.aion.utils
+package com.example.aion.util
 
 import android.app.AppOpsManager
 import android.content.Context

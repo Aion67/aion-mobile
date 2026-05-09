@@ -8,7 +8,7 @@ import com.example.aion.data.entities.AppSettingsEntity
 import com.example.aion.data.entities.TrackedAppEntity
 import com.example.aion.data.repository.AppRepository
 import com.example.aion.data.repository.UsageRepository
-import com.example.aion.util.ScoreUtils
+import com.example.aion.util.ScoringEngine
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -69,7 +69,7 @@ class PlanViewModel @Inject constructor(
                         }
                         val todayUsage = usage ?: 0L
                         val limit = settings?.dailyLimitMs ?: 0L
-                        val score = ScoreUtils.calculateScore(todayUsage, limit)
+                        val score = ScoringEngine.calculateAppScore(todayUsage, limit)
 
                         TrackedAppWithSettings(
                             app, 

@@ -64,16 +64,6 @@ fun PlanScreen(
                                     Icon(Icons.Default.Add, contentDescription = null)
                                 }
                             )
-                            DropdownMenuItem(
-                                text = { Text("Remove Apps") },
-                                onClick = {
-                                    showMenu = false
-                                    // Handle remove apps
-                                },
-                                leadingIcon = {
-                                    Icon(Icons.Default.Delete, contentDescription = null)
-                                }
-                            )
                         }
                     }
                 }

@@ -1,5 +1,6 @@
 package com.example.aion.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -24,7 +25,7 @@ import com.example.aion.ui.components.AionFilledButton
 import com.example.aion.ui.theme.Variables
 import com.example.aion.ui.viewmodels.OnboardingUiState
 import com.example.aion.ui.viewmodels.OnboardingViewModel
-import com.example.aion.utils.PermissionUtils
+import com.example.aion.util.PermissionUtils
 import kotlinx.coroutines.launch
 
 @Composable
@@ -40,6 +41,7 @@ fun OnboardingScreen(
             onFinish()
         },
         onNameChange = { viewModel.updateDisplayName(it) },
+        onModeChange = { viewModel.updateAppMode(it) },
         onPermissionUpdate = { context ->
             viewModel.updatePermissionStatus(
                 usage = PermissionUtils.hasUsageStatsPermission(context),
@@ -54,9 +56,10 @@ fun OnboardingContent(
     uiState: OnboardingUiState,
     onFinish: () -> Unit,
     onNameChange: (String) -> Unit,
+    onModeChange: (String) -> Unit,
     onPermissionUpdate: (android.content.Context) -> Unit
 ) {
-    val pagerState = rememberPagerState(pageCount = { 3 })
+    val pagerState = rememberPagerState(pageCount = { 4 })
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
@@ -80,13 +83,17 @@ fun OnboardingContent(
             ) { page ->
                 when (page) {
                     0 -> WelcomePage()
-                    1 -> PermissionsPage(
+                    1 -> ModeSelectionPage(
+                        selectedMode = uiState.appMode,
+                        onModeSelect = onModeChange
+                    )
+                    2 -> PermissionsPage(
                         usageGranted = uiState.usagePermissionGranted,
                         overlayGranted = uiState.overlayPermissionGranted,
                         onGrantUsage = { context.startActivity(PermissionUtils.getUsageStatsIntent()) },
                         onGrantOverlay = { context.startActivity(PermissionUtils.getOverlayIntent(context)) }
                     )
-                    2 -> ProfilePage(
+                    3 -> ProfilePage(
                         displayName = uiState.displayName,
                         onNameChange = onNameChange
                     )
@@ -105,7 +112,7 @@ fun OnboardingContent(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    repeat(3) { i ->
+                    repeat(4) { i ->
                         val color = if (pagerState.currentPage == i) {
                             MaterialTheme.colorScheme.primary
                         } else {
@@ -120,9 +127,9 @@ fun OnboardingContent(
                 }
 
                 AionFilledButton(
-                    text = if (pagerState.currentPage == 2) "Get Started" else "Next",
+                    text = if (pagerState.currentPage == 3) "Get Started" else "Next",
                     onClick = {
-                        if (pagerState.currentPage < 2) {
+                        if (pagerState.currentPage < 3) {
                             scope.launch {
                                 pagerState.animateScrollToPage(pagerState.currentPage + 1)
                             }
@@ -144,8 +151,87 @@ fun OnboardingPreview() {
             uiState = OnboardingUiState(displayName = "John Doe"),
             onFinish = {},
             onNameChange = {},
+            onModeChange = {},
             onPermissionUpdate = {}
         )
+    }
+}
+
+@Composable
+private fun ModeSelectionPage(
+    selectedMode: String,
+    onModeSelect: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Choose Your Path",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "You can change this anytime in Settings.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        
+        Spacer(modifier = Modifier.height(48.dp))
+
+        ModeCard(
+            title = "Offline Mode",
+            description = "Track screen time. No account needed. All data stays local.",
+            isSelected = selectedMode == "offline",
+            onClick = { onModeSelect("offline") }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        ModeCard(
+            title = "Online Mode",
+            description = "Unlock gamification, achievements, and leaderboards. Account required.",
+            isSelected = selectedMode == "online",
+            onClick = { onModeSelect("online") }
+        )
+    }
+}
+
+@Composable
+private fun ModeCard(
+    title: String,
+    description: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+        border = if (isSelected) androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
+        onClick = onClick
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 
@@ -158,11 +244,10 @@ private fun WelcomePage() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+        Image(
+            painter = painterResource(id = R.drawable.app_logo),
             contentDescription = null,
-            modifier = Modifier.size(200.dp),
-            tint = MaterialTheme.colorScheme.primary
+            modifier = Modifier.size(200.dp)
         )
         Spacer(modifier = Modifier.height(32.dp))
         Text(

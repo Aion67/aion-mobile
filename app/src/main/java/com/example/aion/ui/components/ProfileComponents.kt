@@ -28,10 +28,30 @@ import androidx.compose.ui.unit.dp
 import com.example.aion.ui.theme.Variables
 
 @Composable
+fun LetterAvatar(
+    name: String,
+    modifier: Modifier = Modifier,
+    backgroundColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primary,
+    textColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onPrimary
+) {
+    val initial = name.firstOrNull()?.uppercase() ?: "?"
+    androidx.compose.foundation.layout.Box(
+        modifier = modifier.background(backgroundColor),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = initial,
+            color = textColor,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
 fun ProfileHeaderCard(
     displayName: String,
     username: String,
-    avatarRes: Int,
     avatarUri: String?,
     bio: String,
     modifier: Modifier = Modifier,
@@ -58,13 +78,11 @@ fun ProfileHeaderCard(
                     contentScale = ContentScale.Crop,
                 )
             } else {
-                Image(
-                    painter = painterResource(id = avatarRes),
-                    contentDescription = displayName,
+                LetterAvatar(
+                    name = displayName.ifBlank { username },
                     modifier = Modifier
                         .size(72.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop,
+                        .clip(CircleShape)
                 )
             }
 
@@ -101,7 +119,7 @@ fun ProfileHeaderCard(
 
 @Composable
 fun ProfilePictureCard(
-    avatarRes: Int,
+    displayName: String,
     avatarUri: String?,
     onChangePictureClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -129,14 +147,11 @@ fun ProfilePictureCard(
                     contentScale = ContentScale.Crop,
                 )
             } else {
-                Image(
-                    painter = painterResource(id = avatarRes),
-                    contentDescription = "Profile picture preview",
+                LetterAvatar(
+                    name = displayName,
                     modifier = Modifier
                         .size(112.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentScale = ContentScale.Crop,
                 )
             }
 

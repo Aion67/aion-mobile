@@ -14,6 +14,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import com.example.aion.ui.components.StreakDay
+import com.example.aion.util.TimeUtils
 import java.util.Calendar
 import java.util.Locale
 import java.text.SimpleDateFormat
@@ -31,6 +32,8 @@ data class AppDetailsUiState(
     val usageTodayMs: Long = 0,
     val history: List<UsageSessionEntity> = emptyList(),
     val streakDays: List<StreakDay> = emptyList(),
+    val lastOpenedMs: Long = 0,
+    val notoriety: String = "LOW",
     val isSaving: Boolean = false,
     val saveSuccess: Boolean = false,
     val isLoading: Boolean = true
@@ -73,8 +76,21 @@ class AppDetailsViewModel @Inject constructor(
 
         val limit = settings?.dailyLimitMs ?: 0L
         val tracked = settings?.isTracked ?: true
+        val usage = usageToday ?: 0L
         
         val streakDays = calculateStreakDays(history, limit)
+        val lastOpened = history.maxOfOrNull { it.endTime } ?: 0L
+        
+        val notoriety = if (limit > 0L) {
+            val ratio = usage.toFloat() / limit.toFloat()
+            when {
+                ratio > 0.8f -> "HARD"
+                ratio >= 0.5f -> "MODERATE"
+                else -> "LOW"
+            }
+        } else {
+            "LOW"
+        }
         
         AppDetailsUiState(
             appName = appInfo.first,
@@ -85,9 +101,11 @@ class AppDetailsViewModel @Inject constructor(
             currentIsTracked = tracked,
             pendingLimitMs = pending.first ?: limit,
             pendingIsTracked = pending.second ?: tracked,
-            usageTodayMs = usageToday ?: 0L,
+            usageTodayMs = usage,
             history = history.sortedByDescending { it.startTime },
             streakDays = streakDays,
+            lastOpenedMs = lastOpened,
+            notoriety = notoriety,
             saveSuccess = saveSuccess,
             isSaving = isSaving,
             isLoading = false
@@ -123,7 +141,7 @@ class AppDetailsViewModel @Inject constructor(
                 .sumOf { it.totalDurationMs }
             
             // Passed if usage <= limit and limit > 0
-            val isCompleted = limitMs > 0 && dayUsage <= limitMs && dayUsage > 0
+            val isCompleted = limitMs > 0 && dayUsage <= limitMs
             
             days.add(
                 StreakDay(
@@ -153,15 +171,7 @@ class AppDetailsViewModel @Inject constructor(
     }
 
     private fun getUsageTodayFlow(): Flow<Long?> = flow {
-        // Today's start might change if the app stays open past midnight
-        // But for most cases, getting it once is fine for the flow's lifecycle.
-        val todayStart = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }.timeInMillis
-        
+        val todayStart = TimeUtils.getTodayStartMs()
         emitAll(usageRepository.getTotalUsageForApp(packageName, todayStart))
     }
 
@@ -210,13 +220,7 @@ class AppDetailsViewModel @Inject constructor(
 
     fun resetProgress() {
         viewModelScope.launch {
-            val todayStart = Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-            }.timeInMillis
-            
+            val todayStart = TimeUtils.getTodayStartMs()
             usageRepository.resetTodayUsage(packageName, todayStart)
         }
     }

@@ -24,7 +24,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.aion.ui.components.*
 import com.example.aion.ui.theme.Variables
-import com.example.aion.utils.PermissionUtils
+import com.example.aion.util.PermissionUtils
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.aion.ui.viewmodels.SettingsViewModel
 
@@ -33,6 +33,7 @@ fun SettingsScreen(
     onThemeClick: () -> Unit,
     onAccentClick: () -> Unit,
     onProfileClick: () -> Unit,
+    onOnlineSetupClick: () -> Unit,
     onFaqClick: () -> Unit,
     onFeedbackClick: () -> Unit,
     onPrivacyClick: () -> Unit,
@@ -88,6 +89,19 @@ fun SettingsScreen(
                         subtitle = "Update username and profile picture",
                         leadingIcon = Icons.Filled.Person,
                         onClick = onProfileClick
+                    )
+                    AionSettingsRow(
+                        title = "App Mode",
+                        subtitle = if (uiState.appMode == "online") "Online Mode (Gamification Enabled)" else "Offline Mode (Local Only)",
+                        leadingIcon = if (uiState.appMode == "online") Icons.Filled.Cloud else Icons.Filled.CloudOff,
+                        onClick = { 
+                            if (uiState.appMode == "offline" && !uiState.hasUsedOnlineMode) {
+                                onOnlineSetupClick()
+                            } else {
+                                val newMode = if (uiState.appMode == "online") "offline" else "online"
+                                viewModel.updateAppMode(newMode)
+                            }
+                        }
                     )
                 }
             }
@@ -325,6 +339,7 @@ private fun SettingsScreenPreview() {
         onThemeClick = {},
         onAccentClick = {},
         onProfileClick = {},
+        onOnlineSetupClick = {},
         onFaqClick = {},
         onFeedbackClick = {},
         onPrivacyClick = {},

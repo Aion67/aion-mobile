@@ -41,7 +41,7 @@ fun ProfileScreen(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
         if (uri != null) {
-            val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+            val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
             try {
                 context.contentResolver.takePersistableUriPermission(uri, flags)
             } catch (_: SecurityException) {
@@ -78,7 +78,6 @@ fun ProfileScreen(
             ProfileHeaderCard(
                 displayName = uiState.profile.displayName,
                 username = uiState.profile.username,
-                avatarRes = com.example.aion.R.drawable.tiktok, // Placeholder resource
                 avatarUri = uiState.profile.avatarUri,
                 bio = "Aion user focusing on productivity.",
             )
@@ -100,7 +99,7 @@ fun ProfileScreen(
 
             AionSettingsSection(title = "Profile Picture") {
                 ProfilePictureCard(
-                    avatarRes = com.example.aion.R.drawable.tiktok,
+                    displayName = uiState.profile.displayName,
                     avatarUri = uiState.profile.avatarUri,
                     onChangePictureClick = { avatarPickerLauncher.launch(arrayOf("image/*")) },
                 )

@@ -90,7 +90,6 @@ fun AionTopAppBar(
 fun AionTopAppBarPreview() {
     AionTopAppBar(
         title = "Plan",
-        avatarRes = R.drawable.tiktok,
         actions = {
             IconButton(onClick = {}) {
                 Icon(Icons.Default.MoreVert, contentDescription = "Menu")

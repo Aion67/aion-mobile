@@ -65,6 +65,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AionApp() {
     val navController = rememberNavController()
+    val settingsViewModel: SettingsViewModel = hiltViewModel()
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
     val onboardingViewModel: com.example.aion.ui.viewmodels.OnboardingViewModel = hiltViewModel()
     val onboardingState by onboardingViewModel.uiState.collectAsState()
@@ -156,10 +157,17 @@ fun AionApp() {
                         onThemeClick = { navController.navigate("settings_theme") },
                         onAccentClick = { navController.navigate("settings_accent") },
                         onProfileClick = { navController.navigate(Screen.Profile.route) },
-                        onFaqClick = { /* TODO */ },
-                        onFeedbackClick = { /* TODO */ },
-                        onPrivacyClick = { /* TODO */ },
-                        onVersionClick = { /* TODO */ }
+                        onOnlineSetupClick = { navController.navigate(Screen.OnlineModeSetup.route) },
+                        onFaqClick = { navController.navigate(Screen.SettingsDetail.createRoute("FAQ")) },
+                        onFeedbackClick = {
+                            val intent = android.content.Intent(android.content.Intent.ACTION_SENDTO).apply {
+                                data = android.net.Uri.parse("mailto:support@aion.example.com")
+                                putExtra(android.content.Intent.EXTRA_SUBJECT, "Aion Feedback")
+                            }
+                            navController.context.startActivity(intent)
+                        },
+                        onPrivacyClick = { navController.navigate(Screen.SettingsDetail.createRoute("Privacy Policy")) },
+                        onVersionClick = { navController.navigate(Screen.SettingsDetail.createRoute("Version")) }
                     )
                 }
                 composable("settings_theme") {
@@ -167,6 +175,32 @@ fun AionApp() {
                 }
                 composable("settings_accent") {
                     AccentSettingsScreen(onBack = { navController.popBackStack() })
+                }
+                composable(Screen.OnlineModeSetup.route) {
+                    OnlineModeSetupScreen(
+                        onBack = { navController.popBackStack() },
+                        onComplete = {
+                            settingsViewModel.updateAppMode("online")
+                            navController.popBackStack()
+                        }
+                    )
+                }
+                composable(
+                    route = Screen.SettingsDetail.route,
+                    arguments = listOf(navArgument("title") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val title = backStackEntry.arguments?.getString("title") ?: ""
+                    val body = when (title) {
+                        "FAQ" -> "1. How does the score work?\nScore goes up when you stay under your limits. Overshooting reduces it.\n\n2. Why do I need permissions?\nAion needs Usage Access to track your time and Overlay permission to show you alerts when you exceed limits."
+                        "Privacy Policy" -> "All your data stays locally on your device unless you use Online Mode, in which case game progress is synced to the cloud."
+                        "Version" -> "Aion v1.0.0-alpha\nBuild: 2026"
+                        else -> "Content not found."
+                    }
+                    SettingsDetailScreen(
+                        title = title,
+                        body = body,
+                        onBack = { navController.popBackStack() }
+                    )
                 }
                 composable(Screen.Profile.route) {
                     ProfileScreen(
@@ -204,18 +238,4 @@ enum class AppDestinations(
     SETTINGS("Settings", Icons.Default.Settings),
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AionTheme {
-        Greeting("Android")
-    }
-}

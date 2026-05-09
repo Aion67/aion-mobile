@@ -22,7 +22,7 @@ import com.example.aion.data.entities.UsageSessionEntity
 import com.example.aion.ui.components.*
 import com.example.aion.ui.theme.Variables
 import com.example.aion.ui.viewmodels.AppDetailsViewModel
-import com.example.aion.util.ScoreUtils
+import com.example.aion.util.ScoringEngine
 import com.example.aion.util.TimeUtils
 import java.text.SimpleDateFormat
 import java.util.*
@@ -69,9 +69,8 @@ fun AppDetailsScreen(
             ) {
                 AppDetailsHeader(
                     icon = uiState.icon,
-                    lastOpened = "13:08",
-                    dataUsage = "34 MB",
-                    notoriety = "HARD",
+                    lastOpened = if (uiState.lastOpenedMs > 0) com.example.aion.util.TimeUtils.formatTimestamp(uiState.lastOpenedMs) else "Never",
+                    notoriety = uiState.notoriety,
                     modifier = Modifier.padding(vertical = 16.dp)
                 )
 
@@ -116,7 +115,7 @@ private fun OverviewTabContent(
     val progress = if (limitMs > 0) usageTodayMs.toFloat() / limitMs.toFloat() else 0f
     val remainingMs = maxOf(0L, limitMs - usageTodayMs)
     
-    val score = ScoreUtils.calculateScore(usageTodayMs, limitMs)
+    val score = ScoringEngine.calculateAppScore(usageTodayMs, limitMs)
 
     Column(
         modifier = Modifier

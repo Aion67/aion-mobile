@@ -28,7 +28,7 @@ import com.example.aion.ui.components.AionSearchBar
 import com.example.aion.ui.components.AionTopAppBar
 import com.example.aion.ui.components.SortHeader
 import com.example.aion.ui.theme.Variables
-import com.example.aion.utils.PermissionUtils
+import com.example.aion.util.PermissionUtils
 
 @Composable
 fun AddAppsScreen(

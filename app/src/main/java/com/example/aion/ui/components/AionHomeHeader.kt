@@ -113,5 +113,5 @@ fun AionHomeHeader(
 @Preview(showBackground = true)
 @Composable
 fun AionHomeHeaderPreview() {
-    AionHomeHeader(userName = "Alex", improvementPercentage = 0.05f, avatarRes = R.drawable.tiktok)
+    AionHomeHeader(userName = "Alex", improvementPercentage = 0.05f)
 }

@@ -6,7 +6,7 @@ import com.example.aion.data.entities.UserProfileEntity
 import com.example.aion.data.repository.AppRepository
 import com.example.aion.data.repository.UsageRepository
 import com.example.aion.data.repository.UserRepository
-import com.example.aion.util.ScoreUtils
+import com.example.aion.util.ScoringEngine
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -57,7 +57,7 @@ class ProfileViewModel @Inject constructor(
                 val totalTodayUsage = results.sumOf { it.first }
                 val totalTodayLimit = results.sumOf { it.second }
 
-                val score = ScoreUtils.calculateScore(totalTodayUsage, totalTodayLimit)
+                val score = ScoringEngine.calculateAppScore(totalTodayUsage, totalTodayLimit)
                 val timeSaved = if (totalTodayLimit > totalTodayUsage) totalTodayLimit - totalTodayUsage else 0L
 
                 val rank = when {

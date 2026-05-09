@@ -13,6 +13,8 @@ data class SettingsUiState(
     val theme: String = "System",
     val accentColor: String = "Purple",
     val notificationsEnabled: Boolean = true,
+    val appMode: String = "offline",
+    val hasUsedOnlineMode: Boolean = false,
     val hasUsageAccess: Boolean = false,
     val hasOverlayPermission: Boolean = false,
     val isLoading: Boolean = false
@@ -34,6 +36,8 @@ class SettingsViewModel @Inject constructor(
             theme = prefMap["theme_mode"] ?: "System",
             accentColor = prefMap["accent_color"] ?: "Purple",
             notificationsEnabled = prefMap["notifications_enabled"]?.toBoolean() ?: true,
+            appMode = prefMap["app_mode"] ?: "offline",
+            hasUsedOnlineMode = prefMap["has_used_online_mode"]?.toBoolean() ?: false,
             hasUsageAccess = permissions.first,
             hasOverlayPermission = permissions.second
         )
@@ -62,6 +66,15 @@ class SettingsViewModel @Inject constructor(
     fun toggleNotifications(enabled: Boolean) {
         viewModelScope.launch {
             userRepository.savePreference(UserPreferenceEntity("notifications_enabled", enabled.toString()))
+        }
+    }
+
+    fun updateAppMode(mode: String) {
+        viewModelScope.launch {
+            userRepository.savePreference(UserPreferenceEntity("app_mode", mode))
+            if (mode == "online") {
+                userRepository.savePreference(UserPreferenceEntity("has_used_online_mode", "true"))
+            }
         }
     }
 }
