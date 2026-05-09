@@ -52,7 +52,10 @@ class MainActivity : ComponentActivity() {
             val settingsViewModel: SettingsViewModel = hiltViewModel()
             val settingsUiState by settingsViewModel.uiState.collectAsState()
 
-            AionTheme(themeMode = settingsUiState.theme, accentColor = settingsUiState.accentColor) {
+            AionTheme(
+                themeMode = settingsUiState.theme,
+                accentColor = settingsUiState.accentColor
+            ) {
                 AionApp()
             }
         }
@@ -181,10 +184,8 @@ fun AionApp() {
                 composable(
                     route = Screen.NotificationDetails.route,
                     arguments = listOf(navArgument("id") { type = NavType.LongType })
-                ) { backStackEntry ->
-                    val id = backStackEntry.arguments?.getLong("id") ?: 0L
+                ) {
                     NotificationDetailScreen(
-                        notification = sampleNotifications.find { it.id == id } ?: sampleNotifications.first(),
                         onBack = { navController.popBackStack() }
                     )
                 }
