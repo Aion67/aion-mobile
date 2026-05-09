@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @Singleton
 class UsageStatsHelper @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) {
     private val usageStatsManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
 

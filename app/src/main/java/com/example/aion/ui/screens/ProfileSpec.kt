@@ -6,7 +6,7 @@ import com.example.aion.R
 data class ProfileSpec(
     val displayName: String,
     val username: String,
-    @DrawableRes val avatarRes: Int,
+    @param:DrawableRes val avatarRes: Int,
     val email: String,
     val bio: String,
 )

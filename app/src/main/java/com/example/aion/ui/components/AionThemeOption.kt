@@ -52,7 +52,7 @@ fun AionThemeOption(
                 )
                 .border(
                     width = if (isSelected) 3.dp else 0.dp,
-                    color = if (isSelected) Variables.PrimaryBrand else Color.Transparent,
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
                     shape = RoundedCornerShape(16.dp)
                 )
         ) {
@@ -62,7 +62,7 @@ fun AionThemeOption(
                         .align(Alignment.TopEnd)
                         .padding(10.dp)
                         .background(
-                            color = Variables.PrimaryBrand,
+                            color = MaterialTheme.colorScheme.primary,
                             shape = RoundedCornerShape(999.dp)
                         )
                         .padding(4.dp)

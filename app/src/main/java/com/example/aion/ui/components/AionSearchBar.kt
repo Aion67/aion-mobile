@@ -75,7 +75,7 @@ fun AionSearchBar(
                     disabledContainerColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = Variables.PrimaryBrand
+                    cursorColor = MaterialTheme.colorScheme.primary
                 ),
                 singleLine = true,
                 textStyle = MaterialTheme.typography.bodyLarge.copy(

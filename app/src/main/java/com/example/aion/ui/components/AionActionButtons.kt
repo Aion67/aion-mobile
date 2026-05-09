@@ -28,9 +28,9 @@ fun AionFilledButton(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Variables.PrimaryBrand,
-            contentColor = androidx.compose.ui.graphics.Color.White
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
         )
     ) {
         if (icon != null) {
@@ -56,9 +56,9 @@ fun AionOutlinedButton(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
-        border = androidx.compose.foundation.BorderStroke(1.dp, Variables.PrimaryBrand),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
         colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = Variables.PrimaryBrand
+            contentColor = MaterialTheme.colorScheme.primary
         )
     ) {
         Text(text = text)

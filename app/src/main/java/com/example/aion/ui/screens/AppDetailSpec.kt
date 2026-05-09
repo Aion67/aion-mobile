@@ -5,7 +5,7 @@ import com.example.aion.R
 
 data class AppDetailSpec(
     val appName: String,
-    @DrawableRes val iconRes: Int,
+    @param:DrawableRes val iconRes: Int,
     val creditScore: String,
     val usedTime: String,
     val remainingTime: String,

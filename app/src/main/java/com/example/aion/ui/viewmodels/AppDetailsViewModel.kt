@@ -40,7 +40,7 @@ data class AppDetailsUiState(
 
 @HiltViewModel
 class AppDetailsViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val appRepository: AppRepository,
     private val usageRepository: UsageRepository,
     savedStateHandle: SavedStateHandle

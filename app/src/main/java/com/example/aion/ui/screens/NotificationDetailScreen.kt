@@ -79,6 +79,7 @@ fun NotificationDetailScreen(
 @Composable
 fun NotificationDetailScreenPreview() {
     val sampleNotification = NotificationSpec(
+        id = 1,
         appName = "YouTube",
         title = "New Video Uploaded",
         message = "Your favorite channel just uploaded a new video. Check it out now!",

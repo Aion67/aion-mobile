@@ -250,14 +250,14 @@ fun AccentSettingsScreen(
     
     val accentOptions = remember {
         listOf(
-            AccentOption("Purple", Variables.PrimaryBrand),
-            AccentOption("Pink", Variables.InstagramPink),
-            AccentOption("Green", Variables.EmeraldGreen),
-            AccentOption("Blue", Variables.SelectionBlue),
+            AccentOption("Purple", Color(0xFF6750A4)),
+            AccentOption("Pink", Color(0xFFEC4899)),
+            AccentOption("Green", Color(0xFF10B981)),
+            AccentOption("Blue", Color(0xFF007BFF)),
             AccentOption("Orange", Color(0xFFFF9800)),
             AccentOption("Teal", Color(0xFF14B8A6)),
-            AccentOption("Red", Variables.WarningRed),
-            AccentOption("Gray", Variables.SchemesOutline)
+            AccentOption("Red", Color(0xFFF44336)),
+            AccentOption("Gray", Color(0xFF79747E))
         )
     }
 

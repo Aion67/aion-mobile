@@ -4,40 +4,37 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.aion.data.manager.WorkScheduler
 import com.example.aion.ui.navigation.Screen
 import com.example.aion.ui.screens.*
 import com.example.aion.ui.theme.AionTheme
-import com.example.aion.data.manager.WorkScheduler
 import com.example.aion.ui.viewmodels.SettingsViewModel
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.compose.runtime.collectAsState
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -55,7 +52,7 @@ class MainActivity : ComponentActivity() {
             val settingsViewModel: SettingsViewModel = hiltViewModel()
             val settingsUiState by settingsViewModel.uiState.collectAsState()
 
-            AionTheme(themeMode = settingsUiState.theme) {
+            AionTheme(themeMode = settingsUiState.theme, accentColor = settingsUiState.accentColor) {
                 AionApp()
             }
         }
@@ -66,31 +63,40 @@ class MainActivity : ComponentActivity() {
 fun AionApp() {
     val navController = rememberNavController()
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
+    val onboardingViewModel: com.example.aion.ui.viewmodels.OnboardingViewModel = hiltViewModel()
+    val onboardingState by onboardingViewModel.uiState.collectAsState()
+
+    val startDestination = if (onboardingState.isCompleted) Screen.Home.route else Screen.Onboarding.route
+
+    // Don't show navigation bar on onboarding
+    val showNavBar = onboardingState.isCompleted
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
-            for (destination in AppDestinations.values()) {
-                item(
-                    icon = {
-                        Icon(
-                            destination.icon,
-                            contentDescription = destination.label
-                        )
-                    },
-                    label = { Text(destination.label) },
-                    selected = destination == currentDestination,
-                    onClick = {
-                        currentDestination = destination
-                        when (destination) {
-                            AppDestinations.HOME -> navController.navigate(Screen.Home.route) {
-                                popUpTo(Screen.Home.route) { inclusive = true }
+            if (showNavBar) {
+                for (destination in AppDestinations.entries) {
+                    item(
+                        icon = {
+                            Icon(
+                                destination.icon,
+                                contentDescription = destination.label
+                            )
+                        },
+                        label = { Text(destination.label) },
+                        selected = destination == currentDestination,
+                        onClick = {
+                            currentDestination = destination
+                            when (destination) {
+                                AppDestinations.HOME -> navController.navigate(Screen.Home.route) {
+                                    popUpTo(Screen.Home.route) { inclusive = true }
+                                }
+                                AppDestinations.PLAN -> navController.navigate(Screen.Plan.route)
+                                AppDestinations.NOTIFICATIONS -> navController.navigate(Screen.Notifications.route)
+                                AppDestinations.SETTINGS -> navController.navigate(Screen.Settings.route)
                             }
-                            AppDestinations.PLAN -> navController.navigate(Screen.Plan.route)
-                            AppDestinations.NOTIFICATIONS -> navController.navigate(Screen.Notifications.route)
-                            AppDestinations.SETTINGS -> navController.navigate(Screen.Settings.route)
                         }
-                    }
-                )
+                    )
+                }
             }
         }
     ) {
@@ -98,8 +104,23 @@ fun AionApp() {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            NavHost(navController = navController, startDestination = Screen.Home.route) {
+            NavHost(
+                navController = navController,
+                startDestination = startDestination
+            ) {
+                composable(Screen.Onboarding.route) {
+                    OnboardingScreen(
+                        onFinish = {
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(Screen.Onboarding.route) { inclusive = true }
+                            }
+                        }
+                    )
+                }
                 composable(Screen.Home.route) {
+                    LaunchedEffect(Unit) {
+                        currentDestination = AppDestinations.HOME
+                    }
                     HomeScreen(
                         onAppClick = { packageName ->
                             navController.navigate(Screen.AppDetails.createRoute(packageName))
@@ -161,9 +182,9 @@ fun AionApp() {
                     route = Screen.NotificationDetails.route,
                     arguments = listOf(navArgument("id") { type = NavType.LongType })
                 ) { backStackEntry ->
-                    val id = backStackEntry.arguments?.getLong("id")
+                    val id = backStackEntry.arguments?.getLong("id") ?: 0L
                     NotificationDetailScreen(
-                        notification = sampleNotifications.first(), // Placeholder
+                        notification = sampleNotifications.find { it.id == id } ?: sampleNotifications.first(),
                         onBack = { navController.popBackStack() }
                     )
                 }

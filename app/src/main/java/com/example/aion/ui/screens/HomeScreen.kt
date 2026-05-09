@@ -35,14 +35,7 @@ fun HomeScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            AionTopAppBar(
-                title = "",
-                actions = {
-                    AionProfileActionButton(
-                        onClick = onProfileClick
-                    )
-                }
-            )
+            AionTopAppBar(title = "")
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { inner ->
