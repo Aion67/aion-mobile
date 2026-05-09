@@ -4,14 +4,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.aion.ui.components.AionTopAppBar
@@ -36,18 +37,21 @@ fun PlanScreen(
     val uiState by viewModel.uiState.collectAsState()
     var showMenu by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
+    var appToConfirmDelete by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             AionTopAppBar(
                 title = "Plan",
+                containerColor = Color.Transparent,
                 actions = {
                     Box {
                         IconButton(onClick = { showMenu = true }) {
                             Icon(
                                 imageVector = Icons.Default.MoreVert,
-                                contentDescription = "More options"
+                                contentDescription = "More options",
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
                         DropdownMenu(
@@ -69,14 +73,14 @@ fun PlanScreen(
                 }
             )
         },
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = Color.Transparent
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .padding(innerPadding)
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
         ) {
+            Spacer(modifier = Modifier.height(innerPadding.calculateTopPadding()))
+            
             Box {
                 SortHeader(
                     title = "Apps",
@@ -97,9 +101,17 @@ fun PlanScreen(
                     }
                 }
             }
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 16.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp).let {
+                    PaddingValues(
+                        start = it.calculateStartPadding(androidx.compose.ui.unit.LayoutDirection.Ltr),
+                        end = it.calculateEndPadding(androidx.compose.ui.unit.LayoutDirection.Ltr),
+                        top = it.calculateTopPadding(),
+                        bottom = 140.dp
+                    )
+                },
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(uiState.trackedApps) { item ->
@@ -111,11 +123,34 @@ fun PlanScreen(
                         remainingTime = TimeUtils.formatDuration(item.settings.dailyLimitMs),
                         progress = if (item.settings.dailyLimitMs > 0) item.usageMs.toFloat() / item.settings.dailyLimitMs else 0f,
                         onClick = { onAppClick(item.app.packageName) },
-                        onDeleteClick = { viewModel.removeApp(item.app.packageName) }
+                        onLongClick = { appToConfirmDelete = item.app.packageName }
                     )
                 }
             }
         }
+    }
+
+    if (appToConfirmDelete != null) {
+        AlertDialog(
+            onDismissRequest = { appToConfirmDelete = null },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.removeApp(appToConfirmDelete!!)
+                    appToConfirmDelete = null
+                }) {
+                    Text("Remove", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { appToConfirmDelete = null }) {
+                    Text("Cancel")
+                }
+            },
+            title = { Text("Remove App from Plan?") },
+            text = { Text("Are you sure you want to stop tracking this app? Your progress will be saved but limits will be disabled.") },
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            shape = RoundedCornerShape(28.dp)
+        )
     }
 }
 

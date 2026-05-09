@@ -4,14 +4,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -19,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.aion.data.manager.WorkScheduler
 import com.example.aion.ui.navigation.Screen
+import com.example.aion.ui.navigation.GlassBottomBar
 import com.example.aion.ui.screens.*
 import com.example.aion.ui.theme.AionTheme
 import com.example.aion.ui.viewmodels.SettingsViewModel
@@ -75,39 +79,11 @@ fun AionApp() {
     // Don't show navigation bar on onboarding
     val showNavBar = onboardingState.isCompleted
 
-    NavigationSuiteScaffold(
-        navigationSuiteItems = {
-            if (showNavBar) {
-                for (destination in AppDestinations.entries) {
-                    item(
-                        icon = {
-                            Icon(
-                                destination.icon,
-                                contentDescription = destination.label
-                            )
-                        },
-                        label = { Text(destination.label) },
-                        selected = destination == currentDestination,
-                        onClick = {
-                            currentDestination = destination
-                            when (destination) {
-                                AppDestinations.HOME -> navController.navigate(Screen.Home.route) {
-                                    popUpTo(Screen.Home.route) { inclusive = true }
-                                }
-                                AppDestinations.PLAN -> navController.navigate(Screen.Plan.route)
-                                AppDestinations.NOTIFICATIONS -> navController.navigate(Screen.Notifications.route)
-                                AppDestinations.SETTINGS -> navController.navigate(Screen.Settings.route)
-                            }
-                        }
-                    )
-                }
-            }
-        }
-    ) {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
+    Scaffold(
+        containerColor = androidx.compose.ui.graphics.Color.Transparent,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
+    ) { innerPadding ->
+        Box(modifier = Modifier.fillMaxSize()) {
             NavHost(
                 navController = navController,
                 startDestination = startDestination
@@ -224,6 +200,25 @@ fun AionApp() {
                     )
                 }
             }
+
+            if (showNavBar) {
+                Box(modifier = Modifier.align(Alignment.BottomCenter)) {
+                    GlassBottomBar(
+                        currentDestination = currentDestination,
+                        onDestinationSelected = { destination ->
+                            currentDestination = destination
+                            when (destination) {
+                                AppDestinations.HOME -> navController.navigate(Screen.Home.route) {
+                                    popUpTo(Screen.Home.route) { inclusive = true }
+                                }
+                                AppDestinations.PLAN -> navController.navigate(Screen.Plan.route)
+                                AppDestinations.NOTIFICATIONS -> navController.navigate(Screen.Notifications.route)
+                                AppDestinations.SETTINGS -> navController.navigate(Screen.Settings.route)
+                            }
+                        }
+                    )
+                }
+            }
         }
     }
 }
@@ -237,5 +232,3 @@ enum class AppDestinations(
     NOTIFICATIONS("Notifications", Icons.Default.Notifications),
     SETTINGS("Settings", Icons.Default.Settings),
 }
-
-

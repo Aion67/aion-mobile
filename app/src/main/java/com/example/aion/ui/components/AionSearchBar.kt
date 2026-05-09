@@ -28,12 +28,14 @@ fun AionSearchBar(
     placeholder: String = "Search apps",
     onClear: () -> Unit = {}
 ) {
-    Surface(
+    GlassCard(
         modifier = modifier
             .fillMaxWidth()
             .height(56.dp),
         shape = CircleShape,
-        color = Variables.SchemesSurfaceContainerHigh
+        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.4f),
+        borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+        blurRadius = 12.dp
     ) {
         Row(
             modifier = Modifier
@@ -48,7 +50,7 @@ fun AionSearchBar(
                 modifier = Modifier
                     .padding(start = 12.dp)
                     .size(24.dp),
-                tint = Variables.SchemesOnSurfaceVariant
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             // Search TextField (BasicTextField or TextField without decoration)
@@ -63,9 +65,7 @@ fun AionSearchBar(
                         text = placeholder,
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontSize = Variables.StaticBodyLargeSize,
-                            lineHeight = Variables.StaticBodyLargeLineHeight,
-                            letterSpacing = Variables.StaticBodyLargeTracking,
-                            color = Variables.SchemesOnSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                         )
                     )
                 },
@@ -80,7 +80,7 @@ fun AionSearchBar(
                 singleLine = true,
                 textStyle = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = Variables.StaticBodyLargeSize,
-                    color = Variables.SchemesOnSurface
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             )
 
@@ -91,7 +91,7 @@ fun AionSearchBar(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Clear search",
                         modifier = Modifier.size(24.dp),
-                        tint = Variables.SchemesOnSurfaceVariant
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

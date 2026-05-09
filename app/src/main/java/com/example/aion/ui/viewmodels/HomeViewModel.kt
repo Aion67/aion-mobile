@@ -18,6 +18,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class HomeUiState(
@@ -132,6 +133,12 @@ class HomeViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = HomeUiState(isLoading = true)
     )
+
+    fun removeApp(packageName: String) {
+        viewModelScope.launch {
+            appRepository.removeTrackedApp(packageName)
+        }
+    }
 
     private fun calculateGlobalStreak(
         history: List<com.example.aion.data.entities.UsageSessionEntity>,

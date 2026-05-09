@@ -1,6 +1,5 @@
 package com.example.aion.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -15,7 +14,7 @@ import androidx.compose.ui.unit.sp
 import com.example.aion.ui.theme.Variables
 
 /**
- * A card showing daily usage history.
+ * Revamped History Item with glassmorphism.
  */
 @Composable
 fun AionHistoryItem(
@@ -27,15 +26,17 @@ fun AionHistoryItem(
     isExceeded: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    GlassCard(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        shape = RoundedCornerShape(20.dp),
+        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.25f),
+        borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+        blurRadius = 12.dp,
+        contentPadding = PaddingValues(16.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -51,15 +52,15 @@ fun AionHistoryItem(
                     Text(
                         text = if (isExceeded) "Exceeded" else "Within Limit",
                         color = if (isExceeded) MaterialTheme.colorScheme.error else Variables.SuccessGreen,
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.SemiBold
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold
                     )
                 }
                 
                 Text(
                     text = "$percentage%",
                     fontSize = 24.sp,
-                    fontWeight = FontWeight.Black,
+                    fontWeight = FontWeight.ExtraBold,
                     color = if (isExceeded) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
                 )
             }
@@ -88,7 +89,7 @@ private fun HistoryStat(label: String, value: String) {
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
         )
     }
@@ -108,14 +109,6 @@ fun AionHistoryItemPreview() {
             limitTime = "1h 30m",
             percentage = 116,
             isExceeded = true
-        )
-        AionHistoryItem(
-            date = "02 Oct",
-            day = "Tue",
-            usedTime = "45m",
-            limitTime = "1h 30m",
-            percentage = 50,
-            isExceeded = false
         )
     }
 }

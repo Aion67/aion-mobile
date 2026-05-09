@@ -1,14 +1,18 @@
 package com.example.aion.ui.components
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -28,65 +32,78 @@ data class StreakDay(
 )
 
 /**
- * An enhanced daily streak tracking component.
- * Displays a week's worth of streak data with visual feedback.
+ * Revamped Streak Bar with glass bubbles and glowing "Today" effect.
  */
 @Composable
 fun AionStreakBar(
     days: List<StreakDay>,
     modifier: Modifier = Modifier
 ) {
-    Row(
+    GlassCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
+        shape = RoundedCornerShape(24.dp),
+        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.2f),
+        borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+        blurRadius = 12.dp
     ) {
-        days.forEach { day ->
-            StreakDayItem(day = day)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            days.forEachIndexed { index, day ->
+                StreakDayItem(day = day, delay = index * 100)
+            }
         }
     }
 }
 
 @Composable
 private fun StreakDayItem(
-    day: StreakDay
+    day: StreakDay,
+    delay: Int
 ) {
+    var visible by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (visible) 1f else 0.5f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+        label = "StreakPopAnimation"
+    )
+
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(delay.toLong())
+        visible = true
+    }
+
     Column(
+        modifier = Modifier.scale(scale),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .size(44.dp) // Reduced from 64.dp
-                .background(
-                    color = if (day.isCompleted) MaterialTheme.colorScheme.primary else Variables.NeutralGray.copy(alpha = 0.2f),
-                    shape = CircleShape
-                )
-                .then(
-                    if (day.isToday) {
-                        Modifier.border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                    } else Modifier
-                ),
-            contentAlignment = Alignment.Center
+        GlassCard(
+            modifier = Modifier.size(48.dp),
+            shape = CircleShape,
+            containerColor = if (day.isCompleted) MaterialTheme.colorScheme.primary.copy(alpha = 0.7f) 
+                             else Color.White.copy(alpha = 0.1f),
+            borderColor = if (day.isToday) MaterialTheme.colorScheme.primary.copy(alpha = 0.6f) 
+                           else Color.White.copy(alpha = 0.2f),
+            borderWidth = if (day.isToday) 2.dp else 1.dp,
+            glowColor = if (day.isToday) MaterialTheme.colorScheme.primary else null,
+            blurRadius = 8.dp,
+            contentPadding = PaddingValues(0.dp)
         ) {
             Box(
-                modifier = Modifier
-                    .size(36.dp) // Reduced from 54.dp
-                    .background(
-                        color = if (day.isCompleted) Color.White else Color.Transparent,
-                        shape = CircleShape
-                    ),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = day.dateNumber,
                     style = androidx.compose.ui.text.TextStyle(
-                        fontSize = 16.sp, // Reduced from Variables.StaticTitleLargeSize
-                        lineHeight = 24.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = if (day.isCompleted) Color.Black else Variables.SchemesOnSurface.copy(alpha = 0.5f)
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (day.isCompleted) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     ),
                     textAlign = TextAlign.Center
                 )
@@ -96,10 +113,9 @@ private fun StreakDayItem(
         Text(
             text = day.dayName,
             style = androidx.compose.ui.text.TextStyle(
-                fontSize = 12.sp, // Reduced from Variables.StaticBodyMediumSize
-                lineHeight = 16.sp,
-                fontWeight = FontWeight.Normal,
-                color = if (day.isToday) MaterialTheme.colorScheme.primary else Variables.SchemesOnSurface
+                fontSize = 11.sp,
+                fontWeight = if (day.isToday) FontWeight.Bold else FontWeight.Normal,
+                color = if (day.isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
             ),
             textAlign = TextAlign.Center
         )

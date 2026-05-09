@@ -3,16 +3,20 @@ package com.example.aion.ui.components
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -24,8 +28,7 @@ import com.example.aion.R
 import com.example.aion.ui.theme.Variables
 
 /**
- * A card for the "Add Apps" screen.
- * Matches Figma node 8:1229 and variations.
+ * Revamped Add App Card with glass layout and custom selection indicator.
  */
 @Composable
 fun AddAppCard(
@@ -37,86 +40,112 @@ fun AddAppCard(
     isTracked: Boolean = false,
     onToggleTracking: () -> Unit = {}
 ) {
-    Row(
+    GlassCard(
         modifier = modifier
             .fillMaxWidth()
-            .height(76.dp)
             .clickable { onToggleTracking() },
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically
+        shape = RoundedCornerShape(20.dp),
+        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.25f),
+        borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+        blurRadius = 12.dp,
+        contentPadding = PaddingValues(12.dp)
     ) {
-        // App Icon
-        if (icon != null) {
-            Image(
-                bitmap = icon.toBitmap().asImageBitmap(),
-                contentDescription = appName,
-                modifier = Modifier
-                    .size(76.dp)
-                    .clip(RoundedCornerShape(19.dp)),
-                contentScale = ContentScale.FillBounds
-            )
-        } else {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // App Icon
             Box(
                 modifier = Modifier
-                    .size(76.dp)
-                    .clip(RoundedCornerShape(19.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                    .size(56.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Apps,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(40.dp)
-                )
-            }
-        }
-
-        // Content
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = appName,
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontSize = Variables.StaticTitleLargeSize,
-                    lineHeight = Variables.StaticTitleLargeLineHeight,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Normal
-                ),
-                maxLines = 1
-            )
-
-            if (progress != null) {
-                Spacer(modifier = Modifier.height(8.dp))
-                LinearProgressIndicator(
-                    progress = { progress },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                    trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                    strokeCap = StrokeCap.Round
-                )
-            } else if (usedTime != null) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Used: $usedTime",
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                if (icon != null) {
+                    Image(
+                        bitmap = icon.toBitmap().asImageBitmap(),
+                        contentDescription = appName,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.FillBounds
                     )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Apps,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+            }
+
+            // Content
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = appName,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    maxLines = 1
                 )
+
+                if (progress != null) {
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(6.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(progress.coerceIn(0f, 1f))
+                                .fillMaxHeight()
+                                .background(MaterialTheme.colorScheme.primary)
+                        )
+                    }
+                } else if (usedTime != null) {
+                    Text(
+                        text = "Used: $usedTime",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    )
+                }
+            }
+
+            // Custom Glass Selection Indicator
+            Box(
+                modifier = Modifier
+                    .size(28.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (isTracked) MaterialTheme.colorScheme.primary 
+                        else Color.White.copy(alpha = 0.1f)
+                    )
+                    .border(
+                        width = 1.dp,
+                        color = if (isTracked) Color.Transparent else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                        shape = CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                if (isTracked) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
         }
-
-        // Checkbox for tracking status
-        Checkbox(
-            checked = isTracked,
-            onCheckedChange = { onToggleTracking() }
-        )
     }
 }
 
@@ -129,14 +158,12 @@ fun AddAppCardPreview() {
     ) {
         AddAppCard(
             appName = "Instagram",
-            progress = 0.6f
+            progress = 0.6f,
+            isTracked = true
         )
         AddAppCard(
             appName = "TikTok",
             usedTime = "12h 35m"
-        )
-        AddAppCard(
-            appName = "Reddit"
         )
     }
 }

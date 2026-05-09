@@ -51,12 +51,14 @@ fun NotificationsScreen(
             AionTopAppBar(
                 title = "",
                 onAvatarClick = onAvatarClick,
+                containerColor = Color.Transparent,
                 actions = {
                     Box {
                         IconButton(onClick = { showMenu = true }) {
                             Icon(
                                 imageVector = Icons.Default.MoreVert,
-                                contentDescription = "More options"
+                                contentDescription = "More options",
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
 
@@ -76,14 +78,14 @@ fun NotificationsScreen(
                 }
             )
         },
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = Color.Transparent
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .padding(innerPadding)
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
         ) {
+            Spacer(modifier = Modifier.height(innerPadding.calculateTopPadding()))
+            
             SortHeader(
                 title = "Notifications",
                 onSortClick = { /* Handle sort */ }
@@ -99,8 +101,8 @@ fun NotificationsScreen(
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                contentPadding = PaddingValues(bottom = 140.dp), // Space for floating bar
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(visibleNotifications) { notification ->
                     NotificationItem(

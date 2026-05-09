@@ -51,63 +51,64 @@ fun AppDetailsHeader(
         else -> Variables.SuccessGreen // Green
     }
 
-    Row(
+    GlassCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 14.dp),
-        horizontalArrangement = Arrangement.spacedBy(20.dp),
-        verticalAlignment = Alignment.Bottom
+        shape = RoundedCornerShape(24.dp),
+        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.3f),
+        borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+        blurRadius = 24.dp
     ) {
-        // App Icon
-        Box(
-            modifier = Modifier
-                .size(117.dp)
-                .clip(RoundedCornerShape(19.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant),
-            contentAlignment = Alignment.Center
-        ) {
-            if (icon != null) {
-                Image(
-                    bitmap = icon.toBitmap().asImageBitmap(),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.Apps,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(60.dp)
-                )
-            }
-        }
-
-        // Metadata Table
         Row(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Labels
-            Column(
+            // App Icon
+            Box(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = 10.dp, horizontal = 13.dp),
-                verticalArrangement = Arrangement.spacedBy(0.dp)
+                    .size(96.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                contentAlignment = Alignment.Center
             ) {
-                Text(text = "Last opened:", style = textStyle, modifier = Modifier.height(29.dp))
-                Text(text = "Notoriety:", style = textStyle, modifier = Modifier.height(29.dp))
+                if (icon != null) {
+                    Image(
+                        bitmap = icon.toBitmap().asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Apps,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(48.dp)
+                    )
+                }
             }
 
-            // Values
+            // Metadata Table
             Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = 10.dp, horizontal = 13.dp),
-                verticalArrangement = Arrangement.spacedBy(0.dp)
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(text = lastOpened, style = textStyle, modifier = Modifier.height(29.dp))
-                Text(text = notoriety, style = textStyle.copy(color = notorietyColor), modifier = Modifier.height(29.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = "Last opened:", style = textStyle.copy(color = MaterialTheme.colorScheme.onSurfaceVariant))
+                    Text(text = lastOpened, style = textStyle.copy(fontWeight = FontWeight.Bold))
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = "Notoriety:", style = textStyle.copy(color = MaterialTheme.colorScheme.onSurfaceVariant))
+                    Text(text = notoriety, style = textStyle.copy(color = notorietyColor, fontWeight = FontWeight.Bold))
+                }
             }
         }
     }

@@ -1,21 +1,17 @@
 package com.example.aion.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.aion.ui.viewmodels.HomeViewModel
 import com.example.aion.util.TimeUtils
@@ -31,20 +27,23 @@ fun HomeScreen(
     onProfileClick: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var appToConfirmDelete by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            AionTopAppBar(title = "")
+            AionTopAppBar(title = "", containerColor = Color.Transparent)
         },
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = Color.Transparent
     ) { inner ->
         LazyColumn(
             modifier = Modifier
-                .padding(inner)
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(16.dp),
+                .padding(horizontal = 16.dp),
+            contentPadding = PaddingValues(
+                top = inner.calculateTopPadding(),
+                bottom = 140.dp // Extra space for floating bottom bar
+            ),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
@@ -79,7 +78,7 @@ fun HomeScreen(
 
             item {
                 if (uiState.streakDays.isNotEmpty()) {
-                    com.example.aion.ui.components.AionStreakBar(days = uiState.streakDays)
+                    AionStreakBar(days = uiState.streakDays)
                 }
             }
 
@@ -101,6 +100,10 @@ fun HomeScreen(
                 )
             }
 
+            item {
+                SortHeader(title = "Your Plan")
+            }
+
             items(uiState.trackedApps) { trackedAppUsage ->
                 val remainingMs = (trackedAppUsage.limitMs - trackedAppUsage.usageMs).coerceAtLeast(0)
                 val progress = if (trackedAppUsage.limitMs > 0) trackedAppUsage.usageMs.toFloat() / trackedAppUsage.limitMs else 0f
@@ -112,10 +115,34 @@ fun HomeScreen(
                     usedTime = TimeUtils.formatDuration(trackedAppUsage.usageMs),
                     remainingTime = TimeUtils.formatDuration(remainingMs),
                     progress = progress,
-                    onClick = { onAppClick(trackedAppUsage.app.packageName) }
+                    onClick = { onAppClick(trackedAppUsage.app.packageName) },
+                    onLongClick = { appToConfirmDelete = trackedAppUsage.app.packageName }
                 )
             }
         }
+    }
+
+    if (appToConfirmDelete != null) {
+        AlertDialog(
+            onDismissRequest = { appToConfirmDelete = null },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.removeApp(appToConfirmDelete!!)
+                    appToConfirmDelete = null
+                }) {
+                    Text("Remove", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { appToConfirmDelete = null }) {
+                    Text("Cancel")
+                }
+            },
+            title = { Text("Remove App from Plan?") },
+            text = { Text("Are you sure you want to stop tracking this app? Your progress will be saved but limits will be disabled.") },
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            shape = RoundedCornerShape(28.dp)
+        )
     }
 }
 

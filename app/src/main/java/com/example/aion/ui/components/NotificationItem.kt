@@ -23,8 +23,7 @@ import com.example.aion.R
 import com.example.aion.ui.theme.Variables
 
 /**
- * A card for an individual notification.
- * Matches Figma node 8:2055.
+ * Revamped Notification Item with glassmorphism.
  */
 @Composable
 fun NotificationItem(
@@ -35,80 +34,79 @@ fun NotificationItem(
     modifier: Modifier = Modifier,
     iconRes: Int? = null
 ) {
-    Row(
+    GlassCard(
         modifier = modifier
             .fillMaxWidth()
-            .height(77.dp)
-            .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.Top
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        shape = RoundedCornerShape(20.dp),
+        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.25f),
+        borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+        blurRadius = 12.dp,
+        contentPadding = PaddingValues(12.dp)
     ) {
-        // App Icon
-        Box(
-            modifier = Modifier
-                .size(76.dp)
-                .clip(RoundedCornerShape(19.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant),
-            contentAlignment = Alignment.Center
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.Top
         ) {
-            if (iconRes != null && iconRes != 0) {
-                Image(
-                    painter = painterResource(id = iconRes),
-                    contentDescription = appName,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.FillBounds
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.Notifications,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(32.dp)
-                )
-            }
-        }
-
-        // Content
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontSize = Variables.StaticTitleLargeSize,
-                    lineHeight = Variables.StaticTitleLargeLineHeight,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Normal
-                ),
-                maxLines = 1
-            )
-            
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
+            // App Icon
+            Box(
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                contentAlignment = Alignment.Center
             ) {
+                if (iconRes != null && iconRes != 0) {
+                    Image(
+                        painter = painterResource(id = iconRes),
+                        contentDescription = appName,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.FillBounds
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+            }
+
+            // Content
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        maxLines = 1,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = timestamp,
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    )
+                }
+                
                 Text(
                     text = message,
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = Variables.StaticBodyMediumSize,
-                        lineHeight = Variables.StaticBodyMediumLineHeight,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
-                    maxLines = 1
-                )
-                
-                Text(
-                    text = timestamp,
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        fontSize = Variables.StaticBodySmallSize,
-                        lineHeight = Variables.StaticBodySmallLineHeight,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        letterSpacing = Variables.StaticBodySmallTracking,
-                        fontWeight = FontWeight.Medium
-                    )
+                    maxLines = 2
                 )
             }
         }
@@ -121,7 +119,7 @@ fun NotificationItemPreview() {
     NotificationItem(
         appName = "Instagram",
         title = "Instagram Limit Reached",
-        message = "Notification from instagram",
+        message = "Notification from instagram about your daily limit being reached.",
         timestamp = "12:30"
     )
 }

@@ -1,5 +1,6 @@
 package com.example.aion.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,10 +14,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.aion.data.entities.UsageSessionEntity
 import com.example.aion.ui.components.*
@@ -24,6 +29,9 @@ import com.example.aion.ui.theme.Variables
 import com.example.aion.ui.viewmodels.AppDetailsViewModel
 import com.example.aion.util.ScoringEngine
 import com.example.aion.util.TimeUtils
+import com.kyant.backdrop.backdrops.emptyBackdrop
+import com.kyant.backdrop.drawBackdrop
+import com.kyant.backdrop.effects.blur
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -51,10 +59,11 @@ fun AppDetailsScreen(
             AionTopAppBar(
                 title = uiState.appName,
                 leadingIcon = Icons.AutoMirrored.Filled.ArrowBack,
-                onLeadingClick = onBack
+                onLeadingClick = onBack,
+                containerColor = Color.Transparent
             )
         },
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = Color.Transparent
     ) { innerPadding ->
         if (uiState.isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -63,21 +72,45 @@ fun AppDetailsScreen(
         } else {
             Column(
                 modifier = Modifier
-                    .padding(innerPadding)
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
             ) {
-                AppDetailsHeader(
-                    icon = uiState.icon,
-                    lastOpened = if (uiState.lastOpenedMs > 0) com.example.aion.util.TimeUtils.formatTimestamp(uiState.lastOpenedMs) else "Never",
-                    notoriety = uiState.notoriety,
-                    modifier = Modifier.padding(vertical = 16.dp)
-                )
+                Spacer(modifier = Modifier.height(innerPadding.calculateTopPadding()))
+                
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    // Blurred Icon Backdrop
+                    uiState.icon?.let { icon ->
+                        Image(
+                            bitmap = icon.toBitmap().asImageBitmap(),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(160.dp)
+                                .drawBackdrop(
+                                    backdrop = emptyBackdrop(),
+                                    shape = { RectangleShape },
+                                    effects = { blur(60f) },
+                                    onDrawSurface = {
+                                        drawRect(color = Color.Black.copy(alpha = 0.3f))
+                                    }
+                                ),
+                            contentScale = ContentScale.Crop,
+                            alpha = 0.5f
+                        )
+                    }
+
+                    AppDetailsHeader(
+                        icon = uiState.icon,
+                        lastOpened = if (uiState.lastOpenedMs > 0) com.example.aion.util.TimeUtils.formatTimestamp(uiState.lastOpenedMs) else "Never",
+                        notoriety = uiState.notoriety,
+                        modifier = Modifier.padding(vertical = 16.dp)
+                    )
+                }
 
                 // Tabs
                 AionTabs(
                     selectedTabIndex = selectedTabIndex,
-                    onTabSelected = { selectedTabIndex = it }
+                    onTabSelected = { selectedTabIndex = it },
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
 
                 // Tab Content
@@ -121,24 +154,26 @@ private fun OverviewTabContent(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             AionProgressGauge(
                 progress = score / 100f,
                 valueText = String.format(Locale.US, "%.2f", score),
-                metricText = "Score"
+                metricText = "Score",
+                modifier = Modifier.weight(1f)
             )
             AionProgressGauge(
                 progress = if (limitMs > 0) 1f - minOf(1f, progress) else 0f,
                 valueText = TimeUtils.formatDuration(remainingMs),
                 metricText = "Remaining",
-                progressColor = MaterialTheme.colorScheme.primary
+                progressColor = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.weight(1f)
             )
         }
 
@@ -149,6 +184,8 @@ private fun OverviewTabContent(
             onClick = onResetProgress,
             modifier = Modifier.fillMaxWidth()
         )
+        
+        Spacer(modifier = Modifier.height(100.dp)) // Space for floating bar
     }
 }
 
@@ -172,7 +209,7 @@ private fun SettingsTabContent(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(
                 text = "Daily Limit",
                 style = MaterialTheme.typography.titleMedium,
@@ -197,6 +234,8 @@ private fun SettingsTabContent(
             enabled = isDirty,
             modifier = Modifier.fillMaxWidth()
         )
+        
+        Spacer(modifier = Modifier.height(120.dp)) // Space for floating bar
     }
 }
 
@@ -204,7 +243,7 @@ private fun SettingsTabContent(
 private fun HistoryTabContent(history: List<UsageSessionEntity>, dailyLimitMs: Long) {
     if (history.isEmpty()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("No history available", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("No history available", color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
         }
         return
     }
@@ -224,8 +263,8 @@ private fun HistoryTabContent(history: List<UsageSessionEntity>, dailyLimitMs: L
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        contentPadding = PaddingValues(bottom = 140.dp), // Space for floating bar
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(groupedHistory) { (dayStart, sessions) ->
             val totalUsedMs = sessions.sumOf { it.totalDurationMs }
@@ -248,5 +287,4 @@ private fun HistoryTabContent(history: List<UsageSessionEntity>, dailyLimitMs: L
 @Composable
 fun AppDetailsScreenPreview() {
     // Note: This preview won't work easily with hiltViewModel() without more setup
-    // But keeping it for structure
 }

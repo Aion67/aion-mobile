@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Icon
@@ -39,72 +40,82 @@ fun AionHomeHeader(
     onAvatarClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    Row(
+    GlassCard(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        shape = RoundedCornerShape(24.dp),
+        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.3f),
+        borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+        blurRadius = 24.dp
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = "Welcome back,",
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontSize = Variables.StaticLabelLargeSize,
-                    lineHeight = Variables.StaticLabelLargeLineHeight,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontWeight = FontWeight.Normal
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Welcome back,",
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontSize = Variables.StaticLabelLargeSize,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.Normal
+                    )
                 )
-            )
-            Text(
-                text = userName,
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    fontSize = Variables.StaticHeadlineSmallSize,
-                    lineHeight = Variables.StaticHeadlineSmallLineHeight,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold
+                Text(
+                    text = userName,
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        fontSize = Variables.StaticHeadlineSmallSize,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold
+                    )
                 )
-            )
 
-            val improvementText = if (improvementPercentage >= 0) {
-                "+${(improvementPercentage * 100).toInt()}% Improvement"
-            } else {
-                "${(improvementPercentage * 100).toInt()}% Improvement"
+                val improvementText = if (improvementPercentage >= 0) {
+                    "+${(improvementPercentage * 100).toInt()}% Improvement"
+                } else {
+                    "${(improvementPercentage * 100).toInt()}% Improvement"
+                }
+                val improvementColor = if (improvementPercentage >= 0) {
+                    Variables.SuccessGreen
+                } else {
+                    Variables.WarningRed
+                }
+
+                Text(
+                    text = improvementText,
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontSize = Variables.StaticLabelMediumSize,
+                        color = improvementColor,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
             }
-            val improvementColor = if (improvementPercentage >= 0) {
-                Variables.SuccessGreen
-            } else {
-                Variables.WarningRed
-            }
 
-            Text(
-                text = improvementText,
-                style = MaterialTheme.typography.labelMedium.copy(
-                    fontSize = Variables.StaticLabelMediumSize,
-                    lineHeight = Variables.StaticLabelMediumLineHeight,
-                    color = improvementColor,
-                    fontWeight = FontWeight.Medium
-                )
-            )
-        }
-
-        IconButton(onClick = onAvatarClick) {
-            if (avatarRes != null) {
-                Image(
-                    painter = painterResource(id = avatarRes),
-                    contentDescription = "Avatar",
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription = "Avatar",
-                    modifier = Modifier.size(48.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
+            IconButton(
+                onClick = onAvatarClick,
+                modifier = Modifier
+                    .size(56.dp)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape)
+            ) {
+                if (avatarRes != null) {
+                    Image(
+                        painter = painterResource(id = avatarRes),
+                        contentDescription = "Avatar",
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle,
+                        contentDescription = "Avatar",
+                        modifier = Modifier.size(40.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         }
     }

@@ -11,11 +11,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
-// use Icons.AutoMirrored.Filled.ArrowBack via Icons import
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -26,8 +26,7 @@ import com.example.aion.R
 import com.example.aion.ui.theme.Variables
 
 /**
- * A reusable Top App Bar for Aion.
- * Refactored to support profile icon on left and actions on right.
+ * Revamped Top App Bar with transparent/glass support.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,6 +37,7 @@ fun AionTopAppBar(
     onLeadingClick: () -> Unit = {},
     avatarRes: Int? = null,
     onAvatarClick: () -> Unit = {},
+    containerColor: Color = Color.Transparent,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
     CenterAlignedTopAppBar(
@@ -47,8 +47,7 @@ fun AionTopAppBar(
                 text = title,
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontSize = Variables.StaticTitleLargeSize,
-                    lineHeight = Variables.StaticTitleLargeLineHeight,
-                    fontWeight = FontWeight.Normal,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             )
@@ -77,7 +76,7 @@ fun AionTopAppBar(
         },
         actions = actions,
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = containerColor,
             titleContentColor = MaterialTheme.colorScheme.onSurface,
             navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
             actionIconContentColor = MaterialTheme.colorScheme.onSurface
@@ -95,15 +94,5 @@ fun AionTopAppBarPreview() {
                 Icon(Icons.Default.MoreVert, contentDescription = "Menu")
             }
         }
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AionTopAppBarDetailsPreview() {
-    AionTopAppBar(
-        title = "App Details",
-        leadingIcon = Icons.AutoMirrored.Filled.ArrowBack,
-        onLeadingClick = {}
     )
 }

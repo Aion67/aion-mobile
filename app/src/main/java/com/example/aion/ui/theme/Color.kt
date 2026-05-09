@@ -19,8 +19,16 @@ val SchemesSurfaceVariant = Color(0xFFE7E0EB)
 val SchemesOnSurfaceVariant = Color(0xFF3B383F)
 val SchemesOutline = Color(0xFF5F6066)
 
-val DarkSurface = Color(0xFF0F172A)
+val DarkSurface = Color(0xFF000000)
 val DarkOnSurface = Color(0xFFF1F5F9)
-val DarkSurfaceVariant = Color(0xFF1E293B)
+val DarkSurfaceVariant = Color(0xFF121212)
 val DarkOnSurfaceVariant = Color(0xFFB6C1CC)
 val DarkOutline = Color(0xFF3B4A5A)
+val DarkBackground = Color(0xFF000000)
+
+// Glass Tints
+val GlassWhite = Color(0x33FFFFFF)
+val GlassBlack = Color(0x33000000)
+val GlassAccentPurple = Color(0x4D6750A4)
+val GlassAccentBlue = Color(0x4D007BFF)
+val GlassAccentGreen = Color(0x4D10B981)

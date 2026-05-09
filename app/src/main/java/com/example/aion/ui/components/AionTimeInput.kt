@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -26,8 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.example.aion.ui.theme.Variables
 
 /**
- * A Material 3 Keyboard Time Input component.
- * Allows users to enter hours and minutes manually.
+ * Revamped Keyboard Time Input with glass components.
  */
 @Composable
 fun AionTimeInput(
@@ -39,21 +38,23 @@ fun AionTimeInput(
     var minute by remember { mutableStateOf("00") }
     var isAm by remember { mutableStateOf(true) }
 
-    Surface(
-        modifier = modifier.width(328.dp),
-        shape = RoundedCornerShape(28.dp),
-        color = Variables.SchemesSurfaceContainerHigh
+    GlassCard(
+        modifier = modifier.width(340.dp),
+        shape = RoundedCornerShape(32.dp),
+        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.4f),
+        borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+        blurRadius = 24.dp,
+        contentPadding = PaddingValues(24.dp)
     ) {
         Column(
-            modifier = Modifier.padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             Text(
                 text = "Enter time",
                 style = TextStyle(
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Variables.SchemesOnSurfaceVariant,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
                     letterSpacing = 0.5.sp
                 )
             )
@@ -78,9 +79,10 @@ fun AionTimeInput(
                     
                     Text(
                         text = ":",
-                        fontSize = 57.sp,
-                        color = Variables.SchemesOnSurface,
-                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)
+                        fontSize = 48.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.padding(start = 4.dp, end = 4.dp, bottom = 24.dp)
                     )
 
                     TimeInputField(
@@ -96,10 +98,11 @@ fun AionTimeInput(
                 // AM/PM Selector
                 Column(
                     modifier = Modifier
-                        .width(52.dp)
-                        .height(72.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .border(1.dp, Variables.SchemesOutline, RoundedCornerShape(8.dp))
+                        .width(56.dp)
+                        .height(84.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                        .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f), RoundedCornerShape(12.dp))
                 ) {
                     PeriodButton(
                         text = "AM",
@@ -107,7 +110,6 @@ fun AionTimeInput(
                         onClick = { isAm = true },
                         modifier = Modifier.weight(1f)
                     )
-                    HorizontalDivider(color = Variables.SchemesOutline, thickness = 1.dp)
                     PeriodButton(
                         text = "PM",
                         isSelected = !isAm,
@@ -120,26 +122,20 @@ fun AionTimeInput(
             // Bottom Actions
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { /* Switch to picker mode */ }) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Switch to picker",
-                        tint = Variables.SchemesOnSurface
-                    )
-                }
-
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     TextButton(onClick = onCancel) {
-                        Text("Cancel", color = MaterialTheme.colorScheme.primary)
+                        Text("Cancel", fontWeight = FontWeight.Bold)
                     }
-                    TextButton(onClick = { 
-                        onConfirm(hour.toIntOrNull() ?: 0, minute.toIntOrNull() ?: 0, isAm) 
-                    }) {
-                        Text("OK", color = MaterialTheme.colorScheme.primary)
-                    }
+                    AionFilledButton(
+                        text = "OK",
+                        onClick = { 
+                            onConfirm(hour.toIntOrNull() ?: 0, minute.toIntOrNull() ?: 0, isAm) 
+                        },
+                        modifier = Modifier.width(80.dp)
+                    )
                 }
             }
         }
@@ -154,42 +150,43 @@ private fun TimeInputField(
     isFocused: Boolean
 ) {
     Column(
-        modifier = Modifier.width(96.dp),
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(7.dp)
+        modifier = Modifier.width(88.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Box(
+        GlassCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(72.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(
-                    if (isFocused) Variables.SchemesPrimaryContainer 
-                    else Variables.SchemesSurfaceContainerHighest
-                )
-                .then(
-                    if (isFocused) Modifier.border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp))
-                    else Modifier
-                ),
-            contentAlignment = Alignment.Center
+                .height(84.dp),
+            shape = RoundedCornerShape(16.dp),
+            containerColor = if (isFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) 
+                             else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
+            borderColor = if (isFocused) MaterialTheme.colorScheme.primary 
+                           else MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+            blurRadius = 12.dp,
+            contentPadding = PaddingValues(0.dp)
         ) {
-            BasicTextField(
-                value = value,
-                onValueChange = onValueChange,
-                textStyle = TextStyle(
-                    fontSize = 45.sp,
-                    textAlign = TextAlign.Center,
-                    color = if (isFocused) Variables.SchemesOnPrimaryContainer else Variables.SchemesOnSurface
-                ),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                BasicTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    textStyle = TextStyle(
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurface
+                    ),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
         Text(
             text = label,
-            fontSize = 12.sp,
-            color = Variables.SchemesOnSurfaceVariant,
-            modifier = Modifier.padding(start = 2.dp)
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.Bold
         )
     }
 }
@@ -206,7 +203,7 @@ private fun PeriodButton(
         modifier = modifier
             .fillMaxSize()
             .background(
-                if (isSelected) Variables.SchemesTertiaryContainer 
+                if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.8f) 
                 else Color.Transparent
             )
             .clickable(
@@ -219,8 +216,8 @@ private fun PeriodButton(
         Text(
             text = text,
             fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = if (isSelected) Variables.SchemesOnTertiaryContainer else Variables.SchemesOnSurfaceVariant
+            fontWeight = FontWeight.ExtraBold,
+            color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
