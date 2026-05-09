@@ -8,7 +8,6 @@ out/
 # Gradle
 .gradle/
 build/
-gradle.properties
 !gradle-wrapper.properties
 
 # Local configuration

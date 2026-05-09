@@ -107,7 +107,6 @@ fun PlanScreen(
                     }
                 }
             }
-            
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(bottom = 16.dp),
