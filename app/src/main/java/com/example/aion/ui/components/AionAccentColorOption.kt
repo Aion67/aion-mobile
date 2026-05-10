@@ -6,7 +6,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,8 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.example.aion.ui.theme.Variables
 
 /**
- * A selectable accent color option represented as a circular swatch.
- * Used in the Theme customization screen for color selection.
+ * Revamped Glassy Accent Color Option.
  */
 @Composable
 fun AionAccentColorOption(
@@ -42,34 +44,24 @@ fun AionAccentColorOption(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .size(60.dp)
-                .background(
-                    color = color,
-                    shape = CircleShape
-                )
-                .border(
-                    width = if (isSelected) 3.dp else 2.dp,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                    shape = CircleShape
-                )
+        GlassCard(
+            modifier = Modifier.size(64.dp),
+            shape = CircleShape,
+            containerColor = color.copy(alpha = if (isSelected) 0.8f else 0.4f),
+            borderColor = if (isSelected) color else Color.White.copy(alpha = 0.2f),
+            borderWidth = if (isSelected) 2.dp else 1.dp,
+            blurRadius = 8.dp,
+            contentPadding = PaddingValues(0.dp),
+            enableLens = true,
+            glowColor = if (isSelected) color else null
         ) {
-            if (isSelected) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .size(22.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.18f),
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                if (isSelected) {
                     Icon(
                         imageVector = Icons.Filled.Check,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.surface,
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }
@@ -78,56 +70,9 @@ fun AionAccentColorOption(
         Text(
             text = label,
             style = MaterialTheme.typography.bodySmall.copy(
-                fontSize = Variables.StaticBodySmallSize,
-                lineHeight = Variables.StaticBodySmallLineHeight,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Normal
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Bold
             )
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AionAccentColorOptionPreview() {
-    Column(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            AionAccentColorOption(
-                color = Color(0xFF6750A4),
-                label = "Purple",
-                isSelected = true,
-                onClick = {}
-            )
-
-            AionAccentColorOption(
-                color = Color(0xFFEC4899),
-                label = "Pink",
-                isSelected = false,
-                onClick = {}
-            )
-
-            AionAccentColorOption(
-                color = Color(0xFF10B981),
-                label = "Green",
-                isSelected = false,
-                onClick = {}
-            )
-
-            AionAccentColorOption(
-                color = Color(0xFFFF6B6B),
-                label = "Red",
-                isSelected = false,
-                onClick = {}
-            )
-        }
     }
 }

@@ -1,9 +1,6 @@
 package com.example.aion.ui.components
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -26,9 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.example.aion.ui.theme.Variables
 
 /**
- * Tab bar for the App Details screen.
- * Matches Figma node 7:1104.
- * Revamped with glass look and animated indicators.
+ * Revamped AionTabs with glassy icon backgrounds and no bottom bar.
  */
 @Composable
 fun AionTabs(
@@ -45,15 +40,16 @@ fun AionTabs(
     GlassCard(
         modifier = modifier
             .fillMaxWidth()
-            .height(72.dp),
-        shape = RoundedCornerShape(12.dp),
-        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.4f),
+            .height(64.dp),
+        shape = RoundedCornerShape(16.dp),
+        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.25f),
         borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
-        blurRadius = 12.dp
+        blurRadius = 12.dp,
+        contentPadding = PaddingValues(4.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             tabs.forEachIndexed { index, tab ->
@@ -67,39 +63,34 @@ fun AionTabs(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
-                        .clip(RoundedCornerShape(8.dp))
+                        .clip(RoundedCornerShape(12.dp))
+                        .then(
+                            if (isSelected) {
+                                Modifier.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
+                            } else Modifier
+                        )
                         .clickable { onTabSelected(index) },
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(horizontal = 8.dp)
                     ) {
                         Icon(
                             imageVector = tab.icon,
                             contentDescription = tab.title,
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(20.dp),
                             tint = contentColor
                         )
+                        Spacer(Modifier.width(8.dp))
                         Text(
                             text = tab.title,
                             style = androidx.compose.ui.text.TextStyle(
-                                fontSize = Variables.StaticTitleSmallSize,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                fontSize = Variables.StaticLabelMediumSize,
+                                fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Bold,
                                 color = contentColor
                             )
-                        )
-                    }
-
-                    // Animated Indicator at the bottom of each tab
-                    if (isSelected) {
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .padding(bottom = 4.dp)
-                                .width(24.dp)
-                                .height(3.dp)
-                                .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(2.dp))
                         )
                     }
                 }

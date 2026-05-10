@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,28 +27,31 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.aion.R
 import com.example.aion.ui.theme.Variables
 
 /**
- * Header for Home screen showing avatar, greeting and a small summary row.
+ * Revamped Header with synced profile picture support.
  */
 @Composable
 fun AionHomeHeader(
     userName: String,
     improvementPercentage: Float,
     avatarRes: Int? = null,
+    avatarUri: String? = null,
     onAvatarClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     GlassCard(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(vertical = 8.dp),
         shape = RoundedCornerShape(24.dp),
         containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.3f),
         borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
-        blurRadius = 24.dp
+        blurRadius = 24.dp,
+        contentPadding = PaddingValues(16.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -99,7 +103,16 @@ fun AionHomeHeader(
                     .size(56.dp)
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape)
             ) {
-                if (avatarRes != null) {
+                if (avatarUri != null && avatarUri.isNotEmpty()) {
+                    AsyncImage(
+                        model = avatarUri,
+                        contentDescription = "Avatar",
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                } else if (avatarRes != null) {
                     Image(
                         painter = painterResource(id = avatarRes),
                         contentDescription = "Avatar",
@@ -119,10 +132,4 @@ fun AionHomeHeader(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AionHomeHeaderPreview() {
-    AionHomeHeader(userName = "Alex", improvementPercentage = 0.05f)
 }

@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.aion.ui.viewmodels.HomeViewModel
+import com.example.aion.ui.viewmodels.ProfileViewModel
 import com.example.aion.util.TimeUtils
 import java.util.Locale
 import com.example.aion.ui.components.*
@@ -22,17 +23,24 @@ import com.example.aion.ui.theme.Variables
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    profileViewModel: ProfileViewModel = hiltViewModel(),
     onAppClick: (String) -> Unit = {},
     onProfileClick: () -> Unit = {},
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by homeViewModel.uiState.collectAsState()
+    val profileState by profileViewModel.uiState.collectAsState()
     var appToConfirmDelete by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            AionTopAppBar(title = "", containerColor = Color.Transparent)
+            AionTopAppBar(
+                title = "", 
+                containerColor = Color.Transparent,
+                avatarRes = null, // Using manual profile icon or pass URI if supported
+                onAvatarClick = onProfileClick
+            )
         },
         containerColor = Color.Transparent
     ) { inner ->
@@ -48,9 +56,10 @@ fun HomeScreen(
         ) {
             item {
                 AionHomeHeader(
-                    userName = uiState.displayName,
+                    userName = profileState.profile.displayName,
                     improvementPercentage = uiState.improvementPercentage,
-                    onAvatarClick = onProfileClick
+                    onAvatarClick = onProfileClick,
+                    avatarUri = profileState.profile.avatarUri
                 )
             }
 
@@ -127,7 +136,7 @@ fun HomeScreen(
             onDismissRequest = { appToConfirmDelete = null },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.removeApp(appToConfirmDelete!!)
+                    homeViewModel.removeApp(appToConfirmDelete!!)
                     appToConfirmDelete = null
                 }) {
                     Text("Remove", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)

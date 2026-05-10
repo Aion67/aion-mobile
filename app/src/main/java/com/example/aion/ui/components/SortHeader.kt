@@ -46,10 +46,11 @@ fun SortHeader(
                 .clip(CircleShape)
                 .clickable(onClick = onSortClick),
             shape = CircleShape,
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.3f),
-            borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.35f),
+            borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f),
             blurRadius = 8.dp,
-            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+            enableLens = true
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -58,7 +59,7 @@ fun SortHeader(
                 Text(
                     text = "Sort by",
                     style = MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.ExtraBold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 )
@@ -71,10 +72,4 @@ fun SortHeader(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SortHeaderPreview() {
-    SortHeader()
 }

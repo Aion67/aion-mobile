@@ -22,11 +22,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.aion.R
 import com.example.aion.ui.theme.Variables
 
 /**
- * Revamped Top App Bar with transparent/glass support.
+ * Revamped Top App Bar with synced profile picture support.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +37,7 @@ fun AionTopAppBar(
     leadingIcon: ImageVector? = null,
     onLeadingClick: () -> Unit = {},
     avatarRes: Int? = null,
+    avatarUri: String? = null,
     onAvatarClick: () -> Unit = {},
     containerColor: Color = Color.Transparent,
     actions: @Composable RowScope.() -> Unit = {}
@@ -53,7 +55,18 @@ fun AionTopAppBar(
             )
         },
         navigationIcon = {
-            if (avatarRes != null) {
+            if (avatarUri != null && avatarUri.isNotEmpty()) {
+                IconButton(onClick = onAvatarClick) {
+                    AsyncImage(
+                        model = avatarUri,
+                        contentDescription = "User Avatar",
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            } else if (avatarRes != null) {
                 IconButton(onClick = onAvatarClick) {
                     Image(
                         painter = painterResource(id = avatarRes),
@@ -81,18 +94,5 @@ fun AionTopAppBar(
             navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
             actionIconContentColor = MaterialTheme.colorScheme.onSurface
         )
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AionTopAppBarPreview() {
-    AionTopAppBar(
-        title = "Plan",
-        actions = {
-            IconButton(onClick = {}) {
-                Icon(Icons.Default.MoreVert, contentDescription = "Menu")
-            }
-        }
     )
 }

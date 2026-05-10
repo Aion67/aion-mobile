@@ -15,9 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.aion.ui.components.AionTopAppBar
-import com.example.aion.ui.components.PlanAppCard
-import com.example.aion.ui.components.SortHeader
+import androidx.compose.ui.zIndex
+import com.example.aion.ui.components.*
 import com.example.aion.ui.theme.Variables
 
 import androidx.compose.runtime.collectAsState
@@ -54,21 +53,17 @@ fun PlanScreen(
                                 tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
-                        DropdownMenu(
+                        
+                        AionGlassMenu(
                             expanded = showMenu,
-                            onDismissRequest = { showMenu = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("Add Apps") },
-                                onClick = {
+                            onDismissRequest = { showMenu = false },
+                            items = listOf(
+                                "Add Apps" to {
                                     showMenu = false
                                     onNavigateToAddApps()
-                                },
-                                leadingIcon = {
-                                    Icon(Icons.Default.Add, contentDescription = null)
                                 }
                             )
-                        }
+                        )
                     }
                 }
             )
@@ -81,24 +76,28 @@ fun PlanScreen(
         ) {
             Spacer(modifier = Modifier.height(innerPadding.calculateTopPadding()))
             
-            Box {
+            Box(modifier = Modifier.fillMaxWidth()) {
                 SortHeader(
                     title = "Apps",
-                    onSortClick = { showSortMenu = true }
+                    onSortClick = { showSortMenu = !showSortMenu }
                 )
-                DropdownMenu(
-                    expanded = showSortMenu,
-                    onDismissRequest = { showSortMenu = false }
+                
+                Box(
+                    modifier = Modifier
+                        .padding(top = 48.dp, end = 16.dp)
+                        .zIndex(10f)
+                        .align(androidx.compose.ui.Alignment.TopEnd)
                 ) {
-                    com.example.aion.ui.viewmodels.PlanSort.values().forEach { sort ->
-                        DropdownMenuItem(
-                            text = { Text(sort.name.lowercase().replaceFirstChar { it.uppercase() }) },
-                            onClick = {
+                    AionGlassMenu(
+                        expanded = showSortMenu,
+                        onDismissRequest = { showSortMenu = false },
+                        items = com.example.aion.ui.viewmodels.PlanSort.values().map { sort ->
+                            sort.name.lowercase().replaceFirstChar { it.uppercase() } to {
                                 viewModel.setSort(sort)
                                 showSortMenu = false
                             }
-                        )
-                    }
+                        }
+                    )
                 }
             }
 

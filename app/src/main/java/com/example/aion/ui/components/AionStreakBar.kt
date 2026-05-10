@@ -32,7 +32,7 @@ data class StreakDay(
 )
 
 /**
- * Revamped Streak Bar with glass bubbles and glowing "Today" effect.
+ * Refined Streak Bar with compact glass beads.
  */
 @Composable
 fun AionStreakBar(
@@ -42,11 +42,12 @@ fun AionStreakBar(
     GlassCard(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        shape = RoundedCornerShape(24.dp),
+            .padding(vertical = 4.dp),
+        shape = RoundedCornerShape(20.dp),
         containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.2f),
         borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
-        blurRadius = 12.dp
+        blurRadius = 12.dp,
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -54,7 +55,7 @@ fun AionStreakBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             days.forEachIndexed { index, day ->
-                StreakDayItem(day = day, delay = index * 100)
+                StreakDayItem(day = day, delay = index * 80)
             }
         }
     }
@@ -80,19 +81,20 @@ private fun StreakDayItem(
     Column(
         modifier = Modifier.scale(scale),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         GlassCard(
-            modifier = Modifier.size(48.dp),
+            modifier = Modifier.size(38.dp), // More compact
             shape = CircleShape,
-            containerColor = if (day.isCompleted) MaterialTheme.colorScheme.primary.copy(alpha = 0.7f) 
-                             else Color.White.copy(alpha = 0.1f),
-            borderColor = if (day.isToday) MaterialTheme.colorScheme.primary.copy(alpha = 0.6f) 
-                           else Color.White.copy(alpha = 0.2f),
-            borderWidth = if (day.isToday) 2.dp else 1.dp,
+            containerColor = if (day.isCompleted) MaterialTheme.colorScheme.primary.copy(alpha = 0.75f) 
+                             else Color.White.copy(alpha = 0.08f),
+            borderColor = if (day.isToday) MaterialTheme.colorScheme.primary.copy(alpha = 0.8f) 
+                           else Color.White.copy(alpha = 0.15f),
+            borderWidth = if (day.isToday) 2.dp else 0.5.dp,
             glowColor = if (day.isToday) MaterialTheme.colorScheme.primary else null,
             blurRadius = 8.dp,
-            contentPadding = PaddingValues(0.dp)
+            contentPadding = PaddingValues(0.dp),
+            enableLens = true
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -101,8 +103,8 @@ private fun StreakDayItem(
                 Text(
                     text = day.dateNumber,
                     style = androidx.compose.ui.text.TextStyle(
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.ExtraBold,
                         color = if (day.isCompleted) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     ),
                     textAlign = TextAlign.Center
@@ -113,8 +115,8 @@ private fun StreakDayItem(
         Text(
             text = day.dayName,
             style = androidx.compose.ui.text.TextStyle(
-                fontSize = 11.sp,
-                fontWeight = if (day.isToday) FontWeight.Bold else FontWeight.Normal,
+                fontSize = 10.sp,
+                fontWeight = if (day.isToday) FontWeight.ExtraBold else FontWeight.Bold,
                 color = if (day.isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
             ),
             textAlign = TextAlign.Center

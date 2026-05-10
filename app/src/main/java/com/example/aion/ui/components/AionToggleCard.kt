@@ -6,14 +6,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.aion.ui.theme.Variables
 
 /**
- * A reusable card with a toggle for settings.
+ * A reusable card with a custom glass switch for settings.
  */
 @Composable
 fun AionToggleCard(
@@ -25,10 +23,11 @@ fun AionToggleCard(
 ) {
     GlassCard(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
         containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.3f),
         borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
-        blurRadius = 16.dp
+        blurRadius = 16.dp,
+        contentPadding = PaddingValues(16.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -38,7 +37,7 @@ fun AionToggleCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = label,
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -50,15 +49,9 @@ fun AionToggleCard(
                     )
                 }
             }
-            Switch(
+            AionGlassSwitch(
                 checked = checked,
-                onCheckedChange = onCheckedChange,
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = MaterialTheme.colorScheme.surface,
-                    checkedTrackColor = MaterialTheme.colorScheme.primary,
-                    uncheckedThumbColor = MaterialTheme.colorScheme.outline,
-                    uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                )
+                onCheckedChange = onCheckedChange
             )
         }
     }

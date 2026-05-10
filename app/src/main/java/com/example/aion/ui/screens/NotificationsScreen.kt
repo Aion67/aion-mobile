@@ -34,6 +34,7 @@ import com.example.aion.data.entities.NotificationEntity
 fun NotificationsScreen(
     modifier: Modifier = Modifier,
     viewModel: NotificationsViewModel = hiltViewModel(),
+    avatarUri: String? = null,
     onAvatarClick: () -> Unit = {},
     onNotificationClick: (NotificationEntity) -> Unit = {}
 ) {
@@ -51,6 +52,7 @@ fun NotificationsScreen(
             AionTopAppBar(
                 title = "",
                 onAvatarClick = onAvatarClick,
+                avatarUri = avatarUri,
                 containerColor = Color.Transparent,
                 actions = {
                     Box {
@@ -117,10 +119,4 @@ fun NotificationsScreen(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun NotificationsScreenPreview() {
-    NotificationsScreen()
 }

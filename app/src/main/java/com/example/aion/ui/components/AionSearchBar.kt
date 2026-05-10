@@ -17,8 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.example.aion.ui.theme.Variables
 
 /**
- * A search bar component for Aion.
- * Matches Figma node 4:784.
+ * Revamped Search Bar with glassmorphism and fixed text visibility.
  */
 @Composable
 fun AionSearchBar(
@@ -33,9 +32,10 @@ fun AionSearchBar(
             .fillMaxWidth()
             .height(56.dp),
         shape = CircleShape,
-        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.4f),
-        borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
-        blurRadius = 12.dp
+        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.35f),
+        borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f),
+        blurRadius = 12.dp,
+        contentPadding = PaddingValues(0.dp)
     ) {
         Row(
             modifier = Modifier
@@ -48,12 +48,12 @@ fun AionSearchBar(
                 imageVector = Icons.Default.Search,
                 contentDescription = null,
                 modifier = Modifier
-                    .padding(start = 12.dp)
+                    .padding(start = 16.dp)
                     .size(24.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            // Search TextField (BasicTextField or TextField without decoration)
+            // Search TextField
             TextField(
                 value = query,
                 onValueChange = onQueryChange,
@@ -65,7 +65,7 @@ fun AionSearchBar(
                         text = placeholder,
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontSize = Variables.StaticBodyLargeSize,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                         )
                     )
                 },
@@ -75,12 +75,15 @@ fun AionSearchBar(
                     disabledContainerColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = MaterialTheme.colorScheme.primary
+                    cursorColor = MaterialTheme.colorScheme.primary,
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                 ),
                 singleLine = true,
                 textStyle = MaterialTheme.typography.bodyLarge.copy(
                     fontSize = Variables.StaticBodyLargeSize,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold
                 )
             )
 
@@ -106,12 +109,6 @@ fun AionSearchBarPreview() {
         AionSearchBar(
             query = "",
             onQueryChange = {}
-        )
-        Spacer(Modifier.height(16.dp))
-        AionSearchBar(
-            query = "Insta",
-            onQueryChange = {},
-            onClear = {}
         )
     }
 }

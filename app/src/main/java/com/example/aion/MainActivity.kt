@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,6 +38,7 @@ import com.example.aion.ui.navigation.GlassBottomBar
 import com.example.aion.ui.screens.*
 import com.example.aion.ui.theme.AionTheme
 import com.example.aion.ui.viewmodels.SettingsViewModel
+import com.example.aion.ui.viewmodels.ProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -70,9 +73,12 @@ class MainActivity : ComponentActivity() {
 fun AionApp() {
     val navController = rememberNavController()
     val settingsViewModel: SettingsViewModel = hiltViewModel()
+    val profileViewModel: ProfileViewModel = hiltViewModel()
+    
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
     val onboardingViewModel: com.example.aion.ui.viewmodels.OnboardingViewModel = hiltViewModel()
     val onboardingState by onboardingViewModel.uiState.collectAsState()
+    val profileState by profileViewModel.uiState.collectAsState()
 
     val startDestination = if (onboardingState.isCompleted) Screen.Home.route else Screen.Onboarding.route
 
@@ -86,7 +92,19 @@ fun AionApp() {
         Box(modifier = Modifier.fillMaxSize()) {
             NavHost(
                 navController = navController,
-                startDestination = startDestination
+                startDestination = startDestination,
+                enterTransition = {
+                    fadeIn(animationSpec = tween(500)) + scaleIn(initialScale = 0.92f, animationSpec = tween(500))
+                },
+                exitTransition = {
+                    fadeOut(animationSpec = tween(400)) + scaleOut(targetScale = 0.92f, animationSpec = tween(400))
+                },
+                popEnterTransition = {
+                    fadeIn(animationSpec = tween(500)) + scaleIn(initialScale = 1.08f, animationSpec = tween(500))
+                },
+                popExitTransition = {
+                    fadeOut(animationSpec = tween(400)) + scaleOut(targetScale = 1.08f, animationSpec = tween(400))
+                }
             ) {
                 composable(Screen.Onboarding.route) {
                     OnboardingScreen(
@@ -125,7 +143,8 @@ fun AionApp() {
                     NotificationsScreen(
                         onNotificationClick = { notification ->
                             navController.navigate(Screen.NotificationDetails.createRoute(notification.id))
-                        }
+                        },
+                        avatarUri = profileState.profile.avatarUri
                     )
                 }
                 composable(Screen.Settings.route) {
